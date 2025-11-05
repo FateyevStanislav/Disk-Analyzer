@@ -1,8 +1,5 @@
 ﻿namespace DiskAnalyzer.Infrastructure;
 
-/// <summary>
-/// Базовый класс для всех Entity типов.
-/// </summary>
 public class Entity<TId>
 {
     public Entity(TId id)

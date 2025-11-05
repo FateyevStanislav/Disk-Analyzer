@@ -2,9 +2,6 @@
 
 namespace DiskAnalyzer.Infrastructure;
 
-/// <summary>
-/// Базовый класс для всех Value типов.
-/// </summary>
 public class ValueType<T>
 {
     private static readonly PropertyInfo[] properties
