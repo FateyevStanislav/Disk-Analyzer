@@ -2,7 +2,7 @@
 
 public static class DirectoryInfoExtensions
 {
-    public static List<FileSystemInfo> GetFilesSortedby<TSelected>(
+    public static IReadOnlyList<FileSystemInfo> GetFilesSortedBy<TSelected>(
         this DirectoryInfo directory, 
         Func<FileSystemInfo, TSelected> selector, 
         bool reversed = false)
@@ -13,11 +13,11 @@ public static class DirectoryInfoExtensions
         return files;
     }
 
-    public static List<FileSystemInfo> GetFilesWhere(
+    public static IEnumerable<FileSystemInfo> GetFilesWhere(
         this DirectoryInfo directory,
-        Func<FileSystemInfo, bool> predicate)
+        Predicate<FileSystemInfo> predicate)
     {
-        return directory.EnumerateFileSystemInfos().Where(f => predicate(f)).ToList();
+        return directory.EnumerateFileSystemInfos().Where(f => predicate(f));
     }
 
     public static IEnumerable<IGrouping<TKey, FileSystemInfo>> GetFilesGroupedBy<TKey>(

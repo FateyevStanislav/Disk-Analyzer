@@ -7,7 +7,7 @@ public class Program
     public static void Main(string[] args)
     {
         //var direct = new DirectoryInfo("C:\\Users\\Станислав\\Downloads");
-        //var res1 = direct.GetFilesSortedby(f => f.Extension);
+        //var res1 = direct.GetFilesSortedBy(f => f.Extension);
         //foreach (var file in res1)
         //    Console.WriteLine(file.FullName);
         //Console.WriteLine();
