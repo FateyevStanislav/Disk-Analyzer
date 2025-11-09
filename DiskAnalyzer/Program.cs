@@ -1,5 +1,4 @@
-﻿using DiskAnalyzer.Domain;
-using DiskAnalyzer.Infrastructure;
+﻿using NUnitLite;
 
 namespace DiskAnalyzer;
 
@@ -7,6 +6,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-
+        new AutoRun().Execute(args);
     }
 }
