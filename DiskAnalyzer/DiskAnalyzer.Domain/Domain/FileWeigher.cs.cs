@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Domain;
+﻿namespace DiskAnalyzer.Library.Domain;
 
 public class FileWeigher
 {

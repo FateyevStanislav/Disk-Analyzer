@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Infrastructure;
+﻿namespace DiskAnalyzer.Library.Infrastructure;
 
 public class Entity<TId>
 {

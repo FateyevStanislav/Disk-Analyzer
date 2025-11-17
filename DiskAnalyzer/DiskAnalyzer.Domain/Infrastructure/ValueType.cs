@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace DiskAnalyzer.Infrastructure;
+namespace DiskAnalyzer.Library.Infrastructure;
 
 public class ValueType<T>
 {

@@ -1,0 +1,6 @@
+@DiskAnalyzer.Api_HostAddress = http://localhost:5122
+
+GET {{DiskAnalyzer.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
