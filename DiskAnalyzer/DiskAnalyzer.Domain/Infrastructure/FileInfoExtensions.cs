@@ -1,12 +1,12 @@
 ﻿using System.Security.Cryptography;
 
-namespace DiskAnalyzer.Infrastructure;
+namespace DiskAnalyzer.Library.Infrastructure;
 
 public static class FileInfoExtensions
 {
     public static bool IsEqualTo(this FileInfo file1, FileInfo file2)
     {
-        if (file1.Length != file2.Length) 
+        if (file1.Length != file2.Length)
             return false;
         var hashFile1 = file1.GetFileContentHash();
         var hashFile2 = file2.GetFileContentHash();
@@ -25,4 +25,3 @@ public static class FileInfoExtensions
         return sha256.ComputeHash(stream);
     }
 }
-

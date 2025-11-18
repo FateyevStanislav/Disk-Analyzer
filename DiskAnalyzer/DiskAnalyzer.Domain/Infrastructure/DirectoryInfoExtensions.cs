@@ -1,10 +1,10 @@
-﻿namespace DiskAnalyzer.Infrastructure;
+﻿namespace DiskAnalyzer.Library.Infrastructure;
 
 public static class DirectoryInfoExtensions
 {
     public static IReadOnlyList<FileSystemInfo> GetFilesSortedBy<TSelected>(
-        this DirectoryInfo directory, 
-        Func<FileSystemInfo, TSelected> selector, 
+        this DirectoryInfo directory,
+        Func<FileSystemInfo, TSelected> selector,
         bool reversed = false)
         where TSelected : IComparable
     {

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskAnalyzer", "DiskAnalyzer.csproj", "{BE55A92E-59AE-E7EF-DBC3-609ABCF2F205}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskAnalyzer.Library", "DiskAnalyzer.Domain\DiskAnalyzer.Library.csproj", "{42952A73-99B3-4E04-B211-27E8DF33E270}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskAnalyzer.Api", "DiskAnalyzer.Api\DiskAnalyzer.Api.csproj", "{DFC47AD9-0FB0-4D10-BCF9-9ADB523FEEDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +13,19 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BE55A92E-59AE-E7EF-DBC3-609ABCF2F205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE55A92E-59AE-E7EF-DBC3-609ABCF2F205}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE55A92E-59AE-E7EF-DBC3-609ABCF2F205}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE55A92E-59AE-E7EF-DBC3-609ABCF2F205}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42952A73-99B3-4E04-B211-27E8DF33E270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42952A73-99B3-4E04-B211-27E8DF33E270}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42952A73-99B3-4E04-B211-27E8DF33E270}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42952A73-99B3-4E04-B211-27E8DF33E270}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFC47AD9-0FB0-4D10-BCF9-9ADB523FEEDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFC47AD9-0FB0-4D10-BCF9-9ADB523FEEDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFC47AD9-0FB0-4D10-BCF9-9ADB523FEEDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFC47AD9-0FB0-4D10-BCF9-9ADB523FEEDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {17864B13-13CC-4626-8763-6E8081114389}
+		SolutionGuid = {49BD2CAD-BE41-4A54-A802-14929C639515}
 	EndGlobalSection
 EndGlobal
