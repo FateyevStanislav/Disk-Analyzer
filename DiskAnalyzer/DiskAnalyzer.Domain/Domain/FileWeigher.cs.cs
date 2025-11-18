@@ -4,7 +4,7 @@ namespace DiskAnalyzer.Library.Domain;
 
 public class FileWeigher
 {
-    public static int CountFiles(string rootPath, int maxDepth, IFileFilter filter = null)
+    public static WeightingRecord CountFiles(string rootPath, int maxDepth, IFileFilter filter = null)
     {
         int count = 0;
         var walker = new DirectoryWalker();
@@ -13,10 +13,19 @@ public class FileWeigher
             onFile: file => count++,
             filter: filter
         );
-        return count;
+        var logs = walker.Logger.Logs
+            .Select(log => log.ToString())
+            .ToList()
+            .AsReadOnly();
+        var metric = new FileCountMetric(count);
+        return new WeightingRecord(
+            new Guid(),
+            rootPath,
+            logs,
+            new[] { metric });
     }
 
-    public static long CalcTotalSize(string rootPath, int maxDepth, IFileFilter filter = null)
+    public static WeightingRecord CalcTotalSize(string rootPath, int maxDepth, IFileFilter filter = null)
     {
         long totalSize = 0;
         var walker = new DirectoryWalker();
@@ -25,6 +34,15 @@ public class FileWeigher
             onFile: file => totalSize += file.Length,
             filter: filter
         );
-        return totalSize;
+        var logs = walker.Logger.Logs
+            .Select(log => log.ToString())
+            .ToList()
+            .AsReadOnly();
+        var metric = new FileSizeMetric(totalSize);
+        return new WeightingRecord(
+            new Guid(),
+            rootPath,
+            logs,
+            new[] { metric });
     }
 }

@@ -1,5 +1,5 @@
 ﻿using DiskAnalyzer.Library.Domain.Filters;
-using Microsoft.Extensions.Logging; 
+using DiskAnalyzer.Library.Infrastructure.Logger;
 
 namespace DiskAnalyzer.Library.Domain;
 
@@ -8,11 +8,11 @@ public class DirectoryWalker
     public delegate void FileAction(FileInfo file);
     public delegate void DirectoryAction(DirectoryInfo dir);
 
-    private readonly ILogger logger;
+    public Logger Logger { get; }
 
-    public DirectoryWalker(ILogger logger = null)
+    public DirectoryWalker(Logger logger = null)
     {
-        this.logger = logger;
+        this.Logger = logger;
     }
 
     public void Walk(string rootPath, int maxDepth,
@@ -40,20 +40,31 @@ public class DirectoryWalker
                 {
                     var file = new FileInfo(filePath);
                     if (filter == null || filter.ShouldInclude(file))
+                    {
                         onFile?.Invoke(file);
+                        Logger?.Add(
+                            LogType.Success,
+                            $"Файл {path} обработан");
+                    }
                 }
             }
             catch (UnauthorizedAccessException ex)
             {
-                logger?.LogWarning(ex, $"Нет доступа к файлам в каталоге {path}");
+                Logger?.Add(
+                    LogType.Warning, 
+                    $"Нет доступа к файлам в каталоге {path}: {ex?.ToString()}");
             }
             catch (IOException ex)
             {
-                logger?.LogError(ex, $"Ошибка ввода/вывода при чтении файлов каталога {path}");
+                Logger?.Add(
+                    LogType.Error, 
+                    $"Ошибка ввода/вывода при чтении файлов каталога {path}: {ex?.ToString()}");
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex, $"Неожиданная ошибка при обработке файлов в каталоге {path}");
+                Logger?.Add(
+                    LogType.Error, 
+                    $"Неожиданная ошибка при обработке файлов в каталоге {path}: {ex?.ToString()}");
             }
 
             if (depth >= maxDepth) continue;
@@ -67,15 +78,21 @@ public class DirectoryWalker
             }
             catch (UnauthorizedAccessException ex)
             {
-                logger?.LogWarning(ex, $"Нет доступа к вложенному каталогу {path}");
+                Logger?.Add(
+                    LogType.Warning,
+                    $"Нет доступа к вложенному каталогу {path}: {ex?.ToString()}");
             }
             catch (IOException ex)
             {
-                logger?.LogError(ex, $"Ошибка ввода/вывода при обходе вложенных каталогов {path}");
+                Logger?.Add(
+                    LogType.Error,
+                    $"Ошибка ввода/вывода при обходе вложенных каталогов {path}: {ex?.ToString()}");
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex, $"Неожиданная ошибка при обработке подкаталога {path}");
+                Logger?.Add(
+                    LogType.Error,
+                    $"Неожиданная ошибка при обработке подкаталога {path}: {ex?.ToString()}");
             }
         }
     }
