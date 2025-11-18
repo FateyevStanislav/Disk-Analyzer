@@ -1,19 +1,23 @@
 ﻿using DiskAnalyzer.Library.Infrastructure;
+using Microsoft.ApplicationInsights;
 
-namespace DiskAnalyzer.Library.Domain;
-
-public class WeightingRecord : Entity<Guid>
+namespace DiskAnalyzer.Library.Domain
 {
-    public string Path { get; init; }
-    public int MaxDepth { get; init; }
-    public int FileCount { get; init; }
-    public string? Error { get; init; }
-
-    public WeightingRecord(Guid id, string path, int maxDepth, int fileCount, string? error) : base(id)
+    public class WeightingRecord : Entity<Guid>
     {
-        Path = path;
-        MaxDepth = maxDepth;
-        FileCount = fileCount;
-        Error = error;
+        public string Path { get; init; }
+        public DateTime CreatedAt { get; init; }
+        public IReadOnlyCollection<string> Errors { get; init; }
+        public IReadOnlyCollection<Metric> Metrics { get; init; }
+
+        public WeightingRecord(Guid id, string path,
+            IReadOnlyCollection<string>? errors,
+            IReadOnlyCollection<Metric> metrics) : base(id)
+        {
+            Path = path;
+            Errors = errors ?? Array.Empty<string>();
+            Metrics = metrics ?? Array.Empty<Metric>();
+            CreatedAt = DateTime.Now;
+        }
     }
 }
