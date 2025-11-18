@@ -1,5 +1,4 @@
 ﻿using DiskAnalyzer.Library.Infrastructure;
-using Microsoft.ApplicationInsights;
 
 namespace DiskAnalyzer.Library.Domain
 {
