@@ -1,42 +1,48 @@
-﻿namespace DiskAnalyzer.Library.Domain;
+﻿using DiskAnalyzer.Library.Domain.Filters;
+
+namespace DiskAnalyzer.Library.Domain;
 
 public class FileWeigher
 {
-    public static int CountFiles(string rootPath, int maxDepth, Predicate<FileInfo> predicate = null)
+    public static WeightingRecord CountFiles(string rootPath, int maxDepth, IFileFilter filter = null)
     {
-        if (maxDepth < 0)
-            throw new ArgumentOutOfRangeException(nameof(maxDepth), "Глубина не может быть меньше нуля");
-        if (!Directory.Exists(rootPath))
-            throw new DirectoryNotFoundException(rootPath);
-
         int count = 0;
-        var q = new Queue<(string path, int depth)>();
-        q.Enqueue((rootPath, 0));
-        while (q.Count > 0)
-        {
-            var (path, depth) = q.Dequeue();
-            try
-            {
-                foreach (var filePath in Directory.EnumerateFiles(path, "*", SearchOption.TopDirectoryOnly))
-                {
-                    if (predicate == null || predicate(new FileInfo(filePath)))
-                        count++;
-                }
-            }
-            catch (UnauthorizedAccessException) { continue; }
-            catch (IOException) { continue; }
+        var walker = new DirectoryWalker();
+        walker.Walk(
+            rootPath, maxDepth,
+            onFile: file => count++,
+            filter: filter
+        );
+        var logs = walker.Logger.Logs
+            .Select(log => log.ToString())
+            .ToList()
+            .AsReadOnly();
+        var metric = new FileCountMetric(count);
+        return new WeightingRecord(
+            new Guid(),
+            rootPath,
+            logs,
+            new[] { metric });
+    }
 
-            if (depth >= maxDepth) continue;
-
-            try
-            {
-                foreach (var dir in Directory.EnumerateDirectories(path))
-                    q.Enqueue((dir, depth + 1));
-            }
-            catch (UnauthorizedAccessException) { /* skip */ }
-            catch (IOException) { /* skip */ }
-        }
-
-        return count;
+    public static WeightingRecord CalcTotalSize(string rootPath, int maxDepth, IFileFilter filter = null)
+    {
+        long totalSize = 0;
+        var walker = new DirectoryWalker();
+        walker.Walk(
+            rootPath, maxDepth,
+            onFile: file => totalSize += file.Length,
+            filter: filter
+        );
+        var logs = walker.Logger.Logs
+            .Select(log => log.ToString())
+            .ToList()
+            .AsReadOnly();
+        var metric = new FileSizeMetric(totalSize);
+        return new WeightingRecord(
+            new Guid(),
+            rootPath,
+            logs,
+            new[] { metric });
     }
 }
