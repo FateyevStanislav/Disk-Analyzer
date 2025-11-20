@@ -12,7 +12,7 @@ public class DirectoryWalker
 
     public DirectoryWalker(Logger logger = null)
     {
-        this.Logger = logger;
+        this.Logger = logger ?? new Logger();
     }
 
     public void Walk(string rootPath, int maxDepth,
