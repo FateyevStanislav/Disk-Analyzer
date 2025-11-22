@@ -6,17 +6,17 @@ namespace DiskAnalyzer.Library.Domain
     {
         public string Path { get; init; }
         public DateTime CreatedAt { get; init; }
-        public IReadOnlyCollection<string> Errors { get; init; }
-        public IReadOnlyCollection<Metric> Metrics { get; init; }
+        public IReadOnlyCollection<string> Logs { get; init; }
+        public IReadOnlyCollection<IMetric> Metrics { get; init; }
 
         public WeightingRecord(Guid id, string path,
-            IReadOnlyCollection<string>? errors,
-            IReadOnlyCollection<Metric> metrics) : base(id)
+            IReadOnlyCollection<string>? logs,
+            IReadOnlyCollection<IMetric> metrics) : base(id)
         {
             Path = path;
-            Errors = errors ?? Array.Empty<string>();
-            Metrics = metrics ?? Array.Empty<Metric>();
-            CreatedAt = DateTime.Now;
+            Logs = logs ?? Array.Empty<string>();
+            Metrics = metrics ?? Array.Empty<IMetric>();
+            CreatedAt = DateTime.UtcNow;
         }
     }
 }
