@@ -20,7 +20,7 @@ public class FileWeigher
             .AsReadOnly();
         var metric = new FileCountMetricType(count);
         return new WeightingRecord(
-            new Guid(),
+            Guid.NewGuid(),
             rootPath,
             logs,
             new[] { metric });
@@ -41,7 +41,7 @@ public class FileWeigher
             .AsReadOnly();
         var metric = new FileSizeMetricType(totalSize);
         return new WeightingRecord(
-            new Guid(),
+            Guid.NewGuid(),
             rootPath,
             logs,
             new[] { metric });
