@@ -5,10 +5,10 @@ namespace DiskAnalyzer.Library.Infrastructure.Repositories;
 
 public class ConcDictRepository : IMeasurmentRecordRepository<Guid>
 {
-    private readonly ConcurrentDictionary<Guid, MeasurmentRecord> Repository = new();
+    private readonly ConcurrentDictionary<Guid, DirectoryMeasurmentRecord> Repository = new();
     public int Count => Repository.Count;
 
-    public void Add(MeasurmentRecord record)
+    public void Add(DirectoryMeasurmentRecord record)
     {
         if (!Repository.TryAdd(record.Id, record))
         {
@@ -17,9 +17,9 @@ public class ConcDictRepository : IMeasurmentRecordRepository<Guid>
         Console.WriteLine($"Successfully added new {record.ToString()}");
     }
 
-    public MeasurmentRecord Get(Guid id)
+    public DirectoryMeasurmentRecord Get(Guid id)
     {
-        if (!Repository.TryGetValue(id, out MeasurmentRecord record))
+        if (!Repository.TryGetValue(id, out DirectoryMeasurmentRecord record))
         {
             throw new ArgumentException("Exception in GetRecord Method");
         }
@@ -29,7 +29,7 @@ public class ConcDictRepository : IMeasurmentRecordRepository<Guid>
 
     public bool Remove(Guid id)
     {
-        if (!Repository.TryRemove(id, out MeasurmentRecord record))
+        if (!Repository.TryRemove(id, out DirectoryMeasurmentRecord record))
         {
             return false;
             throw new ArgumentException("Exception in RemoveRecord Method");
@@ -43,14 +43,14 @@ public class ConcDictRepository : IMeasurmentRecordRepository<Guid>
         Repository.Clear();
     }
 
-    public IEnumerable<MeasurmentRecord> GetAllDescOrder()
+    public IEnumerable<DirectoryMeasurmentRecord> GetAllDescOrder()
     {
         return Repository
             .Values
             .OrderByDescending(wr => wr.CreatedAt);
     }
 
-    public IEnumerable<MeasurmentRecord> GetAllAscOrder()
+    public IEnumerable<DirectoryMeasurmentRecord> GetAllAscOrder()
     {
         return Repository
             .Values

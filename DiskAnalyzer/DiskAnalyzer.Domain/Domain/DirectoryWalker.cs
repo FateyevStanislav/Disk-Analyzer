@@ -34,7 +34,8 @@ public class DirectoryWalker
 
             try
             {
-                foreach (var filePath in Directory.EnumerateFiles(path, "*", SearchOption.TopDirectoryOnly))
+                foreach (var filePath in Directory
+                    .EnumerateFiles(path, "*", SearchOption.TopDirectoryOnly))
                 {
                     var file = new FileInfo(filePath);
                     if (filter == null || filter.ShouldInclude(file))

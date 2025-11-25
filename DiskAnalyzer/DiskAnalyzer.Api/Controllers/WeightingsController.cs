@@ -34,15 +34,15 @@ namespace DiskAnalyzer.Api.Controllers
             var repo = new ConcDictRepository();
             var filter = dto.FilterExtension != null ? new ExtensionFilter(dto.FilterExtension.Extension) : null;
 
-            MeasurmentRecord result;
+            DirectoryMeasurmentRecord result;
             switch (dto.Type)
             {
                 case WeightingType.Count:
-                    result = new FileCountMeasurment().Measure(dto.Path, dto.MaxDepth, filter);
+                    result = new FilesCountMeasurment().Measure(dto.Path, dto.MaxDepth, filter);
                     break;
 
                 case WeightingType.Size:
-                    result = new FileSizeMeasurment().Measure(dto.Path, dto.MaxDepth, filter);
+                    result = new FilesSizeMeasurment().Measure(dto.Path, dto.MaxDepth, filter);
                     break;
 
                 default:

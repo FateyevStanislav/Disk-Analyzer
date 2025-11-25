@@ -1,6 +1,6 @@
 ﻿using DiskAnalyzer.Library.Domain.Metrics.Formatters;
 
-namespace DiskAnalyzer.Library.Domain.Metrics;
+namespace DiskAnalyzer.Library.Domain.Metrics.Groups;
 
 public class GroupCountMetric : BaseMetric
 {

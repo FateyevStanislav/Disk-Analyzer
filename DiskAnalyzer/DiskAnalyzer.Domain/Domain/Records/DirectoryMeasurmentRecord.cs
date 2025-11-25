@@ -2,9 +2,9 @@
 
 namespace DiskAnalyzer.Library.Domain.Records;
 
-public class GroupingRecord : BaseRecord
+public class DirectoryMeasurmentRecord : BaseRecord
 {
-    public GroupingRecord(
+    public DirectoryMeasurmentRecord(
         Guid id, 
         string path, 
         IReadOnlyCollection<string>? logs, 
@@ -18,4 +18,4 @@ public class GroupingRecord : BaseRecord
     public override string Path { get; init; }
     public override IReadOnlyCollection<string> Logs { get; init; }
     public override IReadOnlyCollection<IMetric> Metrics { get; init; }
-}
+}s
