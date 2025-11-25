@@ -19,7 +19,7 @@ namespace DiskAnalyzer.Api.Controllers
         public IActionResult Get()
         {
             var repo = new ConcDictRepository();
-            var result = new List<DirectoryMeasurmentRecord>();
+            var result = new List<DirectoryMeasurementRecord>();
             foreach (var id in History)
             {
                 result.Add(repo.Get(id));

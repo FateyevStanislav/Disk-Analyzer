@@ -5,10 +5,10 @@ namespace DiskAnalyzer.Library.Infrastructure.Repositories;
 
 public class ConcDictRepository : IMeasurmentRecordRepository<Guid>
 {
-    private readonly ConcurrentDictionary<Guid, DirectoryMeasurmentRecord> Repository = new();
+    private readonly ConcurrentDictionary<Guid, DirectoryMeasurementRecord> Repository = new();
     public int Count => Repository.Count;
 
-    public void Add(DirectoryMeasurmentRecord record)
+    public void Add(DirectoryMeasurementRecord record)
     {
         if (!Repository.TryAdd(record.Id, record))
         {
@@ -17,9 +17,9 @@ public class ConcDictRepository : IMeasurmentRecordRepository<Guid>
         Console.WriteLine($"Successfully added new {record.ToString()}");
     }
 
-    public DirectoryMeasurmentRecord Get(Guid id)
+    public DirectoryMeasurementRecord Get(Guid id)
     {
-        if (!Repository.TryGetValue(id, out DirectoryMeasurmentRecord record))
+        if (!Repository.TryGetValue(id, out DirectoryMeasurementRecord record))
         {
             throw new ArgumentException("Exception in GetRecord Method");
         }
@@ -29,7 +29,7 @@ public class ConcDictRepository : IMeasurmentRecordRepository<Guid>
 
     public bool Remove(Guid id)
     {
-        if (!Repository.TryRemove(id, out DirectoryMeasurmentRecord record))
+        if (!Repository.TryRemove(id, out DirectoryMeasurementRecord record))
         {
             return false;
             throw new ArgumentException("Exception in RemoveRecord Method");
@@ -43,14 +43,14 @@ public class ConcDictRepository : IMeasurmentRecordRepository<Guid>
         Repository.Clear();
     }
 
-    public IEnumerable<DirectoryMeasurmentRecord> GetAllDescOrder()
+    public IEnumerable<DirectoryMeasurementRecord> GetAllDescOrder()
     {
         return Repository
             .Values
             .OrderByDescending(wr => wr.CreatedAt);
     }
 
-    public IEnumerable<DirectoryMeasurmentRecord> GetAllAscOrder()
+    public IEnumerable<DirectoryMeasurementRecord> GetAllAscOrder()
     {
         return Repository
             .Values

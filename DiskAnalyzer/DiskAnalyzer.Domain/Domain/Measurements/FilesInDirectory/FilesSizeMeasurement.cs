@@ -7,7 +7,7 @@ namespace DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
 
 public class FilesSizeMeasurement : IDirectoryMeasurement
 {
-    public DirectoryMeasurmentRecord MeasureFilesInDirectory(
+    public DirectoryMeasurementRecord MeasureFilesInDirectory(
         string rootPath,
         int maxDepth,
         IFileFilter? filter = null)
@@ -28,7 +28,7 @@ public class FilesSizeMeasurement : IDirectoryMeasurement
             .AsReadOnly();
 
         var metric = new FileSizeMetric(totalSize);
-        return new DirectoryMeasurmentRecord(
+        return new DirectoryMeasurementRecord(
             Guid.NewGuid(),
             rootPath,
             logs,

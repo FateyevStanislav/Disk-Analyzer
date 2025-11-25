@@ -7,7 +7,7 @@ namespace DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
 
 public class FilesCountMeasurement : IDirectoryMeasurement
 {
-    public DirectoryMeasurmentRecord MeasureFilesInDirectory(
+    public DirectoryMeasurementRecord MeasureFilesInDirectory(
         string rootPath,
         int maxDepth,
         IFileFilter? filter = null)
@@ -28,7 +28,7 @@ public class FilesCountMeasurement : IDirectoryMeasurement
             .AsReadOnly();
 
         var metric = new FileCountMetric(count);
-        return new DirectoryMeasurmentRecord(
+        return new DirectoryMeasurementRecord(
             Guid.NewGuid(),
             rootPath,
             logs,

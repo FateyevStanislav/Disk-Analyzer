@@ -3,7 +3,7 @@
 ## Инфраструктурный код
 
 - **Репозитории и данные:**  
-  - `IMeasurmentRecordRepository.cs` — интерфейс для хранения и доступа к измерениям.  
+  - `IMeasurementRecordRepository.cs` — интерфейс для хранения и доступа к измерениям.  
   - `ConcDictRepository.cs` — реализация репозитория для словарных данных.  
   - `Entity.cs`, `ValueType.cs` — базовые сущности и типы данных.
 
@@ -25,13 +25,13 @@
 ## Доменный слой
 
 - **Базовые интерфейсы и модели:**  
-  - `IMetric.cs`, `IRecord.cs`, `IGroupingMeasurment.cs`, `IDirectoryMeasurment.cs` — контракты для метрик, записей и измерений.  
+  - `IMetric.cs`, `IRecord.cs`, `IGroupingMeasurement.cs`, `IDirectoryMeasurement.cs` — контракты для метрик, записей и измерений.  
   - `BaseMetric.cs`, `BaseRecord.cs` — базовые реализации метрик и записей.  
-  - `DirectoryMeasurmentRecord.cs` — модель записи измерения директории.
+  - `DirectoryMeasurementRecord.cs` — модель записи измерения директории.
 
 - **Метрики и измерения:**  
   - `FileCountMetric.cs`, `FileSizeMetric.cs`, `GroupCountMetric.cs`, `GroupSizeMetric.cs` — метрики для подсчёта файлов, их размеров и группировки.  
-  - `FilesCountMeasurment.cs`, `FilesSizeMeasurment.cs`, `GroupingMeasurment.cs` — конкретные измерения с логикой подсчётов.
+  - `FilesCountMeasurement.cs`, `FilesSizeMeasurement.cs`, `GroupingMeasurement.cs` — конкретные измерения с логикой подсчётов.
 
 - **Группировки и записи:**  
   - `FileGrouping.cs`, `GroupingRecord.cs` — сущности для группировки файлов и соответствующих записей.
@@ -39,4 +39,4 @@
 - **Форматтеры для отображения значений:**  
   - `IValueFormatter.cs`, `CountFormatter.cs`, `SizeFormatter.cs` — форматтеры для представления значений метрик в удобном виде.
 
-Доменный слой описывает бизнес-модель приложения DiskAnalyzer, включая основные сущности, метрики, измерения и правила представления информации[IDirectoryMeasurment.cs, FilesSizeMeasurment.cs, SizeFormatter.cs и др.].
+Доменный слой описывает бизнес-модель приложения DiskAnalyzer, включая основные сущности, метрики, измерения и правила представления информации[IDirectoryMeasurement.cs, FilesSizeMeasurement.cs, SizeFormatter.cs и др.].

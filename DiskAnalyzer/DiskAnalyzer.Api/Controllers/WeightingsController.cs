@@ -34,7 +34,7 @@ namespace DiskAnalyzer.Api.Controllers
             var repo = new ConcDictRepository();
             var filter = dto.FilterExtension != null ? new ExtensionFilter(dto.FilterExtension.Extension) : null;
 
-            DirectoryMeasurmentRecord result;
+            DirectoryMeasurementRecord result;
             switch (dto.Type)
             {
                 case WeightingType.Count:

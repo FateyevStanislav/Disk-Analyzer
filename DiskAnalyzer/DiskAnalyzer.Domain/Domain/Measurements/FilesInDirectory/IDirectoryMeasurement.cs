@@ -5,7 +5,7 @@ namespace DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
 
 public interface IDirectoryMeasurement
 {
-    DirectoryMeasurmentRecord MeasureFilesInDirectory(
+    DirectoryMeasurementRecord MeasureFilesInDirectory(
         string rootPath, 
         int maxDepth, 
         IFileFilter? filter = null);

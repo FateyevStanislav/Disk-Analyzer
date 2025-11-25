@@ -2,11 +2,11 @@
 
 public interface IMeasurmentRecordRepository<TId>
 {
-    void Add(DirectoryMeasurmentRecord record);
-    DirectoryMeasurmentRecord Get(TId id);
+    void Add(DirectoryMeasurementRecord record);
+    DirectoryMeasurementRecord Get(TId id);
     bool Remove(TId id);
     void Clear();
     int Count { get; }
-    IEnumerable<DirectoryMeasurmentRecord> GetAllDescOrder();
-    IEnumerable<DirectoryMeasurmentRecord> GetAllAscOrder();
+    IEnumerable<DirectoryMeasurementRecord> GetAllDescOrder();
+    IEnumerable<DirectoryMeasurementRecord> GetAllAscOrder();
 }

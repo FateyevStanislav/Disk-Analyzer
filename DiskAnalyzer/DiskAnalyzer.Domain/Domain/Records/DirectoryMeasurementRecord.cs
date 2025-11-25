@@ -2,9 +2,9 @@
 
 namespace DiskAnalyzer.Library.Domain.Records;
 
-public class DirectoryMeasurmentRecord : BaseRecord
+public class DirectoryMeasurementRecord : BaseRecord
 {
-    public DirectoryMeasurmentRecord(
+    public DirectoryMeasurementRecord(
         Guid id, 
         string path, 
         IReadOnlyCollection<string>? logs, 
