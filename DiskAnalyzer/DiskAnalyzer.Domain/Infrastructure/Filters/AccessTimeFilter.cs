@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Library.Domain.Filters;
+﻿namespace DiskAnalyzer.Library.Infrastructure.Filters;
 
 public class AccessTimeFilter : IFileFilter
 {

@@ -25,7 +25,7 @@ public class ValueType<T>
         return true;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is T typed && ValueTypeEquals(typed);
     }

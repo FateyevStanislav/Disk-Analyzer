@@ -1,13 +1,13 @@
-﻿namespace DiskAnalyzer.Library.Domain.Filters;
+﻿namespace DiskAnalyzer.Library.Infrastructure.Filters;
 
-public class WriteTimeFilter : IFileFilter
+public class CreationTimeFilter : IFileFilter
 {
-    public string Name => "Выбор по дате изменения";
+    public string Name => "Выбор по дате создания";
 
     private readonly DateTime minDateUtc;
     private readonly DateTime maxDateUtc;
 
-    public WriteTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
+    public CreationTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
         ValidateSize(minDateUtc, maxDateUtc);
         this.minDateUtc = minDateUtc;
@@ -15,7 +15,7 @@ public class WriteTimeFilter : IFileFilter
     }
 
     public bool ShouldInclude(FileInfo file)
-        => file.LastWriteTimeUtc <= maxDateUtc && file.LastWriteTimeUtc >= minDateUtc;
+        => file.CreationTimeUtc <= maxDateUtc && file.CreationTimeUtc >= minDateUtc;
 
     private static void ValidateSize(DateTime minDateUtc, DateTime maxDateUtc)
     {

@@ -18,4 +18,4 @@ public class DirectoryMeasurmentRecord : BaseRecord
     public override string Path { get; init; }
     public override IReadOnlyCollection<string> Logs { get; init; }
     public override IReadOnlyCollection<IMetric> Metrics { get; init; }
-}s
+}

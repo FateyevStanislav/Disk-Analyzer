@@ -1,5 +1,5 @@
-﻿using DiskAnalyzer.Library.Domain.Filters;
-using DiskAnalyzer.Library.Domain.Records;
+﻿using DiskAnalyzer.Library.Domain.Records;
+using DiskAnalyzer.Library.Infrastructure.Filters;
 
 namespace DiskAnalyzer.Library.Domain.Measurments.FilesInDirectory;
 

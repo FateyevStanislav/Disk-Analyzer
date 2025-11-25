@@ -1,8 +1,8 @@
-﻿using DiskAnalyzer.Library.Domain.Filters;
-using DiskAnalyzer.Library.Domain.Groupers;
-using DiskAnalyzer.Library.Domain.Metrics;
+﻿using DiskAnalyzer.Library.Domain.Metrics;
 using DiskAnalyzer.Library.Domain.Metrics.Groups;
 using DiskAnalyzer.Library.Domain.Records;
+using DiskAnalyzer.Library.Infrastructure.Filters;
+using DiskAnalyzer.Library.Infrastructure.Groupers;
 
 namespace DiskAnalyzer.Library.Domain.Measurments.GroupsInDirectory;
 

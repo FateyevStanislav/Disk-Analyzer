@@ -1,7 +1,6 @@
-﻿using DiskAnalyzer.Library.Domain.Filters;
-using DiskAnalyzer.Library.Infrastructure.Logger;
+﻿using DiskAnalyzer.Library.Infrastructure.Filters;
 
-namespace DiskAnalyzer.Library.Domain;
+namespace DiskAnalyzer.Library.Infrastructure;
 
 public static class FileGrouping
 {
@@ -10,7 +9,7 @@ public static class FileGrouping
         int maxDepth,
         Func<FileInfo, TKey> groupBySelector,
         IFileFilter? filter = null,
-        Logger? logger = null)
+        Logger.Logger? logger = null)
     {
         var files = new List<FileInfo>();
 

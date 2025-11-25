@@ -1,6 +1,6 @@
-﻿using DiskAnalyzer.Library.Domain.Filters;
+﻿using DiskAnalyzer.Library.Infrastructure.Filters;
 
-namespace DiskAnalyzer.Library.Domain.Groupers;
+namespace DiskAnalyzer.Library.Infrastructure.Groupers;
 
 public class LastAccessTimeGrouper : IGrouper
 {

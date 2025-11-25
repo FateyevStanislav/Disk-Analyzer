@@ -1,17 +1,17 @@
-﻿using DiskAnalyzer.Library.Domain.Filters;
+﻿using DiskAnalyzer.Library.Infrastructure.Filters;
 using DiskAnalyzer.Library.Infrastructure.Logger;
 
-namespace DiskAnalyzer.Library.Domain;
+namespace DiskAnalyzer.Library.Infrastructure;
 
 public class DirectoryWalker
 {
     public delegate void OnFileAction(FileInfo file);
 
-    public Logger? Logger { get; }
+    public Logger.Logger? Logs { get; }
 
-    public DirectoryWalker(Logger? logger = null)
+    public DirectoryWalker(Logger.Logger? logger = null)
     {
-        Logger = logger ?? new Logger();
+        Logs = logger ?? new Logger.Logger();
     }
 
     public void Walk(
@@ -41,7 +41,7 @@ public class DirectoryWalker
                     if (filter == null || filter.ShouldInclude(file))
                     {
                         onFile?.Invoke(file);
-                        Logger?.Add(
+                        Logs?.Add(
                             LogType.Success,
                             $"Файл {path} обработан");
                     }
@@ -49,19 +49,19 @@ public class DirectoryWalker
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger?.Add(
+                Logs?.Add(
                     LogType.Warning,
                     $"Нет доступа к файлам в каталоге {path}: {ex?.ToString()}");
             }
             catch (IOException ex)
             {
-                Logger?.Add(
+                Logs?.Add(
                     LogType.Error,
                     $"Ошибка ввода/вывода при чтении файлов каталога {path}: {ex?.ToString()}");
             }
             catch (Exception ex)
             {
-                Logger?.Add(
+                Logs?.Add(
                     LogType.Error,
                     $"Неожиданная ошибка при обработке файлов в каталоге {path}: {ex?.ToString()}");
             }
@@ -77,19 +77,19 @@ public class DirectoryWalker
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logger?.Add(
+                Logs?.Add(
                     LogType.Warning,
                     $"Нет доступа к вложенному каталогу {path}: {ex?.ToString()}");
             }
             catch (IOException ex)
             {
-                Logger?.Add(
+                Logs?.Add(
                     LogType.Error,
                     $"Ошибка ввода/вывода при обходе вложенных каталогов {path}: {ex?.ToString()}");
             }
             catch (Exception ex)
             {
-                Logger?.Add(
+                Logs?.Add(
                     LogType.Error,
                     $"Неожиданная ошибка при обработке подкаталога {path}: {ex?.ToString()}");
             }
