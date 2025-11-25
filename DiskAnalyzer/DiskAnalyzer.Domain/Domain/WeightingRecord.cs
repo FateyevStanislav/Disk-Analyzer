@@ -1,4 +1,5 @@
-﻿using DiskAnalyzer.Library.Infrastructure;
+﻿using DiskAnalyzer.Library.Domain.Metrics;
+using DiskAnalyzer.Library.Infrastructure;
 
 namespace DiskAnalyzer.Library.Domain
 {

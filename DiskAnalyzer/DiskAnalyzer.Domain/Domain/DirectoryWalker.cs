@@ -6,18 +6,18 @@ namespace DiskAnalyzer.Library.Domain;
 public class DirectoryWalker
 {
     public delegate void FileAction(FileInfo file);
-    public delegate void DirectoryAction(DirectoryInfo dir);
 
     public Logger Logger { get; }
 
     public DirectoryWalker(Logger logger = null)
     {
-        this.Logger = logger ?? new Logger();
+        Logger = logger ?? new Logger();
     }
 
-    public void Walk(string rootPath, int maxDepth,
+    public void Walk(
+        string rootPath,
+        int maxDepth,
         FileAction onFile = null,
-        DirectoryAction onDirectory = null,
         IFileFilter filter = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(maxDepth);
@@ -31,8 +31,6 @@ public class DirectoryWalker
         while (q.Count > 0)
         {
             var (path, depth) = q.Dequeue();
-
-            onDirectory?.Invoke(new DirectoryInfo(path));
 
             try
             {
@@ -51,19 +49,19 @@ public class DirectoryWalker
             catch (UnauthorizedAccessException ex)
             {
                 Logger?.Add(
-                    LogType.Warning, 
+                    LogType.Warning,
                     $"Нет доступа к файлам в каталоге {path}: {ex?.ToString()}");
             }
             catch (IOException ex)
             {
                 Logger?.Add(
-                    LogType.Error, 
+                    LogType.Error,
                     $"Ошибка ввода/вывода при чтении файлов каталога {path}: {ex?.ToString()}");
             }
             catch (Exception ex)
             {
                 Logger?.Add(
-                    LogType.Error, 
+                    LogType.Error,
                     $"Неожиданная ошибка при обработке файлов в каталоге {path}: {ex?.ToString()}");
             }
 

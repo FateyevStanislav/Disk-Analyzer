@@ -1,13 +1,13 @@
 ﻿namespace DiskAnalyzer.Library.Domain.Filters;
 
-public class AccessTimeFilte : IFileFilter
+public class AccessTimeFilter : IFileFilter
 {
     public string Name => "Выбор по дате открытия";
 
     private readonly DateTime minDate;
     private readonly DateTime maxDate;
 
-    public AccessTimeFilte(DateTime minDate, DateTime maxDate)
+    public AccessTimeFilter(DateTime minDate, DateTime maxDate)
     {
         ValidateSize(minDate, maxDate);
         this.minDate = minDate;
@@ -15,7 +15,7 @@ public class AccessTimeFilte : IFileFilter
     }
 
     public bool ShouldInclude(FileInfo file)
-        => file.LastAccessTime <= maxDate && file.LastAccessTime >= minDate;
+        => file.LastAccessTimeUtc <= maxDate && file.LastAccessTimeUtc >= minDate;
 
     private static void ValidateSize(DateTime minDate, DateTime maxDate)
     {

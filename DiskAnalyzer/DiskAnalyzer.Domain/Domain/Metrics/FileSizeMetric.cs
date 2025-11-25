@@ -1,14 +1,15 @@
 ﻿using DiskAnalyzer.Library.Infrastructure;
-namespace DiskAnalyzer.Library.Domain
+
+namespace DiskAnalyzer.Library.Domain.Metrics
 {
-    public class FileSizeMetricType : IMetric
+    public class FileSizeMetric : IMetric
     {
         public string Name => "FileSize";
         public string Value => FormatValue(_value);
 
         private readonly object _value;
 
-        public FileSizeMetricType(object value) => _value = value;
+        public FileSizeMetric(object value) => _value = value;
 
         private string FormatValue(object value)
         {

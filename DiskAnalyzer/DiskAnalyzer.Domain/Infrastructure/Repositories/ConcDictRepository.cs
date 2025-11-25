@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using DiskAnalyzer.Library.Domain;
 
-namespace DiskAnalyzer.Library.Infrastructure;
+namespace DiskAnalyzer.Library.Infrastructure.Repositories;
 
 public class ConcDictRepository : IWeightingRecordRepository<Guid>
 {
