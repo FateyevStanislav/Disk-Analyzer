@@ -5,7 +5,7 @@ namespace DiskAnalyzer.Library.Domain.Measurments;
 
 public class FileSizeMeasurment : IMeasurment
 {
-    public WeightingRecord Measure(string rootPath, int maxDepth, IFileFilter filter = null)
+    public MeasurmentRecord Measure(string rootPath, int maxDepth, IFileFilter filter = null)
     {
         long totalSize = 0;
 
@@ -22,7 +22,7 @@ public class FileSizeMeasurment : IMeasurment
             .AsReadOnly();
 
         var metric = new FileSizeMetric(totalSize);
-        return new WeightingRecord(
+        return new MeasurmentRecord(
             Guid.NewGuid(),
             rootPath,
             logs,

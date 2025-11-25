@@ -5,7 +5,7 @@ namespace DiskAnalyzer.Library.Domain;
 
 public class DirectoryWalker
 {
-    public delegate void FileAction(FileInfo file);
+    public delegate void OnFileAction(FileInfo file);
 
     public Logger Logger { get; }
 
@@ -17,7 +17,7 @@ public class DirectoryWalker
     public void Walk(
         string rootPath,
         int maxDepth,
-        FileAction onFile = null,
+        OnFileAction onFile = null,
         IFileFilter filter = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(maxDepth);

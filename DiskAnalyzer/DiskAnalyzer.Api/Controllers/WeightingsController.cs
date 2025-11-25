@@ -1,9 +1,8 @@
 ﻿using DiskAnalyzer.Library.Domain;
 using DiskAnalyzer.Library.Domain.Filters;
-using DiskAnalyzer.Library.Infrastructure;
-using Microsoft.AspNetCore.Http;
+using DiskAnalyzer.Library.Domain.Measurments;
+using DiskAnalyzer.Library.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 
 namespace DiskAnalyzer.Api.Controllers
 {
@@ -23,7 +22,7 @@ namespace DiskAnalyzer.Api.Controllers
     }
 
     public record RequestDto(WeightingType Type, string Path, int MaxDepth, FilterExtensionDto? FilterExtension, bool SaveInHistory);
-   
+
 
     [ApiController]
     [Route("api/[controller]")]
@@ -32,18 +31,18 @@ namespace DiskAnalyzer.Api.Controllers
         [HttpPost]
         public IActionResult Create(RequestDto dto)
         {
-            var repo = new WeightingRecordRepository();
+            var repo = new ConcDictRepository();
             var filter = dto.FilterExtension != null ? new ExtensionFilter(dto.FilterExtension.Extension) : null;
 
-            WeightingRecord result;
+            MeasurmentRecord result;
             switch (dto.Type)
             {
                 case WeightingType.Count:
-                    result = FileWeigher.CountFiles(dto.Path, dto.MaxDepth, filter);
+                    result = new FileCountMeasurment().Measure(dto.Path, dto.MaxDepth, filter);
                     break;
 
                 case WeightingType.Size:
-                    result = FileWeigher.CalcTotalSize(dto.Path, dto.MaxDepth, filter);
+                    result = new FileSizeMeasurment().Measure(dto.Path, dto.MaxDepth, filter);
                     break;
 
                 default:
@@ -65,7 +64,7 @@ namespace DiskAnalyzer.Api.Controllers
         {
             try
             {
-                var repo = new WeightingRecordRepository();
+                var repo = new ConcDictRepository();
                 return Ok(repo.Get(id));
             }
 

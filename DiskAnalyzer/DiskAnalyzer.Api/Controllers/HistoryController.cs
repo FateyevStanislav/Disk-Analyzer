@@ -1,6 +1,5 @@
 ﻿using DiskAnalyzer.Library.Domain;
-using DiskAnalyzer.Library.Infrastructure;
-using Microsoft.AspNetCore.Http;
+using DiskAnalyzer.Library.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
@@ -19,8 +18,8 @@ namespace DiskAnalyzer.Api.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var repo = new WeightingRecordRepository();
-            var result = new List<WeightingRecord>();
+            var repo = new ConcDictRepository();
+            var result = new List<MeasurmentRecord>();
             foreach (var id in History)
             {
                 result.Add(repo.Get(id));
@@ -30,4 +29,3 @@ namespace DiskAnalyzer.Api.Controllers
         }
     }
 }
-    
