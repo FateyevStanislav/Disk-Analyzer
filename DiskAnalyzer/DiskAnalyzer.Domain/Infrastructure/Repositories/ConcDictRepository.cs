@@ -3,10 +3,9 @@ using DiskAnalyzer.Library.Domain;
 
 namespace DiskAnalyzer.Library.Infrastructure;
 
-public class WeightingRecordRepository : IWeightingRecordRepository<Guid>
+public class ConcDictRepository : IWeightingRecordRepository<Guid>
 {
-    private static readonly ConcurrentDictionary<Guid, WeightingRecord> Repository = new();
-
+    private readonly ConcurrentDictionary<Guid, WeightingRecord> Repository = new();
     public int Count => Repository.Count;
 
     public void Add(WeightingRecord record)
@@ -42,5 +41,19 @@ public class WeightingRecordRepository : IWeightingRecordRepository<Guid>
     public void Clear()
     {
         Repository.Clear();
+    }
+
+    public IEnumerable<WeightingRecord> GetAllDescOrder()
+    {
+        return Repository
+            .Values
+            .OrderByDescending(wr => wr.CreatedAt);
+    }
+
+    public IEnumerable<WeightingRecord> GetAllAscOrder()
+    {
+        return Repository
+            .Values
+            .OrderBy(wr => wr.CreatedAt);
     }
 }

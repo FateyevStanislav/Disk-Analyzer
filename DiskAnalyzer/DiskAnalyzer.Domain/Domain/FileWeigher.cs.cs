@@ -1,4 +1,5 @@
 ﻿using DiskAnalyzer.Library.Domain.Filters;
+using DiskAnalyzer.Library.Domain.Metrics;
 
 namespace DiskAnalyzer.Library.Domain;
 
@@ -17,9 +18,9 @@ public class FileWeigher
             .Select(log => log.ToString())
             .ToList()
             .AsReadOnly();
-        var metric = new FileCountMetric(count);
+        var metric = new FileCountMetricType(count);
         return new WeightingRecord(
-            new Guid(),
+            Guid.NewGuid(),
             rootPath,
             logs,
             new[] { metric });
@@ -38,9 +39,9 @@ public class FileWeigher
             .Select(log => log.ToString())
             .ToList()
             .AsReadOnly();
-        var metric = new FileSizeMetric(totalSize);
+        var metric = new FileSizeMetricType(totalSize);
         return new WeightingRecord(
-            new Guid(),
+            Guid.NewGuid(),
             rootPath,
             logs,
             new[] { metric });

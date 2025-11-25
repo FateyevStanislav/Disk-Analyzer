@@ -7,4 +7,6 @@ public interface IWeightingRecordRepository<TId>
     bool Remove(TId id);
     void Clear();
     int Count { get; }
+    IEnumerable<WeightingRecord> GetAllDescOrder();
+    IEnumerable<WeightingRecord> GetAllAscOrder();
 }

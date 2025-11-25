@@ -1,38 +1,25 @@
-using DiskAnalyzer.Library.Domain;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers().AddJsonOptions(
+    options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(
+    c => c.UseAllOfForInheritance());
+
 var app = builder.Build();
 
-app.MapPost("/api/weightings", (RequestDto dto) =>
+if (app.Environment.IsDevelopment())
 {
-    var id = Guid.NewGuid();
-    try
-    {
-        var count = FileWeigher.CountFiles(dto.Path, dto.MaxDepth);
-        var record = new WeightingRecord(id, dto.Path, dto.MaxDepth, count, null);
-        WeightingRecordRepository.AddRecord(record);
-    }
-    catch (Exception ex)
-    {
-        var record = new WeightingRecord(id, dto.Path, dto.MaxDepth, 0, ex.Message);
-        WeightingRecordRepository.AddRecord(record);
-    }
-    return Results.Created($"/api/weightings/{id}", new { id });
-});
+    app.UseSwagger(); app.UseSwaggerUI();
+}
 
-app.MapGet("/api/weightings/{id:guid}", (Guid id) =>
-{
-    try
-    {
-        var record = WeightingRecordRepository.GetRecord(id);
-        return Results.Ok(record);
-    }
-    catch
-    {
-        return Results.NotFound();
-    }
-});
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
-
-public record RequestDto(string Path, int MaxDepth);
