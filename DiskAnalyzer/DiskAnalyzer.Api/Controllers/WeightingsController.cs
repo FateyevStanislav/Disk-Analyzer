@@ -1,6 +1,6 @@
-﻿using DiskAnalyzer.Library.Domain.Filters;
-using DiskAnalyzer.Library.Domain.Measurments;
+﻿using DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
 using DiskAnalyzer.Library.Domain.Records;
+using DiskAnalyzer.Library.Infrastructure.Filters;
 using DiskAnalyzer.Library.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,11 +38,11 @@ namespace DiskAnalyzer.Api.Controllers
             switch (dto.Type)
             {
                 case WeightingType.Count:
-                    result = new FilesCountMeasurment().Measure(dto.Path, dto.MaxDepth, filter);
+                    result = new FilesCountMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, filter);
                     break;
 
                 case WeightingType.Size:
-                    result = new FilesSizeMeasurment().Measure(dto.Path, dto.MaxDepth, filter);
+                    result = new FilesSizeMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, filter);
                     break;
 
                 default:

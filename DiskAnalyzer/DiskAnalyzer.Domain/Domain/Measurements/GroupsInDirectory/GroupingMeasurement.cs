@@ -4,9 +4,9 @@ using DiskAnalyzer.Library.Domain.Records;
 using DiskAnalyzer.Library.Infrastructure.Filters;
 using DiskAnalyzer.Library.Infrastructure.Groupers;
 
-namespace DiskAnalyzer.Library.Domain.Measurments.GroupsInDirectory;
+namespace DiskAnalyzer.Library.Domain.Measurements.GroupsInDirectory;
 
-public class GroupMeasurement : IGroupingMeasurment
+public class GroupMeasurement : IGroupingMeasurement
 {
     public IEnumerable<GroupingRecord> MeasureGroupsInDirectory(
         string rootPath,

@@ -3,9 +3,9 @@ using DiskAnalyzer.Library.Domain.Records;
 using DiskAnalyzer.Library.Infrastructure;
 using DiskAnalyzer.Library.Infrastructure.Filters;
 
-namespace DiskAnalyzer.Library.Domain.Measurments.FilesInDirectory;
+namespace DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
 
-public class FilesCountMeasurment : IDirectoryMeasurment
+public class FilesCountMeasurement : IDirectoryMeasurement
 {
     public DirectoryMeasurmentRecord MeasureFilesInDirectory(
         string rootPath,
