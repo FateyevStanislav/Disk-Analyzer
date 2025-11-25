@@ -7,9 +7,9 @@ public class DirectoryWalker
 {
     public delegate void OnFileAction(FileInfo file);
 
-    public Logger Logger { get; }
+    public Logger? Logger { get; }
 
-    public DirectoryWalker(Logger logger = null)
+    public DirectoryWalker(Logger? logger = null)
     {
         Logger = logger ?? new Logger();
     }
@@ -17,8 +17,8 @@ public class DirectoryWalker
     public void Walk(
         string rootPath,
         int maxDepth,
-        OnFileAction onFile = null,
-        IFileFilter filter = null)
+        OnFileAction? onFile = null,
+        IFileFilter? filter = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(maxDepth);
 

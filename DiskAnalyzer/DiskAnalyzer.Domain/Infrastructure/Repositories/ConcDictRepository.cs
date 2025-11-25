@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using DiskAnalyzer.Library.Domain;
+using DiskAnalyzer.Library.Domain.Records;
 
 namespace DiskAnalyzer.Library.Infrastructure.Repositories;
 

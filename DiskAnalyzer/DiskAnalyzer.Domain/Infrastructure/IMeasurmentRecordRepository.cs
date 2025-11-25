@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Library.Domain;
+﻿using DiskAnalyzer.Library.Domain.Records;
 
 public interface IMeasurmentRecordRepository<TId>
 {

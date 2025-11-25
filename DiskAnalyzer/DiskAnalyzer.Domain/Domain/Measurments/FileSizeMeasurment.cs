@@ -1,22 +1,24 @@
 ﻿using DiskAnalyzer.Library.Domain.Filters;
 using DiskAnalyzer.Library.Domain.Metrics;
+using DiskAnalyzer.Library.Domain.Records;
 
 namespace DiskAnalyzer.Library.Domain.Measurments;
 
 public class FileSizeMeasurment : IMeasurment
 {
-    public MeasurmentRecord Measure(string rootPath, int maxDepth, IFileFilter filter = null)
+    public MeasurmentRecord Measure(string rootPath, int maxDepth, IFileFilter? filter = null)
     {
         long totalSize = 0;
 
         var walker = new DirectoryWalker();
         walker.Walk(
-            rootPath, maxDepth,
+            rootPath, 
+            maxDepth,
             onFile: file => totalSize += file.Length,
             filter: filter
         );
 
-        var logs = walker.Logger.Logs
+        var logs = walker.Logger?.Logs
             .Select(log => log.ToString())
             .ToList()
             .AsReadOnly();

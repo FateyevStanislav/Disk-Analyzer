@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Library.Domain;
+﻿using DiskAnalyzer.Library.Domain.Records;
 using DiskAnalyzer.Library.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
