@@ -19,7 +19,7 @@ namespace DiskAnalyzer.Api.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var repo = new WeightingRecordRepository();
+            var repo = new ConcDictRepository();
             var result = new List<WeightingRecord>();
             foreach (var id in History)
             {

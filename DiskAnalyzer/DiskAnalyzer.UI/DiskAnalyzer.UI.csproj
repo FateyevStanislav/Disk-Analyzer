@@ -28,6 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DiskAnalyzer.Api\DiskAnalyzer.Api.csproj" />
     <ProjectReference Include="..\DiskAnalyzer.Domain\DiskAnalyzer.Library.csproj" />
   </ItemGroup>
 

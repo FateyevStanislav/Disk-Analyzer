@@ -4,6 +4,10 @@ using DiskAnalyzer.Library.Domain;
 using DiskAnalyzer.Library.Domain.Attributes;
 using DiskAnalyzer.Library.Domain.Metrics;
 using DiskAnalyzer.Library.Domain.Filters;
+using DiskAnalyzer.Api;
+using DiskAnalyzer.Api.Controllers;
+using DiskAnalyzer.UI.Infrastructure;
+using System.Diagnostics;
 
 namespace DiskAnalyzer.UI
 {
@@ -206,9 +210,38 @@ namespace DiskAnalyzer.UI
         {
             var path = GetPath();
             var maxDepth = GetDepth();
-            
+            var selectedMetrics = metricsCheckList.CheckedItems.Cast<string>();
+            var weightingTypes = new List<WeightingType?>();
+            foreach ( var metric in selectedMetrics )
+            {
+                var type = GetTypeByNameAttribute(metric, typeof(IMetric));
+                weightingTypes.Add(ConversionsHandler.ConvertMetricToWeightingType(type));
+            }
+            var selectedFilters = filterCheckList.CheckedItems.Cast<string>();
+            var filterTypes = new List<FilterType?>();
+            foreach (var filter in selectedFilters)
+            {
+                var type = GetTypeByNameAttribute(filter, typeof(IFileFilter));
+                filterTypes.Add(ConversionsHandler.ConvertFilterToFilterType(type));
+            }
         }
 
+        private Type GetTypeByNameAttribute(string name, Type interfaceType)
+        {
+            var type = Assembly
+                .Load("DiskAnalyzer.Library")
+                .GetTypes()
+                .Where(x => x.GetInterfaces().Contains(interfaceType))
+                .Where(x => x.GetDisplayName() == name)
+                .FirstOrDefault();
+
+            return type;
+        }
+
+        private void SendPostRequest()
+        {
+
+        }
         private System.Windows.Forms.Label pathLabel;
         private System.Windows.Forms.TextBox pathTextBox;
         private System.Windows.Forms.Button analyzeButton;

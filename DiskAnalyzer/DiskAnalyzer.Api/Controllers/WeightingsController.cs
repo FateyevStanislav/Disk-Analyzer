@@ -32,7 +32,7 @@ namespace DiskAnalyzer.Api.Controllers
         [HttpPost]
         public IActionResult Create(RequestDto dto)
         {
-            var repo = new WeightingRecordRepository();
+            var repo = new ConcDictRepository();
             var filter = dto.FilterExtension != null ? new ExtensionFilter(dto.FilterExtension.Extension) : null;
 
             WeightingRecord result;
@@ -65,7 +65,7 @@ namespace DiskAnalyzer.Api.Controllers
         {
             try
             {
-                var repo = new WeightingRecordRepository();
+                var repo = new ConcDictRepository();
                 return Ok(repo.Get(id));
             }
 
