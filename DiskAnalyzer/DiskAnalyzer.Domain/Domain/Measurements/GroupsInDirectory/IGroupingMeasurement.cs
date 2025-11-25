@@ -9,6 +9,6 @@ public interface IGroupingMeasurement
     IEnumerable<GroupingRecord> MeasureGroupsInDirectory(
         string rootPath, 
         int maxDepth,
-        IGrouper grouper,
+        IFileGrouper grouper,
         IFileFilter? filter = null);
 }

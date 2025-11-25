@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Library.Infrastructure.Groupers;
 
-public class SizeBucketGrouper : IGrouper
+public class SizeBucketGrouper : IFileGrouper
 {
     public string Name => "Группировка по размеру";
 

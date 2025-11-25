@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Library.Infrastructure.Groupers;
 
-public interface IGrouper
+public interface IFileGrouper
 {
     string Name { get; }
     IEnumerable<IGrouping<string, FileInfo>> Group(

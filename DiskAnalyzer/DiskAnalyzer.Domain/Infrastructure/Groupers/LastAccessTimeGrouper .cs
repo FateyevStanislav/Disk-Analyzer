@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Library.Infrastructure.Groupers;
 
-public class LastAccessTimeGrouper : IGrouper
+public class LastAccessTimeGrouper : IFileGrouper
 {
     public string Name => "Группировка по времени последнего доступа";
 

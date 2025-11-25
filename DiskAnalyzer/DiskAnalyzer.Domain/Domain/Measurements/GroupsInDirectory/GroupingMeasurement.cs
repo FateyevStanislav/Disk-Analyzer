@@ -11,7 +11,7 @@ public class GroupMeasurement : IGroupingMeasurement
     public IEnumerable<GroupingRecord> MeasureGroupsInDirectory(
         string rootPath,
         int maxDepth,
-        IGrouper grouper,
+        IFileGrouper grouper,
         IFileFilter? filter = null)
     {
         var groups = grouper.Group(rootPath, maxDepth, filter);

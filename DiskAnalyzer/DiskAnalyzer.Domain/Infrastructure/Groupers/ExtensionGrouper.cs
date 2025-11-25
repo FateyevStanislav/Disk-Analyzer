@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Library.Infrastructure.Groupers;
 
-public class ExtensionGrouper : IGrouper
+public class ExtensionGrouper : IFileGrouper
 {
     public string Name => "Группировка по расширению";
 
