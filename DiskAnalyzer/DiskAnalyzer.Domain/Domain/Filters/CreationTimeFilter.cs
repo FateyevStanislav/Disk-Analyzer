@@ -4,24 +4,24 @@ public class CreationTimeFilter : IFileFilter
 {
     public string Name => "Выбор по дате создания";
 
-    private readonly DateTime minDate;
-    private readonly DateTime maxDate;
+    private readonly DateTime minDateUtc;
+    private readonly DateTime maxDateUtc;
 
-    public CreationTimeFilter(DateTime minDate, DateTime maxDate)
+    public CreationTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
-        ValidateSize(minDate, maxDate);
-        this.minDate = minDate;
-        this.maxDate = maxDate;
+        ValidateSize(minDateUtc, maxDateUtc);
+        this.minDateUtc = minDateUtc;
+        this.maxDateUtc = maxDateUtc;
     }
 
     public bool ShouldInclude(FileInfo file)
-        => file.CreationTime <= maxDate && file.CreationTime >= minDate;
+        => file.CreationTimeUtc <= maxDateUtc && file.CreationTimeUtc >= minDateUtc;
 
-    private static void ValidateSize(DateTime minDate, DateTime maxDate)
+    private static void ValidateSize(DateTime minDateUtc, DateTime maxDateUtc)
     {
-        if (minDate > maxDate)
+        if (minDateUtc > maxDateUtc)
             throw new ArgumentOutOfRangeException(
-                nameof(maxDate),
+                nameof(maxDateUtc),
                 "Максимальная дата должна быть не меньше минимальной");
     }
 }

@@ -4,24 +4,24 @@ public class WriteTimeFilter : IFileFilter
 {
     public string Name => "Выбор по дате изменения";
 
-    private readonly DateTime minDate;
-    private readonly DateTime maxDate;
+    private readonly DateTime minDateUtc;
+    private readonly DateTime maxDateUtc;
 
-    public WriteTimeFilter(DateTime minDate, DateTime maxDate)
+    public WriteTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
-        ValidateSize(minDate, maxDate);
-        this.minDate = minDate;
-        this.maxDate = maxDate;
+        ValidateSize(minDateUtc, maxDateUtc);
+        this.minDateUtc = minDateUtc;
+        this.maxDateUtc = maxDateUtc;
     }
 
     public bool ShouldInclude(FileInfo file)
-        => file.LastWriteTime <= maxDate && file.LastWriteTime >= minDate;
+        => file.LastWriteTimeUtc <= maxDateUtc && file.LastWriteTimeUtc >= minDateUtc;
 
-    private static void ValidateSize(DateTime minDate, DateTime maxDate)
+    private static void ValidateSize(DateTime minDateUtc, DateTime maxDateUtc)
     {
-        if (minDate > maxDate)
+        if (minDateUtc > maxDateUtc)
             throw new ArgumentOutOfRangeException(
-                nameof(maxDate),
+                nameof(maxDateUtc),
                 "Максимальная дата должна быть не меньше минимальной");
     }
 }
