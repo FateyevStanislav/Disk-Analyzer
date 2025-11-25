@@ -1,9 +1,12 @@
-﻿using DiskAnalyzer.Library.Infrastructure;
-namespace DiskAnalyzer.Library.Domain
+﻿using DiskAnalyzer.Library.Domain.Attributes;
+using DiskAnalyzer.Library.Infrastructure;
+
+namespace DiskAnalyzer.Library.Domain.Metrics
 {
+    [MetricName("Общее количество файлов")]
     public class FileSizeMetricType : IMetric
     {
-        public string Name => "FileSize";
+        public string Name => "FileCount";
         public string Value => FormatValue(_value);
 
         private readonly object _value;

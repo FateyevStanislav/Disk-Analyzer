@@ -1,6 +1,8 @@
-﻿
+﻿using DiskAnalyzer.Library.Domain.Attributes;
+
 namespace DiskAnalyzer.Library.Domain.Filters;
 
+[FilterName("Выбор по расширению")]
 public class ExtensionFilter : IFileFilter
 {
     public string Name => "Выбор по расширению";

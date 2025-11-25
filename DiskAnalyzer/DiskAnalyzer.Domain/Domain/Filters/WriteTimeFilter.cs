@@ -1,5 +1,8 @@
-﻿namespace DiskAnalyzer.Library.Domain.Filters;
+﻿using DiskAnalyzer.Library.Domain.Attributes;
 
+namespace DiskAnalyzer.Library.Domain.Filters;
+
+[FilterName("Выбор по дате изменения")]
 public class WriteTimeFilter : IFileFilter
 {
     public string Name => "Выбор по дате изменения";

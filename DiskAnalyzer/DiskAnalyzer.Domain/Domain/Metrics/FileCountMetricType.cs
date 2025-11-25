@@ -1,8 +1,11 @@
-﻿namespace DiskAnalyzer.Library.Domain
+﻿using DiskAnalyzer.Library.Domain.Attributes;
+
+namespace DiskAnalyzer.Library.Domain.Metrics
 {
+    [MetricName("Общий размер файлов")]
     public class FileCountMetricType : IMetric
     {
-        public string Name => "FileCount";
+        public string Name => "FileSize";
         public string Value => FormatValue(_value);
 
         private readonly object _value;

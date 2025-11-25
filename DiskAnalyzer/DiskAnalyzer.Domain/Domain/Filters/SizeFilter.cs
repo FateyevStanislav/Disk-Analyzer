@@ -1,5 +1,8 @@
-﻿namespace DiskAnalyzer.Library.Domain.Filters;
+﻿using DiskAnalyzer.Library.Domain.Attributes;
 
+namespace DiskAnalyzer.Library.Domain.Filters;
+
+[FilterName("Выбор по размеру")]
 public class SizeFilter : IFileFilter
 {
     public string Name => "Выбор по размеру";
