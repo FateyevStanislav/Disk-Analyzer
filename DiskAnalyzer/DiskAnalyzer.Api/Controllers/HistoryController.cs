@@ -25,7 +25,7 @@ namespace DiskAnalyzer.Api.Controllers
 
             foreach (var record in History.GetAllAscOrder())
             {
-                if(countOfRecords > 0 && i >= countOfRecords)
+                if (countOfRecords > 0 && i >= countOfRecords)
                 {
                     break;
                 }

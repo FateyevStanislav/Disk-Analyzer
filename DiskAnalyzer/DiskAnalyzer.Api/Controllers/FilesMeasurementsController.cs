@@ -1,19 +1,18 @@
-﻿using DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
+﻿using DiskAnalyzer.Api.Controllers.Filters;
+using DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
 using DiskAnalyzer.Library.Domain.Records;
 using DiskAnalyzer.Library.Infrastructure.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
 {
-    public record FilterExtensionDto(string Extension);
-
     public enum FilesMeasurementType
     {
         Count,
         Size
     }
 
-    public record RequestDto(FilesMeasurementType Type, string Path, int MaxDepth, FilterExtensionDto? FilterExtension, bool SaveInHistory);
+    public record RequestDto(FilesMeasurementType Type, string Path, int MaxDepth, IEnumerable<FilterDto>? Filters, bool SaveInHistory);
 
 
     [ApiController]
@@ -23,17 +22,24 @@ namespace DiskAnalyzer.Api.Controllers
         [HttpPost()]
         public IActionResult Create(RequestDto dto)
         {
-            var filter = dto.FilterExtension != null ? new ExtensionFilter(dto.FilterExtension.Extension) : null;
+            var filters = dto.Filters?
+                .Select(FilterFactory.Create)
+                .ToList() ?? new List<IFileFilter>();
+            var compositeFilter = new CompositeFilter();
+            foreach (var filter in filters)
+            {
+                compositeFilter.Add(filter);
+            }
 
             DirectoryMeasurementRecord result;
             switch (dto.Type)
             {
                 case FilesMeasurementType.Count:
-                    result = new FilesCountMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, filter);
+                    result = new FilesCountMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, compositeFilter);
                     break;
 
                 case FilesMeasurementType.Size:
-                    result = new FilesSizeMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, filter);
+                    result = new FilesSizeMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, compositeFilter);
                     break;
 
                 default:
