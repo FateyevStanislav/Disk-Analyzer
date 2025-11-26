@@ -1,47 +1,38 @@
 ﻿using DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
 using DiskAnalyzer.Library.Domain.Records;
 using DiskAnalyzer.Library.Infrastructure.Filters;
-using DiskAnalyzer.Library.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
 {
-    public enum FilterType
-    {
-        Extension,
-        Size
-    }
-
     public record FilterExtensionDto(string Extension);
 
-
-    public enum WeightingType
+    public enum FilesMeasurementType
     {
         Count,
         Size
     }
 
-    public record RequestDto(WeightingType Type, string Path, int MaxDepth, FilterExtensionDto? FilterExtension, bool SaveInHistory);
+    public record RequestDto(FilesMeasurementType Type, string Path, int MaxDepth, FilterExtensionDto? FilterExtension, bool SaveInHistory);
 
 
     [ApiController]
-    [Route("api/[controller]")]
-    public class WeightingsController : ControllerBase
+    [Route("api/measurements/files")]
+    public class FilesMeasurementsController : ControllerBase
     {
-        [HttpPost]
+        [HttpPost()]
         public IActionResult Create(RequestDto dto)
         {
-            var repo = new ConcDictRepository();
             var filter = dto.FilterExtension != null ? new ExtensionFilter(dto.FilterExtension.Extension) : null;
 
             DirectoryMeasurementRecord result;
             switch (dto.Type)
             {
-                case WeightingType.Count:
+                case FilesMeasurementType.Count:
                     result = new FilesCountMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, filter);
                     break;
 
-                case WeightingType.Size:
+                case FilesMeasurementType.Size:
                     result = new FilesSizeMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, filter);
                     break;
 
@@ -51,27 +42,10 @@ namespace DiskAnalyzer.Api.Controllers
 
             if (dto.SaveInHistory)
             {
-                HistoryController.AddIdToHistory(result.Id);
+                HistoryController.AddIdToHistory(result);
             }
 
-            repo.Add(result);
-
-            return Created($"/api/Weightings/{result.Id}", new { result.Id });
-        }
-
-        [HttpGet("{id:guid}")]
-        public IActionResult Get(Guid id)
-        {
-            try
-            {
-                var repo = new ConcDictRepository();
-                return Ok(repo.Get(id));
-            }
-
-            catch
-            {
-                return NotFound();
-            }
+            return Ok(result);
         }
     }
 }
