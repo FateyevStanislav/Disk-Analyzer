@@ -1,4 +1,6 @@
-﻿namespace DiskAnalyzer.Library.Infrastructure.Filters;
+﻿using DiskAnalyzer.Library.Domain.Attributes;
+
+namespace DiskAnalyzer.Library.Infrastructure.Filters;
 
 [FilterName("Выбор по расширению")]
 public class ExtensionFilter : IFileFilter

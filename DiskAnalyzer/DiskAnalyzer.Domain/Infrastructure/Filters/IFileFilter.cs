@@ -1,5 +1,6 @@
-﻿namespace DiskAnalyzer.Library.Infrastructure.Filters;
+﻿using DiskAnalyzer.Library.Domain.Attributes;
 
+namespace DiskAnalyzer.Library.Infrastructure.Filters;
 public interface IFileFilter
 {
     string Name { get; }

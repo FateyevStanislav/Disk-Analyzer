@@ -1,8 +1,10 @@
-﻿using DiskAnalyzer.Library.Domain.Metrics.Formatters;
+﻿using DiskAnalyzer.Library.Domain.Attributes;
+using DiskAnalyzer.Library.Domain.Metrics.Formatters;
 
 namespace DiskAnalyzer.Library.Domain.Metrics.Files;
 
-public class FileCountMetric : BaseMetric
+[MetricName("Общее количество файлов")]
+public class FileCountMetric : BaseMetric, IFileMetric
 {
     public override string Name => "FileCount";
 

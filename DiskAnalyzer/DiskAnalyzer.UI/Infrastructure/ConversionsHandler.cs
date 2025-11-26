@@ -1,27 +1,26 @@
-﻿using DiskAnalyzer.Api;
-using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Library.Domain;
-using DiskAnalyzer.Library.Domain.Filters;
+﻿using DiskAnalyzer.Api.Controllers;
+using DiskAnalyzer.Api.Controllers.Filters;
 using DiskAnalyzer.Library.Domain.Metrics;
+using DiskAnalyzer.Library.Infrastructure.Filters;
 
 namespace DiskAnalyzer.UI.Infrastructure
 {
     public class ConversionsHandler : IConversionService
     {
-        public WeightingType? ConvertMetricToWeightingType(Type metricType)
+        public FilesMeasurementType ConvertMetricToMeasurementType(Type metricType)
         {
             if (!typeof(IMetric).IsAssignableFrom(metricType))
-                return null;
+                throw new ArgumentException($"Type {metricType} does not implement IMetric");
 
-            return ConversionMappings.TypeToWeightingType.TryGetValue(metricType, out var result) ? result : null;
+            return ConversionMappings.TypeToWeightingType[metricType];
         }
 
-        public FilterType? ConvertFilterToFilterType(Type filterType)
+        public FilterType ConvertFilterToFilterType(Type filterType)
         {
             if (!typeof(IFileFilter).IsAssignableFrom(filterType))
-                return null;
+                throw new ArgumentException($"Type {filterType} does not implement IFileFilter");
 
-            return ConversionMappings.TypeToFilterType.TryGetValue(filterType, out var result) ? result : null;
+            return ConversionMappings.TypeToFilterType[filterType];
         }
     }
 }

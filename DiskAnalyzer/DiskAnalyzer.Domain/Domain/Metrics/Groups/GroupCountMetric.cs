@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Library.Domain.Metrics.Groups;
 
-public class GroupCountMetric : BaseMetric
+public class GroupCountMetric : BaseMetric, IGroupMetric
 {
     public override string Name => "GroupCount";
     public string GroupKey { get; }

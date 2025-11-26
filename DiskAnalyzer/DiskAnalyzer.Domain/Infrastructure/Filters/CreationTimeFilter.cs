@@ -1,5 +1,8 @@
-﻿namespace DiskAnalyzer.Library.Infrastructure.Filters;
+﻿using DiskAnalyzer.Library.Domain.Attributes;
 
+namespace DiskAnalyzer.Library.Infrastructure.Filters;
+
+[FilterName("Выбор по дате создания")]
 public class CreationTimeFilter : IFileFilter
 {
     public string Name => "Выбор по дате создания";

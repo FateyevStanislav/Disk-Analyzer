@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DiskAnalyzer.Api.Controllers;
+using DiskAnalyzer.Library.Domain.Records;
 
 namespace DiskAnalyzer.UI.Infrastructure
 {
-    internal interface IApiClient
+    public interface IApiClient
     {
+        Task<DirectoryMeasurementRecord> CreateMeasurementAsync(RequestDto request);
+        Task SaveToHistoryAsync();
     }
 }

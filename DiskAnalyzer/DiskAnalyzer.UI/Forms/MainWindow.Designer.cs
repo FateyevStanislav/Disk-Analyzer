@@ -1,15 +1,17 @@
 ﻿using DiskAnalyzer.Api;
 using DiskAnalyzer.Api.Controllers;
+using DiskAnalyzer.Api.Controllers.Filters;
 using DiskAnalyzer.Library.Domain;
 using DiskAnalyzer.Library.Domain.Attributes;
-using DiskAnalyzer.Library.Domain.Filters;
 using DiskAnalyzer.Library.Domain.Metrics;
 using DiskAnalyzer.Library.Infrastructure;
+using DiskAnalyzer.Library.Infrastructure.Filters;
 using DiskAnalyzer.UI.Infrastructure;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace DiskAnalyzer.UI
 {
@@ -20,6 +22,7 @@ namespace DiskAnalyzer.UI
         private ITypeResolver typeResolver = new TypeResolver();
         private IMetricLoader metricLoader = new MetricLoader();
         private IFilterLoader filterLoader = new FilterLoader();
+        private IApiClient apiClient = new ApiClient(new HttpClient());
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -36,11 +39,11 @@ namespace DiskAnalyzer.UI
             analyzeButton = new Button();
             depthLabel = new Label();
             depthUpDown = new NumericUpDown();
-            metricsCheckList = new CheckedListBox();
             metricsLabel = new Label();
-            filterCheckList = new CheckedListBox();
+            filterListBox = new CheckedListBox();
             filterLabel = new Label();
             historyCheckBox = new CheckBox();
+            metricsListBox = new CheckedListBox();
             ((System.ComponentModel.ISupportInitialize)depthUpDown).BeginInit();
             SuspendLayout();
             // 
@@ -101,40 +104,24 @@ namespace DiskAnalyzer.UI
             depthUpDown.TabIndex = 3;
             depthUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
-            // metricsCheckList
-            // 
-            metricsCheckList.FormattingEnabled = true;
-            metricsCheckList.Location = new Point(20, 241);
-            metricsCheckList.Margin = new Padding(4, 3, 4, 3);
-            metricsCheckList.Name = "metricsCheckList";
-            metricsCheckList.Size = new Size(280, 94);
-            metricsCheckList.TabIndex = 4;
-
-            var metricTypes = metricLoader.GetAvailableMetrics().ToArray();
-            metricsCheckList.Items.Clear();
-            metricsCheckList.Items.AddRange(metricTypes);
-            // 
             // metricsLabel
             // 
             metricsLabel.AutoSize = true;
             metricsLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
             metricsLabel.Location = new Point(59, 202);
             metricsLabel.Name = "metricsLabel";
-            metricsLabel.Size = new Size(197, 24);
+            metricsLabel.Size = new Size(195, 24);
             metricsLabel.TabIndex = 5;
-            metricsLabel.Text = "Выберите метрики";
+            metricsLabel.Text = "Выберите метрику";
             // 
-            // filterCheckList
+            // filterListBox
             // 
-            filterCheckList.FormattingEnabled = true;
-            filterCheckList.Location = new Point(356, 241);
-            filterCheckList.Name = "filterCheckList";
-            filterCheckList.Size = new Size(280, 94);
-            filterCheckList.TabIndex = 6;
-
-            var filterTypes = filterLoader.GetAvailableFilters().ToArray();
-            filterCheckList.Items.Clear();
-            filterCheckList.Items.AddRange(filterTypes);
+            filterListBox.FormattingEnabled = true;
+            filterListBox.Location = new Point(356, 241);
+            filterListBox.Name = "filterListBox";
+            filterListBox.Size = new Size(280, 94);
+            filterListBox.TabIndex = 6;
+            filterListBox.Items.AddRange(filterLoader.GetAvailableFilters().ToArray());
             // 
             // filterLabel
             // 
@@ -157,17 +144,27 @@ namespace DiskAnalyzer.UI
             historyCheckBox.Text = "Сохранить в историю";
             historyCheckBox.UseVisualStyleBackColor = true;
             // 
+            // metricsListBox
+            // 
+            metricsListBox.FormattingEnabled = true;
+            metricsListBox.Location = new Point(20, 241);
+            metricsListBox.Name = "metricsListBox";
+            metricsListBox.Size = new Size(280, 94);
+            metricsListBox.TabIndex = 9;
+            metricsListBox.SelectionMode = SelectionMode.One;
+            metricsListBox.Items.AddRange(metricLoader.GetAvailableMetrics(typeof(IFileMetric)).ToArray());
+            // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientInactiveCaption;
             ClientSize = new Size(649, 501);
+            Controls.Add(metricsListBox);
             Controls.Add(historyCheckBox);
             Controls.Add(filterLabel);
-            Controls.Add(filterCheckList);
+            Controls.Add(filterListBox);
             Controls.Add(metricsLabel);
-            Controls.Add(metricsCheckList);
             Controls.Add(depthUpDown);
             Controls.Add(depthLabel);
             Controls.Add(analyzeButton);
@@ -183,42 +180,9 @@ namespace DiskAnalyzer.UI
 
         }
 
-        private void LoadMetricsToCheckList()
-        {
-            metricsCheckList.Items.Clear();
-
-            var metricTypes = Assembly
-                .Load("DiskAnalyzer.Library")
-                .GetTypes()
-                .Where(x => x.GetInterfaces().Contains(typeof(IMetric)))
-                .Select(m => m.GetCustomAttribute<MetricNameAttribute>()?.Name ?? m.Name)
-                .ToArray();
-
-            metricsCheckList.Items.AddRange(metricTypes);
-        }
-
-        private void LoadFiltersToCheckList()
-        {
-            filterCheckList.Items.Clear();
-
-            var metricTypes = Assembly
-                .Load("DiskAnalyzer.Library")
-                .GetTypes()
-                .Where(x => x.GetInterfaces().Contains(typeof(IFileFilter)))
-                .Where(x => x.GetCustomAttributes(typeof(FilterNameAttribute), false).Length > 0)
-                .Select(m =>
-                {
-                    var attribute = m.GetCustomAttribute<FilterNameAttribute>();
-                    return attribute?.Name ?? m.Name;
-                })
-                .ToArray();
-
-            filterCheckList.Items.AddRange(metricTypes);
-        }
-
         private void GetSelectedMetrics()
         {
-            var metrics = metricsCheckList.CheckedItems;
+            var metrics = metricsListBox.CheckedItems;
         }
 
         private string GetPath()
@@ -236,58 +200,44 @@ namespace DiskAnalyzer.UI
             return historyCheckBox.Checked;
         }
 
-        private void OnAnalyzeButtonClick(object sender, EventArgs e)
+        private async void OnAnalyzeButtonClick(object sender, EventArgs e)
         {
-            var path = GetPath().EscapeSlashes();
-            var maxDepth = GetDepth();
-            var selectedMetrics = metricsCheckList.CheckedItems.Cast<string>();
-            var weightingTypes = new List<WeightingType?>();
-            foreach ( var metric in selectedMetrics )
+            try
             {
-                var type = typeResolver.GetTypeByDisplayName(metric, typeof(IMetric));
-                weightingTypes.Add(conversionService.ConvertMetricToWeightingType(type));
+                var path = GetPath().EscapeSlashes();
+                var maxDepth = GetDepth();
+                var selectedMetrics = metricsListBox.CheckedItems.Cast<string>();
+                var saveInHistory = SetSaveToHistory();
+
+                var selectedMetric = metricsListBox.CheckedItems.Cast<string>().ToArray()[0];
+                Type metricType = typeResolver.GetTypeByDisplayName(selectedMetric, typeof(IMetric));
+                FilesMeasurementType metric = conversionService.ConvertMetricToMeasurementType(metricType);
+
+                var requestDto = new RequestDto(metric, path, maxDepth, null);
+
+                var result = await apiClient.CreateMeasurementAsync(requestDto);
+
+                if (saveInHistory)
+                {
+                    await apiClient.SaveToHistoryAsync();
+                }
             }
-            var selectedFilters = filterCheckList.CheckedItems.Cast<string>();
-            var filterTypes = new List<FilterType?>();
-            foreach (var filter in selectedFilters)
+            catch (Exception ex)
             {
-                var type = typeResolver.GetTypeByDisplayName(filter, typeof(IFileFilter));
-                filterTypes.Add(conversionService.ConvertFilterToFilterType(type));
+                MessageBox.Show($"Ошибка: {ex.Message}");
             }
-            var saveInHistory = SetSaveToHistory();
         }
 
-        private async Task<WeightingRecord> SendPostRequest(
-            List<WeightingType> weightingType, 
-            string path, 
-            int maxDepth, 
-            bool saveInHistory, 
-            List<FilterType> filterType)
-        {
-            using var client = new HttpClient();
-            var requestData = new
-            {
-                type = weightingType.ToString(),
-                path = path,
-                maxDepth = maxDepth,
-                saveInHistory = saveInHistory, 
-                filterType = filterType
-            };
-
-            var response = await client.PostAsJsonAsync("/api/Weightings", requestData);
-            var result = await response.Content.ReadFromJsonAsync<WeightingRecord>();
-            return result;
-        }
         private System.Windows.Forms.Label pathLabel;
         private System.Windows.Forms.TextBox pathTextBox;
         private System.Windows.Forms.Button analyzeButton;
         private System.Windows.Forms.Label depthLabel;
         private System.Windows.Forms.NumericUpDown depthUpDown;
-        private System.Windows.Forms.CheckedListBox metricsCheckList;
         private Label metricsLabel;
-        private CheckedListBox filterCheckList;
+        private CheckedListBox filterListBox;
         private Label filterLabel;
         private CheckBox historyCheckBox;
+        private CheckedListBox metricsListBox;
     }
 }
 

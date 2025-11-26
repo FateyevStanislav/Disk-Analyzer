@@ -1,5 +1,6 @@
-﻿
-namespace DiskAnalyzer.Library.Domain.Filters;
+﻿using DiskAnalyzer.Library.Domain.Attributes;
+
+namespace DiskAnalyzer.Library.Infrastructure.Filters;
 
 [FilterName("Выбор по дате открытия")]
 public class AccessTimeFilter : IFileFilter

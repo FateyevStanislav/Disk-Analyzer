@@ -1,8 +1,10 @@
-﻿using DiskAnalyzer.Library.Domain.Metrics.Formatters;
+﻿using DiskAnalyzer.Library.Domain.Attributes;
+using DiskAnalyzer.Library.Domain.Metrics.Formatters;
 
 namespace DiskAnalyzer.Library.Domain.Metrics.Files;
 
-public class FileSizeMetric : BaseMetric
+[MetricName("Общий размер файлов")]
+public class FileSizeMetric : BaseMetric, IFileMetric
 {
     public override string Name => "FileSize";
 

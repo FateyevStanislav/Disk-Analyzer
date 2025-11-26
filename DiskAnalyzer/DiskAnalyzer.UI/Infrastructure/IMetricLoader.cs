@@ -2,6 +2,6 @@
 {
     public interface IMetricLoader
     {
-        public IEnumerable<string> GetAvailableMetrics();
+        public IEnumerable<string> GetAvailableMetrics(Type targetInterface);
     }
 }
