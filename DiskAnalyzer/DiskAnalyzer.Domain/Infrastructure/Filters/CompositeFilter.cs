@@ -1,6 +1,5 @@
-﻿using DiskAnalyzer.Library.Domain.Attributes;
+﻿namespace DiskAnalyzer.Library.Infrastructure.Filters;
 
-namespace DiskAnalyzer.Library.Domain.Filters;
 public class CompositeFilter : IFileFilter
 {
     public string Name => "Composite";

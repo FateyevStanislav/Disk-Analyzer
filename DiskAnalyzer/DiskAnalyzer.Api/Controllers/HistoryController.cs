@@ -1,33 +1,40 @@
-﻿using DiskAnalyzer.Library.Domain;
-using DiskAnalyzer.Library.Infrastructure;
-using Microsoft.AspNetCore.Http;
+﻿using DiskAnalyzer.Library.Domain.Records;
+using DiskAnalyzer.Library.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/history")]
     [ApiController]
     public class HistoryController : ControllerBase
     {
-        private static readonly List<Guid> History = new();
+        private static readonly ConcDictRepository History = new();
 
-        public static void AddIdToHistory(Guid id)
+        public static void AddIdToHistory(DirectoryMeasurementRecord record)
         {
-            History.Add(id);
+            History.Add(record);
         }
 
         [HttpGet]
-        public IActionResult Get()
+        [HttpGet("{countOfRecords:int}")]
+        public IActionResult Get(int countOfRecords = 0)
         {
             var repo = new ConcDictRepository();
-            var result = new List<WeightingRecord>();
-            foreach (var id in History)
+            var result = new List<DirectoryMeasurementRecord>();
+            var i = 0;
+
+            foreach (var record in History.GetAllAscOrder())
             {
-                result.Add(repo.Get(id));
+                if (countOfRecords > 0 && i >= countOfRecords)
+                {
+                    break;
+                }
+
+                result.Add(record);
+                i++;
             }
 
             return Ok(result);
         }
     }
 }
-    
