@@ -6,32 +6,22 @@ using DiskAnalyzer.Library.Domain.Metrics;
 
 namespace DiskAnalyzer.UI.Infrastructure
 {
-    public static class ConversionsHandler
+    public class ConversionsHandler : IConversionService
     {
-        private static Dictionary<Type, WeightingType> TypeToWeightingType = new Dictionary<Type, WeightingType>
+        public WeightingType? ConvertMetricToWeightingType(Type metricType)
         {
-            { typeof(FileSizeMetricType), WeightingType.Size},
-            { typeof(FileCountMetricType), WeightingType.Count}
-        };
+            if (!typeof(IMetric).IsAssignableFrom(metricType))
+                return null;
 
-        private static Dictionary<Type, FilterType> TypeToFilterType = new Dictionary<Type, FilterType>
-        {
-            { typeof(ExtensionFilter), FilterType.Extension },
-            { typeof(SizeFilter), FilterType.Size }
-        };
-
-        public static WeightingType? ConvertMetricToWeightingType(Type type)
-        {
-            return TypeToWeightingType.TryGetValue(type, out var result)
-                   ? result
-                   : null;
+            return ConversionMappings.TypeToWeightingType.TryGetValue(metricType, out var result) ? result : null;
         }
 
-        public static FilterType? ConvertFilterToFilterType(Type type)
+        public FilterType? ConvertFilterToFilterType(Type filterType)
         {
-            return TypeToFilterType.TryGetValue(type, out var result)
-                   ? result
-                   : null;
+            if (!typeof(IFileFilter).IsAssignableFrom(filterType))
+                return null;
+
+            return ConversionMappings.TypeToFilterType.TryGetValue(filterType, out var result) ? result : null;
         }
     }
 }

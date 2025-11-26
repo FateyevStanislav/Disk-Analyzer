@@ -1,19 +1,25 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using DiskAnalyzer.Api;
+using DiskAnalyzer.Api.Controllers;
 using DiskAnalyzer.Library.Domain;
 using DiskAnalyzer.Library.Domain.Attributes;
-using DiskAnalyzer.Library.Domain.Metrics;
 using DiskAnalyzer.Library.Domain.Filters;
-using DiskAnalyzer.Api;
-using DiskAnalyzer.Api.Controllers;
+using DiskAnalyzer.Library.Domain.Metrics;
+using DiskAnalyzer.Library.Infrastructure;
 using DiskAnalyzer.UI.Infrastructure;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.Http.Json;
+using System.Reflection;
 
 namespace DiskAnalyzer.UI
 {
     partial class MainWindow
     {
         private System.ComponentModel.IContainer components = null;
+        private IConversionService conversionService = new ConversionsHandler();
+        private ITypeResolver typeResolver = new TypeResolver();
+        private IMetricLoader metricLoader = new MetricLoader();
+        private IFilterLoader filterLoader = new FilterLoader();
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -34,6 +40,7 @@ namespace DiskAnalyzer.UI
             metricsLabel = new Label();
             filterCheckList = new CheckedListBox();
             filterLabel = new Label();
+            historyCheckBox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)depthUpDown).BeginInit();
             SuspendLayout();
             // 
@@ -41,7 +48,7 @@ namespace DiskAnalyzer.UI
             // 
             pathLabel.AutoSize = true;
             pathLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            pathLabel.Location = new Point(20, 9);
+            pathLabel.Location = new Point(15, 9);
             pathLabel.Margin = new Padding(4, 0, 4, 0);
             pathLabel.Name = "pathLabel";
             pathLabel.Size = new Size(263, 24);
@@ -62,7 +69,7 @@ namespace DiskAnalyzer.UI
             // analyzeButton
             // 
             analyzeButton.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            analyzeButton.Location = new Point(271, 372);
+            analyzeButton.Location = new Point(269, 456);
             analyzeButton.Margin = new Padding(4, 3, 4, 3);
             analyzeButton.Name = "analyzeButton";
             analyzeButton.Size = new Size(112, 33);
@@ -102,13 +109,16 @@ namespace DiskAnalyzer.UI
             metricsCheckList.Name = "metricsCheckList";
             metricsCheckList.Size = new Size(280, 94);
             metricsCheckList.TabIndex = 4;
-            LoadMetricsToCheckList();
+
+            var metricTypes = metricLoader.GetAvailableMetrics().ToArray();
+            metricsCheckList.Items.Clear();
+            metricsCheckList.Items.AddRange(metricTypes);
             // 
             // metricsLabel
             // 
             metricsLabel.AutoSize = true;
             metricsLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            metricsLabel.Location = new Point(48, 198);
+            metricsLabel.Location = new Point(59, 202);
             metricsLabel.Name = "metricsLabel";
             metricsLabel.Size = new Size(197, 24);
             metricsLabel.TabIndex = 5;
@@ -121,24 +131,39 @@ namespace DiskAnalyzer.UI
             filterCheckList.Name = "filterCheckList";
             filterCheckList.Size = new Size(280, 94);
             filterCheckList.TabIndex = 6;
-            LoadFiltersToCheckList();
+
+            var filterTypes = filterLoader.GetAvailableFilters().ToArray();
+            filterCheckList.Items.Clear();
+            filterCheckList.Items.AddRange(filterTypes);
             // 
             // filterLabel
             // 
             filterLabel.AutoSize = true;
             filterLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            filterLabel.Location = new Point(391, 198);
+            filterLabel.Location = new Point(392, 202);
             filterLabel.Name = "filterLabel";
             filterLabel.Size = new Size(201, 24);
             filterLabel.TabIndex = 7;
             filterLabel.Text = "Выберите фильтры";
+            // 
+            // historyCheckBox
+            // 
+            historyCheckBox.AutoSize = true;
+            historyCheckBox.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            historyCheckBox.Location = new Point(20, 368);
+            historyCheckBox.Name = "historyCheckBox";
+            historyCheckBox.Size = new Size(236, 29);
+            historyCheckBox.TabIndex = 8;
+            historyCheckBox.Text = "Сохранить в историю";
+            historyCheckBox.UseVisualStyleBackColor = true;
             // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientInactiveCaption;
-            ClientSize = new Size(681, 417);
+            ClientSize = new Size(649, 501);
+            Controls.Add(historyCheckBox);
             Controls.Add(filterLabel);
             Controls.Add(filterCheckList);
             Controls.Add(metricsLabel);
@@ -206,41 +231,52 @@ namespace DiskAnalyzer.UI
             return (int)depthUpDown.Value;
         }
 
+        private bool SetSaveToHistory()
+        {
+            return historyCheckBox.Checked;
+        }
+
         private void OnAnalyzeButtonClick(object sender, EventArgs e)
         {
-            var path = GetPath();
+            var path = GetPath().EscapeSlashes();
             var maxDepth = GetDepth();
             var selectedMetrics = metricsCheckList.CheckedItems.Cast<string>();
             var weightingTypes = new List<WeightingType?>();
             foreach ( var metric in selectedMetrics )
             {
-                var type = GetTypeByNameAttribute(metric, typeof(IMetric));
-                weightingTypes.Add(ConversionsHandler.ConvertMetricToWeightingType(type));
+                var type = typeResolver.GetTypeByDisplayName(metric, typeof(IMetric));
+                weightingTypes.Add(conversionService.ConvertMetricToWeightingType(type));
             }
             var selectedFilters = filterCheckList.CheckedItems.Cast<string>();
             var filterTypes = new List<FilterType?>();
             foreach (var filter in selectedFilters)
             {
-                var type = GetTypeByNameAttribute(filter, typeof(IFileFilter));
-                filterTypes.Add(ConversionsHandler.ConvertFilterToFilterType(type));
+                var type = typeResolver.GetTypeByDisplayName(filter, typeof(IFileFilter));
+                filterTypes.Add(conversionService.ConvertFilterToFilterType(type));
             }
+            var saveInHistory = SetSaveToHistory();
         }
 
-        private Type GetTypeByNameAttribute(string name, Type interfaceType)
+        private async Task<WeightingRecord> SendPostRequest(
+            List<WeightingType> weightingType, 
+            string path, 
+            int maxDepth, 
+            bool saveInHistory, 
+            List<FilterType> filterType)
         {
-            var type = Assembly
-                .Load("DiskAnalyzer.Library")
-                .GetTypes()
-                .Where(x => x.GetInterfaces().Contains(interfaceType))
-                .Where(x => x.GetDisplayName() == name)
-                .FirstOrDefault();
+            using var client = new HttpClient();
+            var requestData = new
+            {
+                type = weightingType.ToString(),
+                path = path,
+                maxDepth = maxDepth,
+                saveInHistory = saveInHistory, 
+                filterType = filterType
+            };
 
-            return type;
-        }
-
-        private void SendPostRequest()
-        {
-
+            var response = await client.PostAsJsonAsync("/api/Weightings", requestData);
+            var result = await response.Content.ReadFromJsonAsync<WeightingRecord>();
+            return result;
         }
         private System.Windows.Forms.Label pathLabel;
         private System.Windows.Forms.TextBox pathTextBox;
@@ -251,6 +287,7 @@ namespace DiskAnalyzer.UI
         private Label metricsLabel;
         private CheckedListBox filterCheckList;
         private Label filterLabel;
+        private CheckBox historyCheckBox;
     }
 }
 
