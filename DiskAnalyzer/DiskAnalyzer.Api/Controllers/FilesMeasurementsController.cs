@@ -12,7 +12,7 @@ public enum FilesMeasurementType
     Size
 }
 
-public record RequestDto(FilesMeasurementType Type, string Path, int MaxDepth, IEnumerable<FilterDto>? Filters);
+public record FilesMeasurementDto(FilesMeasurementType Type, string Path, int MaxDepth, IEnumerable<FilterDto>? Filters);
 
 [ApiController]
 [Route("api/measurements/files")]
@@ -21,7 +21,7 @@ public class FilesMeasurementsController : ControllerBase
     private static DirectoryMeasurementRecord? lastResult;
 
     [HttpPost]
-    public IActionResult Create(RequestDto dto)
+    public IActionResult Create(FilesMeasurementDto dto)
     {
         var filters = dto.Filters?
             .Select(FilterFactory.Create)
