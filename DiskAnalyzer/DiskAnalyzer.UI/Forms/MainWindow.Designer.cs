@@ -6,6 +6,7 @@ using DiskAnalyzer.Library.Domain.Attributes;
 using DiskAnalyzer.Library.Domain.Metrics;
 using DiskAnalyzer.Library.Infrastructure;
 using DiskAnalyzer.Library.Infrastructure.Filters;
+using DiskAnalyzer.UI.Forms;
 using DiskAnalyzer.UI.Infrastructure;
 using System.Diagnostics;
 using System.Linq;
@@ -66,7 +67,7 @@ namespace DiskAnalyzer.UI
             pathTextBox.Location = new Point(20, 58);
             pathTextBox.Margin = new Padding(4, 3, 4, 3);
             pathTextBox.Name = "pathTextBox";
-            pathTextBox.Size = new Size(647, 20);
+            pathTextBox.Size = new Size(616, 20);
             pathTextBox.TabIndex = 1;
             // 
             // analyzeButton
@@ -151,7 +152,6 @@ namespace DiskAnalyzer.UI
             metricsListBox.Name = "metricsListBox";
             metricsListBox.Size = new Size(280, 94);
             metricsListBox.TabIndex = 9;
-            metricsListBox.SelectionMode = SelectionMode.One;
             metricsListBox.Items.AddRange(metricLoader.GetAvailableMetrics(typeof(IFileMetric)).ToArray());
             // 
             // MainWindow
@@ -209,6 +209,12 @@ namespace DiskAnalyzer.UI
                 var selectedMetrics = metricsListBox.CheckedItems.Cast<string>();
                 var saveInHistory = SetSaveToHistory();
 
+                if (metricsListBox.CheckedItems.Count == 0)
+                {
+                    MessageBox.Show("Выберите хотя бы одну метрику!");
+                    return;
+                }
+
                 var selectedMetric = metricsListBox.CheckedItems.Cast<string>().ToArray()[0];
                 Type metricType = typeResolver.GetTypeByDisplayName(selectedMetric, typeof(IMetric));
                 FilesMeasurementType metric = conversionService.ConvertMetricToMeasurementType(metricType);
@@ -221,12 +227,19 @@ namespace DiskAnalyzer.UI
                 {
                     await apiClient.SaveToHistoryAsync();
                 }
+
+                var resultForm = new ResultForm();
+                resultForm.SetMetric(result.Metrics.FirstOrDefault());
+
+                resultForm.Show();
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка: {ex.Message}");
             }
         }
+
 
         private System.Windows.Forms.Label pathLabel;
         private System.Windows.Forms.TextBox pathTextBox;
