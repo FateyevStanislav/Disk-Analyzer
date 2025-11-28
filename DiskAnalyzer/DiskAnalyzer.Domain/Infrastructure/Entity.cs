@@ -1,6 +1,6 @@
 ﻿namespace DiskAnalyzer.Library.Infrastructure;
 
-public class Entity<TId>
+public class Entity<TId> where TId : notnull
 {
     public Entity(TId id)
     {
@@ -14,7 +14,7 @@ public class Entity<TId>
         return EqualityComparer<TId>.Default.Equals(Id, other.Id);
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
