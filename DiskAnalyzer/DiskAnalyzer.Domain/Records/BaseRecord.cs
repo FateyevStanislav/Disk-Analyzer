@@ -8,6 +8,5 @@ public abstract class BaseRecord : Entity<Guid>, IRecord
 
     public abstract string Path { get; init; }
     public DateTime CreatedAt { get; init; }
-    public abstract IReadOnlyCollection<string> Logs { get; init; }
     public abstract IReadOnlyCollection<IMetric> Metrics { get; init; }
 }

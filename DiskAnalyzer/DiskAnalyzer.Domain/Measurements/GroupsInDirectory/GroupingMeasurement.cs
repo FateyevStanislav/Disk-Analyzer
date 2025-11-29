@@ -38,7 +38,6 @@ public class GroupMeasurement(ILogger<GroupMeasurement> logger) : IGroupingMeasu
             yield return new GroupingRecord(
                 Guid.NewGuid(),
                 key,
-                logs: Array.Empty<string>(),
                 metrics: metrics);
         }
 

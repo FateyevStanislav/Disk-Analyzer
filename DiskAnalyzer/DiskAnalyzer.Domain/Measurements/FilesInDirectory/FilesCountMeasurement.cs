@@ -37,7 +37,6 @@ public class FilesCountMeasurement(
         return new DirectoryMeasurementRecord(
             Guid.NewGuid(),
             rootPath,
-            logs: Array.Empty<string>(),
-            metrics: new[] { metric });
+            metrics: [metric]);
     }
 }
