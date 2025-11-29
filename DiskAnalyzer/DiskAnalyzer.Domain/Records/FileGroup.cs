@@ -4,4 +4,4 @@ public record FileGroup(
     string Key,
     long FileCount,
     long TotalSize,
-    IReadOnlyList<string> FilePaths);
+    IReadOnlyList<FileDetails> Files);

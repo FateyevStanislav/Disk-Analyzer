@@ -106,7 +106,7 @@ public class DuplicatesFinder(DirectoryWalker walker)
             FileSize: fileSize,
             FileCount: count,
             TotalWastedSpace: wastedSpace,
-            FilePaths: fileList.Select(f => f.FullName).ToList());
+            Files: [.. fileList.Select(f => new FileDetails(f.FullName, f.Length))]); 
     }
 
     private static long CalculateTotalWastedSpace(List<DuplicateGroup> groups)

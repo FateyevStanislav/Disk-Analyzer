@@ -2,7 +2,7 @@
 
 public record FilterInfo(
     string Type,
-    Dictionary<string, object> Parameters);
+    Dictionary<string, string> Parameters);
 
 [AttributeUsage(AttributeTargets.Property)]
 public class FilterInfoAttribute(string name) : Attribute

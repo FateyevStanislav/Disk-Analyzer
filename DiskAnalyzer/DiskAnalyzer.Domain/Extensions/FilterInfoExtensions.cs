@@ -7,7 +7,7 @@ namespace DiskAnalyzer.Domain.Extensions;
 
 public static class FilterInfoExtensions
 {
-    private static readonly ConcurrentDictionary<Type, (string typeName, PropertyInfo[] props)> cache 
+    private static readonly ConcurrentDictionary<Type, (string typeName, PropertyInfo[] props)> cache
         = new();
 
     public static FilterInfo ToFilterInfo(this IFileFilter filter)
@@ -30,7 +30,7 @@ public static class FilterInfoExtensions
 
         var parameters = cached.props.ToDictionary(
             p => p.GetCustomAttribute<FilterInfoAttribute>()!.Name,
-            p => p.GetValue(filter) ?? (object)"null");
+            p => ConvertToString(p.GetValue(filter)));
 
         return new FilterInfo(cached.typeName, parameters);
     }
@@ -44,5 +44,18 @@ public static class FilterInfoExtensions
             CompositeFilter composite => composite.Filters.Select(ToFilterInfo).ToList(),
             _ => new[] { filter.ToFilterInfo() }
         };
+    }
+
+    private static string ConvertToString(object? value)
+    {
+        if (value == null) return "null";
+
+        if (value is DateTime dateTime)
+            return dateTime.ToString("o"); 
+
+        if (value is bool boolean)
+            return boolean.ToString().ToLowerInvariant(); 
+
+        return value.ToString() ?? "null";
     }
 }

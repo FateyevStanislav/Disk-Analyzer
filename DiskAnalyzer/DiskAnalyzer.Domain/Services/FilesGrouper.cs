@@ -12,7 +12,7 @@ public class FilesGrouper(DirectoryWalker walker)
         IFileGrouper grouper,
         IFileFilter? filter = null)
     {
-        var groups = new Dictionary<string, (long count, long size, List<string> paths)>();
+        var groups = new Dictionary<string, (long count, long size, List<FileDetails> files)>();
 
         walker.Walk(
             path,
@@ -22,15 +22,15 @@ public class FilesGrouper(DirectoryWalker walker)
                 var key = grouper.GetKey(file);
 
                 if (!groups.ContainsKey(key))
-                    groups[key] = (0, 0, new List<string>());
+                    groups[key] = (0, 0, new List<FileDetails>());
 
-                var (count, size, paths) = groups[key];
+                var (count, size, files) = groups[key];
                 groups[key] = (
                     count + 1,
                     size + file.Length,
-                    paths
+                    files
                 );
-                paths.Add(file.FullName);
+                files.Add(new FileDetails(file.FullName, file.Length)); 
             },
             filter);
 
@@ -39,7 +39,7 @@ public class FilesGrouper(DirectoryWalker walker)
                 Key: kvp.Key,
                 FileCount: kvp.Value.count,
                 TotalSize: kvp.Value.size,
-                FilePaths: kvp.Value.paths))
+                Files: kvp.Value.files))
             .OrderByDescending(g => g.TotalSize)
             .ToList();
 
