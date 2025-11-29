@@ -2,20 +2,24 @@
 
 namespace DiskAnalyzer.Domain.Filters;
 
+[FilterType("WriteType")]
 public class WriteTimeFilter : IFileFilter
 {
-    private readonly DateTime minDateUtc;
-    private readonly DateTime maxDateUtc;
+    [FilterInfo("MinDate")]
+    public DateTime MinDateUtc { get; }
+
+    [FilterInfo("MaxDate")]
+    public DateTime MaxDateUtc { get; }
 
     public WriteTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
         ValidateSize(minDateUtc, maxDateUtc);
-        this.minDateUtc = minDateUtc;
-        this.maxDateUtc = maxDateUtc;
+        MinDateUtc = minDateUtc;
+        MaxDateUtc = maxDateUtc;
     }
 
     public bool ShouldInclude(FileInfo file)
-        => file.LastWriteTimeUtc <= maxDateUtc && file.LastWriteTimeUtc >= minDateUtc;
+        => file.LastWriteTimeUtc <= MaxDateUtc && file.LastWriteTimeUtc >= MinDateUtc;
 
     private static void ValidateSize(DateTime minDateUtc, DateTime maxDateUtc)
     {

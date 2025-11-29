@@ -2,20 +2,24 @@
 
 namespace DiskAnalyzer.Domain.Filters;
 
+[FilterType("AccessTime")]
 public class AccessTimeFilter : IFileFilter
 {
-    private readonly DateTime minDateUtc;
-    private readonly DateTime maxDateUtc;
+    [FilterInfo("MinDate")]
+    public DateTime MinDateUtc { get; }
+
+    [FilterInfo("MaxDate")]
+    public DateTime MaxDateUtc { get; }
 
     public AccessTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
         ValidateSize(minDateUtc, maxDateUtc);
-        this.minDateUtc = minDateUtc;
-        this.maxDateUtc = maxDateUtc;
+        MinDateUtc = minDateUtc;
+        MaxDateUtc = maxDateUtc;
     }
 
     public bool ShouldInclude(FileInfo file)
-        => file.LastAccessTimeUtc <= maxDateUtc && file.LastAccessTimeUtc >= minDateUtc;
+        => file.LastAccessTimeUtc <= MaxDateUtc && file.LastAccessTimeUtc >= MinDateUtc;
 
     private static void ValidateSize(DateTime minDateUtc, DateTime maxDateUtc)
     {

@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Infrastructure;
+﻿namespace DiskAnalyzer.Infrastructure;
 
 public interface IRepository<TId>
 {

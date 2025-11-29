@@ -2,7 +2,11 @@
 
 namespace DiskAnalyzer.Domain.Filters;
 
+[FilterType("Extension")]
 public class ExtensionFilter(string extension) : IFileFilter
 {
-    public bool ShouldInclude(FileInfo file) => extension == file.Extension;
+    [FilterInfo("Extension")]
+    public string Extension { get; } = extension;
+
+    public bool ShouldInclude(FileInfo file) => $".{Extension}" == file.Extension;
 }

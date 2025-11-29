@@ -2,20 +2,24 @@
 
 namespace DiskAnalyzer.Domain.Filters;
 
+[FilterType("CreationTime")]
 public class CreationTimeFilter : IFileFilter
 {
-    private readonly DateTime minDateUtc;
-    private readonly DateTime maxDateUtc;
+    [FilterInfo("MinDate")]
+    public DateTime MinDateUtc { get; }
+
+    [FilterInfo("MaxDate")]
+    public DateTime MaxDateUtc { get; }
 
     public CreationTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
         ValidateSize(minDateUtc, maxDateUtc);
-        this.minDateUtc = minDateUtc;
-        this.maxDateUtc = maxDateUtc;
+        MinDateUtc = minDateUtc;
+        MaxDateUtc = maxDateUtc;
     }
 
     public bool ShouldInclude(FileInfo file)
-        => file.CreationTimeUtc <= maxDateUtc && file.CreationTimeUtc >= minDateUtc;
+        => file.CreationTimeUtc <= MaxDateUtc && file.CreationTimeUtc >= MinDateUtc;
 
     private static void ValidateSize(DateTime minDateUtc, DateTime maxDateUtc)
     {

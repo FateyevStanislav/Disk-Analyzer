@@ -4,10 +4,10 @@ namespace DiskAnalyzer.Domain.Filters;
 
 public class CompositeFilter : IFileFilter
 {
-    private readonly List<IFileFilter> filters = [];
+    public List<IFileFilter> Filters { get; } = [];
 
-    public void Add(IFileFilter filter) => filters.Add(filter);
+    public void Add(IFileFilter filter) => Filters.Add(filter);
 
     public bool ShouldInclude(FileInfo file) =>
-        filters.All(f => f.ShouldInclude(file));
+        Filters.All(f => f.ShouldInclude(file));
 }

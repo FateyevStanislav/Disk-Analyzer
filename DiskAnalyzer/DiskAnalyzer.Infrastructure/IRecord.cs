@@ -2,7 +2,7 @@
 
 public interface IRecord
 {
+    Guid Id { get; }
     string Path { get; init; }
     DateTime CreatedAt { get; init; }
-    IReadOnlyCollection<IMetric> Metrics { get; init; }
 }

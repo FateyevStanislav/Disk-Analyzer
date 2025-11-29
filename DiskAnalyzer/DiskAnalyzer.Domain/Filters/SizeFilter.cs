@@ -2,20 +2,24 @@
 
 namespace DiskAnalyzer.Domain.Filters;
 
+[FilterType("Size")]
 public class SizeFilter : IFileFilter
 {
-    private readonly long minSizeBytes;
-    private readonly long maxSizeBytes;
+    [FilterInfo("MinSize")]
+    public long MinSizeBytes { get; }
+
+    [FilterInfo("MaxSize")]
+    public long MaxSizeBytes { get; }
 
     public SizeFilter(long minSizeBytes, long maxSizeBytes)
     {
         ValidateSize(minSizeBytes, maxSizeBytes);
-        this.minSizeBytes = minSizeBytes;
-        this.maxSizeBytes = maxSizeBytes;
+        MinSizeBytes = minSizeBytes;
+        MaxSizeBytes = maxSizeBytes;
     }
 
     public bool ShouldInclude(FileInfo file)
-        => file.Length <= maxSizeBytes && file.Length >= minSizeBytes;
+        => file.Length <= MaxSizeBytes && file.Length >= MinSizeBytes;
 
     private static void ValidateSize(long minSizeBytes, long maxSizeBytes)
     {
