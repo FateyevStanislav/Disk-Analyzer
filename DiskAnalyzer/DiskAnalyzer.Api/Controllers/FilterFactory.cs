@@ -1,4 +1,5 @@
 ﻿using DiskAnalyzer.Api.Controllers.Filters;
+using DiskAnalyzer.Infrastructure;
 using DiskAnalyzer.Library.Infrastructure.Filters;
 
 public static class FilterFactory

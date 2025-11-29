@@ -1,5 +1,5 @@
 ﻿using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Library.Domain.Records;
+using DiskAnalyzer.Domain.Records;
 
 namespace DiskAnalyzer.UI.Infrastructure
 {

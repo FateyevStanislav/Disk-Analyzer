@@ -1,7 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using DiskAnalyzer.Library.Domain.Metrics;
-using DiskAnalyzer.Library.Domain.Metrics.Files;
+using DiskAnalyzer.Domain.Metrics;
+using DiskAnalyzer.Domain.Metrics.Files;
+using DiskAnalyzer.Infrastructure;
 
 public class MetricJsonConverter : JsonConverter<IMetric>
 {

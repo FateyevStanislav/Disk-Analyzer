@@ -1,5 +1,6 @@
-﻿using DiskAnalyzer.Library.Domain.Attributes;
-using DiskAnalyzer.Library.Domain.Metrics;
+﻿using DiskAnalyzer.Domain.Metrics;
+using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Library.Domain.Attributes;
 
 namespace DiskAnalyzer.UI.Forms
 {
