@@ -1,10 +1,11 @@
 ﻿using DiskAnalyzer.Api;
 using DiskAnalyzer.Api.Controllers;
 using DiskAnalyzer.Api.Controllers.Filters;
+using DiskAnalyzer.Domain.Extensions;
+using DiskAnalyzer.Domain.Metrics;
+using DiskAnalyzer.Infrastructure;
 using DiskAnalyzer.Library.Domain;
 using DiskAnalyzer.Library.Domain.Attributes;
-using DiskAnalyzer.Library.Domain.Metrics;
-using DiskAnalyzer.Library.Infrastructure;
 using DiskAnalyzer.Library.Infrastructure.Filters;
 using DiskAnalyzer.UI.Forms;
 using DiskAnalyzer.UI.Infrastructure;

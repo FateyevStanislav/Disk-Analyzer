@@ -1,7 +1,7 @@
 ﻿using DiskAnalyzer.Api.Controllers;
 using DiskAnalyzer.Api.Controllers.Filters;
-using DiskAnalyzer.Library.Domain.Metrics;
-using DiskAnalyzer.Library.Infrastructure.Filters;
+using DiskAnalyzer.Domain.Metrics;
+using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.UI.Infrastructure
 {

@@ -1,5 +1,5 @@
-﻿using DiskAnalyzer.Library.Domain.Attributes;
-using DiskAnalyzer.Library.Infrastructure.Filters;
+﻿using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Library.Domain.Attributes;
 using System.Reflection;
 
 namespace DiskAnalyzer.UI.Infrastructure

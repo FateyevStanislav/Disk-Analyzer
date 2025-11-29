@@ -1,5 +1,5 @@
 ﻿using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Library.Domain.Records;
+using DiskAnalyzer.Domain.Records;
 using DiskAnalyzer.UI.Infrastructure;
 using System.Net.Http.Json;
 using System.Text.Json;
