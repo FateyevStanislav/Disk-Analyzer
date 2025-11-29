@@ -1,8 +1,9 @@
 ﻿using DiskAnalyzer.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace DiskAnalyzer.Domain.Groupers;
 
-public class LastAccessTimeGrouper : IFileGrouper
+public class LastAccessTimeGrouper(ILoggerFactory loggerFactory) : IFileGrouper
 {
     public IEnumerable<IGrouping<string, FileInfo>> Group(
         string rootPath, 
@@ -18,6 +19,7 @@ public class LastAccessTimeGrouper : IFileGrouper
                 if (span.TotalDays > 30) return "Используемые";
                 return "Наиболее актуальные";
             }, 
-            filter);
+            filter,
+            loggerFactory);
     }
 }

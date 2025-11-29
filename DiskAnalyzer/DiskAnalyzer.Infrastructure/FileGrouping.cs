@@ -1,23 +1,27 @@
-﻿namespace DiskAnalyzer.Infrastructure;
+﻿using Microsoft.Extensions.Logging;
+
+namespace DiskAnalyzer.Infrastructure;
 
 public static class FileGrouping
 {
-    public static IEnumerable<IGrouping<TKey, FileInfo>> GroupFilesBy<TKey>(
+    public static IEnumerable<IGrouping<string, FileInfo>> GroupFilesBy(
         string rootPath,
         int maxDepth,
-        Func<FileInfo, TKey> groupBySelector,
-        IFileFilter? filter = null,
-        Logger.Logger? logger = null)
+        Func<FileInfo, string> keySelector,
+        IFileFilter? filter,
+        ILoggerFactory loggerFactory)
     {
+        var logger = loggerFactory.CreateLogger<DirectoryWalker>();
+        var walker = new DirectoryWalker(logger);
+
         var files = new List<FileInfo>();
 
-        var walker = new DirectoryWalker(logger);
         walker.Walk(
             rootPath,
             maxDepth,
             onFile: files.Add,
             filter: filter);
 
-        return files.GroupBy(groupBySelector);
+        return files.GroupBy(keySelector);
     }
 }

@@ -1,10 +1,13 @@
 ﻿using DiskAnalyzer.Domain.Metrics.Files;
 using DiskAnalyzer.Domain.Records;
 using DiskAnalyzer.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace DiskAnalyzer.Domain.Measurements.FilesInDirectory;
 
-public class FilesSizeMeasurement : IDirectoryMeasurement
+public class FilesSizeMeasurement(
+    ILogger<DirectoryWalker> walkerLogger,
+    ILogger<FilesSizeMeasurement> logger) : IDirectoryMeasurement
 {
     public DirectoryMeasurementRecord MeasureFilesInDirectory(
         string rootPath,
@@ -13,24 +16,28 @@ public class FilesSizeMeasurement : IDirectoryMeasurement
     {
         long totalSize = 0;
 
-        var walker = new DirectoryWalker();
+        var walker = new DirectoryWalker(walkerLogger);
+
+        logger.LogInformation(
+            "Начато измерение размера файлов {RootPath} максимальная глубина {MaxDepth}",
+            rootPath, maxDepth);
+
         walker.Walk(
             rootPath,
             maxDepth,
             onFile: file => totalSize += file.Length,
-            filter: filter
-        );
-
-        var logs = walker.Logs?.Logs
-            .Select(log => log.ToString())
-            .ToList()
-            .AsReadOnly();
+            filter: filter);
 
         var metric = new FileSizeMetric(totalSize);
+
+        logger.LogInformation(
+            "Измерение окончено {RootPath}. Размер: {TotalSize} бит",
+            rootPath, totalSize);
+
         return new DirectoryMeasurementRecord(
             Guid.NewGuid(),
             rootPath,
-            logs,
-            new[] { metric });
+            logs: Array.Empty<string>(),
+            metrics: new[] { metric });
     }
 }

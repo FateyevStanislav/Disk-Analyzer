@@ -1,36 +1,43 @@
 ﻿using DiskAnalyzer.Domain.Metrics.Files;
 using DiskAnalyzer.Domain.Records;
 using DiskAnalyzer.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace DiskAnalyzer.Domain.Measurements.FilesInDirectory;
 
-public class FilesCountMeasurement : IDirectoryMeasurement
+public class FilesCountMeasurement(
+    ILogger<DirectoryWalker> walkerLogger,
+    ILogger<FilesSizeMeasurement> logger) : IDirectoryMeasurement
 {
     public DirectoryMeasurementRecord MeasureFilesInDirectory(
         string rootPath,
         int maxDepth,
         IFileFilter? filter = null)
     {
-        int count = 0;
+        long count = 0;
 
-        var walker = new DirectoryWalker();
+        var walker = new DirectoryWalker(walkerLogger);
+
+        logger.LogInformation(
+            "Начато измерение количества файлов {RootPath} максимальная глубина {MaxDepth}",
+            rootPath, maxDepth);
+
         walker.Walk(
             rootPath,
             maxDepth,
             onFile: file => count++,
-            filter: filter
-        );
+            filter: filter);
 
-        var logs = walker.Logs?.Logs
-            .Select(log => log.ToString())
-            .ToList()
-            .AsReadOnly();
+        var metric = new FileSizeMetric(count);
 
-        var metric = new FileCountMetric(count);
+        logger.LogInformation(
+            "Измерение окончено {RootPath}. Количество: {Count}",
+            rootPath, count);
+
         return new DirectoryMeasurementRecord(
             Guid.NewGuid(),
             rootPath,
-            logs,
-            new[] { metric });
+            logs: Array.Empty<string>(),
+            metrics: new[] { metric });
     }
 }

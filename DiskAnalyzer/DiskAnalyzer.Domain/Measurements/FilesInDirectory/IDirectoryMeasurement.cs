@@ -9,4 +9,12 @@ public interface IDirectoryMeasurement
         string rootPath, 
         int maxDepth, 
         IFileFilter? filter = null);
+
+    public async Task<DirectoryMeasurementRecord> MeasureFilesInDirectoryAsync(
+        string rootPath,
+        int maxDepth,
+        IFileFilter? filter = null)
+    {
+        return await Task.Run(() => MeasureFilesInDirectory(rootPath, maxDepth, filter));
+    }
 }

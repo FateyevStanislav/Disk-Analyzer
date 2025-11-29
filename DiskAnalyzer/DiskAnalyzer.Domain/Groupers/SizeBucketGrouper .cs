@@ -1,8 +1,9 @@
 ﻿using DiskAnalyzer.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace DiskAnalyzer.Domain.Groupers;
 
-public class SizeBucketGrouper : IFileGrouper
+public class SizeBucketGrouper(ILoggerFactory loggerFactory) : IFileGrouper
 {
     public IEnumerable<IGrouping<string, FileInfo>> Group(
         string rootPath,
@@ -15,11 +16,13 @@ public class SizeBucketGrouper : IFileGrouper
             f =>
             {
                 var size = f.Length;
+
                 if (size < 1L << 20) return "<1 MB";
-                if (size < 10L << 20) return "1–10 MB";
-                if (size < 100L << 20) return "10–100 MB";
-                return "≥100 MB";
+                if (size < 10L << 20) return "1-10 MB";
+                if (size < 100L << 20) return "10-100 MB";
+                return ">=100 MB";
             },
-            filter);
+            filter,
+            loggerFactory);
     }
 }

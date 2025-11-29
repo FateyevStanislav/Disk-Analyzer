@@ -1,17 +1,10 @@
-﻿using DiskAnalyzer.Infrastructure.Logger;
+﻿using Microsoft.Extensions.Logging;
 
 namespace DiskAnalyzer.Infrastructure;
 
-public class DirectoryWalker
+public class DirectoryWalker(ILogger<DirectoryWalker> logger)
 {
     public delegate void OnFileAction(FileInfo file);
-
-    public Logger.Logger? Logs { get; }
-
-    public DirectoryWalker(Logger.Logger? logger = null)
-    {
-        Logs = logger ?? new Logger.Logger();
-    }
 
     public void Walk(
         string rootPath,
@@ -24,74 +17,66 @@ public class DirectoryWalker
         if (!Directory.Exists(rootPath))
             throw new DirectoryNotFoundException(rootPath);
 
+        logger.LogInformation("Начат обход {RootPath}, глубина {MaxDepth}", rootPath, maxDepth);
+
         var q = new Queue<(string path, int depth)>();
         q.Enqueue((rootPath, 0));
 
         while (q.Count > 0)
         {
             var (path, depth) = q.Dequeue();
+            int fileCount = 0;
 
             try
             {
-                foreach (var filePath in Directory
-                    .EnumerateFiles(path, "*", SearchOption.TopDirectoryOnly))
+                foreach (var filePath in Directory.EnumerateFiles(path, "*", SearchOption.TopDirectoryOnly))
                 {
                     var file = new FileInfo(filePath);
-                    if (filter == null || filter.ShouldInclude(file))
+                    if (filter?.ShouldInclude(file) != false)
                     {
                         onFile?.Invoke(file);
-                        Logs?.Add(
-                            LogType.Success,
-                            $"Файл {path} обработан");
+                        fileCount++;
                     }
                 }
+                logger.LogDebug("Обработано {FileCount} файлов в {Path}", fileCount, path);
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logs?.Add(
-                    LogType.Warning,
-                    $"Нет доступа к файлам в каталоге {path}: {ex?.ToString()}");
+                logger.LogWarning(ex, "Нет доступа к файлам в {Path}", path);
             }
             catch (IOException ex)
             {
-                Logs?.Add(
-                    LogType.Error,
-                    $"Ошибка ввода/вывода при чтении файлов каталога {path}: {ex?.ToString()}");
+                logger.LogError(ex, "I/O ошибка при чтении файлов в {Path}", path);
             }
             catch (Exception ex)
             {
-                Logs?.Add(
-                    LogType.Error,
-                    $"Неожиданная ошибка при обработке файлов в каталоге {path}: {ex?.ToString()}");
+                logger.LogError(ex, "Ошибка при обработке файлов в {Path}", path);
             }
 
             if (depth >= maxDepth) continue;
 
             try
             {
-                foreach (var dir in Directory.EnumerateDirectories(path))
-                {
+                var subdirs = Directory.EnumerateDirectories(path).ToList();
+                foreach (var dir in subdirs)
                     q.Enqueue((dir, depth + 1));
-                }
+
+                logger.LogDebug("Добавлено {SubdirCount} поддиректорий из {Path}", subdirs.Count, path);
             }
             catch (UnauthorizedAccessException ex)
             {
-                Logs?.Add(
-                    LogType.Warning,
-                    $"Нет доступа к вложенному каталогу {path}: {ex?.ToString()}");
+                logger.LogWarning(ex, "Нет доступа к поддиректориям {Path}", path);
             }
             catch (IOException ex)
             {
-                Logs?.Add(
-                    LogType.Error,
-                    $"Ошибка ввода/вывода при обходе вложенных каталогов {path}: {ex?.ToString()}");
+                logger.LogError(ex, "I/O ошибка при обходе поддиректорий {Path}", path);
             }
             catch (Exception ex)
             {
-                Logs?.Add(
-                    LogType.Error,
-                    $"Неожиданная ошибка при обработке подкаталога {path}: {ex?.ToString()}");
+                logger.LogError(ex, "Ошибка при обходе поддиректорий {Path}", path);
             }
         }
+
+        logger.LogInformation("Обход {RootPath} завершён", rootPath);
     }
 }

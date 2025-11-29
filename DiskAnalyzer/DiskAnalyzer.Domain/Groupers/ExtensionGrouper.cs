@@ -1,8 +1,9 @@
 ﻿using DiskAnalyzer.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace DiskAnalyzer.Domain.Groupers;
 
-public class ExtensionGrouper : IFileGrouper
+public class ExtensionGrouper(ILoggerFactory loggerFactory) : IFileGrouper
 {
     public IEnumerable<IGrouping<string, FileInfo>> Group(
         string rootPath, 
@@ -13,6 +14,7 @@ public class ExtensionGrouper : IFileGrouper
             rootPath, 
             maxDepth, 
             f => f.Extension.ToLowerInvariant(), 
-            filter);
+            filter,
+            loggerFactory);
     }
 }
