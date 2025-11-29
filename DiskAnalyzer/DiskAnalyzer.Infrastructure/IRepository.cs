@@ -1,12 +1,12 @@
 ﻿namespace DiskAnalyzer.Infrastructure;
 
-public interface IRepository<TId>
+public interface IRepository
 {
-    void Add(IRecord record);
-    IRecord Get(TId id);
-    bool Remove(TId id);
+    void Add(Record record);
+    Record Get(Guid id);
+    bool Remove(Guid id);
     void Clear();
     int Count { get; }
-    IEnumerable<IRecord> GetAllDescOrder();
-    IEnumerable<IRecord> GetAllAscOrder();
+    IEnumerable<Record> GetAllDescOrder();
+    IEnumerable<Record> GetAllAscOrder();
 }

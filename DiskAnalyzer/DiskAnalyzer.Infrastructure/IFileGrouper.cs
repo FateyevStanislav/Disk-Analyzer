@@ -2,8 +2,5 @@
 
 public interface IFileGrouper
 {
-    IEnumerable<IGrouping<string, FileInfo>> Group(
-        string rootPath,
-        int maxDepth,
-        IFileFilter? filter = null);
+    string GetKey(FileInfo file);
 }

@@ -26,11 +26,11 @@ public class SizeFilter : IFileFilter
         if (minSizeBytes < 0)
             throw new ArgumentOutOfRangeException(
                 nameof(minSizeBytes),
-                "Минимальный размер должен быть больше нуля");
+                "Минимальный размер должен быть неотрицательным");
         if (maxSizeBytes < 0)
             throw new ArgumentOutOfRangeException(
                 nameof(maxSizeBytes),
-                "Максимальный размер должен быть больше нуля");
+                "Максимальный размер должен быть неотрицательным");
         if (minSizeBytes > maxSizeBytes)
             throw new ArgumentOutOfRangeException(
                 nameof(maxSizeBytes),

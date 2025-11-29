@@ -1,31 +1,47 @@
 ﻿using DiskAnalyzer.Domain.Filters;
 using DiskAnalyzer.Infrastructure;
+using System.Collections.Concurrent;
 using System.Reflection;
+
+namespace DiskAnalyzer.Domain.Extensions;
 
 public static class FilterInfoExtensions
 {
+    private static readonly ConcurrentDictionary<Type, (string typeName, PropertyInfo[] props)> cache 
+        = new();
+
     public static FilterInfo ToFilterInfo(this IFileFilter filter)
     {
-        var filterType = filter.GetType().GetCustomAttribute<FilterTypeAttribute>()
-            ?? new FilterTypeAttribute(filter.GetType().Name.Replace("Filter", ""));
+        var type = filter.GetType();
 
-        var parameters = filter.GetType()
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanRead && p.GetIndexParameters().Length == 0)
-            .Where(p => p.GetCustomAttribute<FilterInfoAttribute>() != null)
-            .ToDictionary(
-                p => p.GetCustomAttribute<FilterInfoAttribute>()!.Name,
-                p => p.GetValue(filter) ?? "null");
+        var cached = cache.GetOrAdd(type, t =>
+        {
+            var filterType = t.GetCustomAttribute<FilterTypeAttribute>()
+                ?? new FilterTypeAttribute(t.Name.Replace("Filter", ""));
 
-        return new FilterInfo(filterType.DisplayName, parameters);
+            var props = t.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.CanRead &&
+                           p.GetIndexParameters().Length == 0 &&
+                           p.GetCustomAttribute<FilterInfoAttribute>() != null)
+                .ToArray();
+
+            return (filterType.DisplayName, props);
+        });
+
+        var parameters = cached.props.ToDictionary(
+            p => p.GetCustomAttribute<FilterInfoAttribute>()!.Name,
+            p => p.GetValue(filter) ?? (object)"null");
+
+        return new FilterInfo(cached.typeName, parameters);
     }
 
     public static IReadOnlyCollection<FilterInfo>? ToFilterInfoList(this IFileFilter? filter)
     {
         if (filter == null) return null;
+
         return filter switch
         {
-            CompositeFilter composite => [.. composite.Filters.Select(ToFilterInfo)],
+            CompositeFilter composite => composite.Filters.Select(ToFilterInfo).ToList(),
             _ => new[] { filter.ToFilterInfo() }
         };
     }
