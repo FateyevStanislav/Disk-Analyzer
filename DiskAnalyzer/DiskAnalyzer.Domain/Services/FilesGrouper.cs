@@ -4,7 +4,7 @@ using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class FilesGrouping(DirectoryWalker walker)
+public class FilesGrouper(DirectoryWalker walker)
 {
     public FilesGroupingRecord GroupFiles(
         string path,

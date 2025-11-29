@@ -4,7 +4,7 @@ using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class FilesMeasurement(DirectoryWalker walker)
+public class FilesMeasurer(DirectoryWalker walker)
 {
     public FilesMeasurementRecord MeasureFiles(
         string path,
