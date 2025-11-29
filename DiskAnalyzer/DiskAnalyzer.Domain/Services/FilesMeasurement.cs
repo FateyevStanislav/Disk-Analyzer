@@ -4,9 +4,9 @@ using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class FileAnalyzer(DirectoryWalker walker)
+public class FilesMeasurement(DirectoryWalker walker)
 {
-    public FilesMeasurementRecord MeasureFilesInDirectory(
+    public FilesMeasurementRecord MeasureFiles(
         string path,
         int maxDepth,
         IFileFilter? filter = null)
@@ -14,16 +14,29 @@ public class FileAnalyzer(DirectoryWalker walker)
         long fileCount = 0;
         long totalSize = 0;
 
-        walker.Walk(path, maxDepth, onFile: file =>
-        {
-            fileCount++;
-            totalSize += file.Length;
-        }, filter);
+        walker.Walk(
+            path,
+            maxDepth,
+            file =>
+            {
+                fileCount++;
+                totalSize += file.Length;
+            },
+            filter);
 
         return new FilesMeasurementRecord(
             path,
             fileCount,
             totalSize,
             filter?.ToFilterInfoList());
+    }
+
+    public Task<FilesMeasurementRecord> MeasureFilesAsync(
+        string path,
+        int maxDepth,
+        IFileFilter? filter = null,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => MeasureFiles(path, maxDepth, filter), cancellationToken);
     }
 }

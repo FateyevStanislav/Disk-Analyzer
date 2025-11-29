@@ -4,7 +4,7 @@ using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class FileGroupingAnalyzer(DirectoryWalker walker)
+public class FilesGrouping(DirectoryWalker walker)
 {
     public FilesGroupingRecord GroupFiles(
         string path,
@@ -15,8 +15,8 @@ public class FileGroupingAnalyzer(DirectoryWalker walker)
         var groups = new Dictionary<string, (long count, long size, List<string> paths)>();
 
         walker.Walk(
-            path, 
-            maxDepth, 
+            path,
+            maxDepth,
             file =>
             {
                 var key = grouper.GetKey(file);
@@ -31,8 +31,7 @@ public class FileGroupingAnalyzer(DirectoryWalker walker)
                     paths
                 );
                 paths.Add(file.FullName);
-
-            }, 
+            },
             filter);
 
         var fileGroups = groups
@@ -49,5 +48,15 @@ public class FileGroupingAnalyzer(DirectoryWalker walker)
             grouper.ToGrouperInfo(),
             fileGroups,
             filter?.ToFilterInfoList());
+    }
+
+    public Task<FilesGroupingRecord> GroupFilesAsync(
+        string path,
+        int maxDepth,
+        IFileGrouper grouper,
+        IFileFilter? filter = null,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.Run(() => GroupFiles(path, maxDepth, grouper, filter), cancellationToken);
     }
 }
