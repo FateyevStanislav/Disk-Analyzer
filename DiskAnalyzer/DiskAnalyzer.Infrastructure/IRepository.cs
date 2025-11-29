@@ -1,12 +1,14 @@
 ﻿namespace DiskAnalyzer.Infrastructure;
 
-public interface IRepository
+public interface IRepository<TRecord> where TRecord : Record
 {
-    void Add(Record record);
-    Record Get(Guid id);
-    bool Remove(Guid id);
-    void Clear();
-    int Count { get; }
-    IEnumerable<Record> GetAllDescOrder();
-    IEnumerable<Record> GetAllAscOrder();
+    Task AddAsync(TRecord record, CancellationToken cancellationToken = default);
+    Task<TRecord?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<TRecord>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<TRecord>> GetAllOrderedAsync(
+        bool descending = true, 
+        CancellationToken cancellationToken = default);
+    Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<int> CountAsync(CancellationToken cancellationToken = default);
+    Task ClearAsync(CancellationToken cancellationToken = default); 
 }
