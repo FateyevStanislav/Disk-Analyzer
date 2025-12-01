@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Infrastructure.Grouper;
 
 namespace DiskAnalyzer.Domain.Groupers;
 

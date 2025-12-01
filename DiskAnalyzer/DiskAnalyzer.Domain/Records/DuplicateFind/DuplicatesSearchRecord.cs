@@ -1,7 +1,7 @@
-﻿using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Infrastructure.Filter;
 
-namespace DiskAnalyzer.Domain.Records;
+namespace DiskAnalyzer.Domain.Records.DuplicateFind;
 
 public record DuplicatesSearchRecord(
     string Path,

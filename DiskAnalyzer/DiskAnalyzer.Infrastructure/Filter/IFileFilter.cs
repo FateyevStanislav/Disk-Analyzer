@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Infrastructure;
+﻿namespace DiskAnalyzer.Infrastructure.Filter;
 
 public interface IFileFilter
 {

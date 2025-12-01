@@ -1,14 +1,16 @@
 ﻿using DiskAnalyzer.Domain.Extensions;
-using DiskAnalyzer.Domain.Records;
+using DiskAnalyzer.Domain.Records.RecordStrategies.Measurement;
 using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Infrastructure.Filter;
 
 namespace DiskAnalyzer.Domain.Services;
 
 public class FilesMeasurer(DirectoryWalker walker)
 {
-    public FilesMeasurementRecord MeasureFiles(
+    public Record MeasureFiles(
         string path,
         int maxDepth,
+        IFilesMeasurementStrategy strategy,
         IFileFilter? filter = null)
     {
         long fileCount = 0;
@@ -24,19 +26,20 @@ public class FilesMeasurer(DirectoryWalker walker)
             },
             filter);
 
-        return new FilesMeasurementRecord(
+        return strategy.CreateRecord(
             path,
             fileCount,
             totalSize,
             filter?.ToFilterInfoList());
     }
 
-    public Task<FilesMeasurementRecord> MeasureFilesAsync(
+    public Task<Record> MeasureFilesAsync(
         string path,
         int maxDepth,
+        IFilesMeasurementStrategy strategy,
         IFileFilter? filter = null,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(() => MeasureFiles(path, maxDepth, filter), cancellationToken);
+        return Task.Run(() => MeasureFiles(path, maxDepth, strategy, filter), cancellationToken);
     }
 }

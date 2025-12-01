@@ -1,6 +1,10 @@
 ﻿using DiskAnalyzer.Domain.Extensions;
 using DiskAnalyzer.Domain.Records;
+using DiskAnalyzer.Domain.Records.Grouping;
+using DiskAnalyzer.Domain.Records.RecordStrategies.Grouping;
 using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Infrastructure.Filter;
+using DiskAnalyzer.Infrastructure.Grouper;
 
 namespace DiskAnalyzer.Domain.Services;
 
@@ -9,6 +13,7 @@ public class FilesGrouper(DirectoryWalker walker)
     public FilesGroupingRecord GroupFiles(
         string path,
         int maxDepth,
+        IFilesGroupStrategy strategy,
         IFileGrouper grouper,
         IFileFilter? filter = null)
     {
@@ -35,12 +40,11 @@ public class FilesGrouper(DirectoryWalker walker)
             filter);
 
         var fileGroups = groups
-            .Select(kvp => new FileGroup(
-                Key: kvp.Key,
-                FileCount: kvp.Value.count,
-                TotalSize: kvp.Value.size,
-                Files: kvp.Value.files))
-            .OrderByDescending(g => g.TotalSize)
+            .Select(kvp => strategy.CreateGroup(
+                kvp.Key, 
+                kvp.Value.count, 
+                kvp.Value.size, 
+                kvp.Value.files))
             .ToList();
 
         return new FilesGroupingRecord(
@@ -53,10 +57,12 @@ public class FilesGrouper(DirectoryWalker walker)
     public Task<FilesGroupingRecord> GroupFilesAsync(
         string path,
         int maxDepth,
+        IFilesGroupStrategy strategy,
         IFileGrouper grouper,
         IFileFilter? filter = null,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(() => GroupFiles(path, maxDepth, grouper, filter), cancellationToken);
+        return Task.Run(() 
+            => GroupFiles(path, maxDepth, strategy, grouper, filter), cancellationToken);
     }
 }
