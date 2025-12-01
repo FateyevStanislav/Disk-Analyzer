@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Infrastructure.Filter;
 
 namespace DiskAnalyzer.Domain.Filters;
 

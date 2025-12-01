@@ -1,5 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Infrastructure.Filter;
 using System.Collections.Concurrent;
 using System.Reflection;
 

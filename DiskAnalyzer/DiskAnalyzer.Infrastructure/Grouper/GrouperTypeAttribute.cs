@@ -1,6 +1,4 @@
-﻿namespace DiskAnalyzer.Domain.Groupers;
-
-public record GrouperInfo(string Type);
+﻿namespace DiskAnalyzer.Infrastructure.Grouper;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class GrouperTypeAttribute(string displayName) : Attribute

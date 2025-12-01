@@ -1,5 +1,4 @@
-﻿using DiskAnalyzer.Domain.Groupers;
-using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Infrastructure.Grouper;
 using System.Collections.Concurrent;
 using System.Reflection;
 

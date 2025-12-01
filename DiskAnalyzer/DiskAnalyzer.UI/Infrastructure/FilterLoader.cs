@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Infrastructure.Filter;
 using DiskAnalyzer.Library.Domain.Attributes;
 using System.Reflection;
 

@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Infrastructure.Filter;
 
 namespace DiskAnalyzer.Domain.Filters;
 
@@ -13,7 +13,7 @@ public class WriteTimeFilter : IFileFilter
 
     public WriteTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
-        ValidateSize(minDateUtc, maxDateUtc);
+        ValidateDateSpan(minDateUtc, maxDateUtc);
         MinDateUtc = minDateUtc;
         MaxDateUtc = maxDateUtc;
     }
@@ -21,7 +21,7 @@ public class WriteTimeFilter : IFileFilter
     public bool ShouldInclude(FileInfo file)
         => file.LastWriteTimeUtc <= MaxDateUtc && file.LastWriteTimeUtc >= MinDateUtc;
 
-    private static void ValidateSize(DateTime minDateUtc, DateTime maxDateUtc)
+    private static void ValidateDateSpan(DateTime minDateUtc, DateTime maxDateUtc)
     {
         if (minDateUtc > maxDateUtc)
             throw new ArgumentOutOfRangeException(
