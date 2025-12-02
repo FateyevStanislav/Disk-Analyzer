@@ -1,7 +1,8 @@
 ﻿using DiskAnalyzer.Api.Controllers.Filters;
-using DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
-using DiskAnalyzer.Library.Domain.Records;
-using DiskAnalyzer.Library.Infrastructure.Filters;
+using DiskAnalyzer.Domain.Filters;
+using DiskAnalyzer.Domain.Measurements.FilesInDirectory;
+using DiskAnalyzer.Domain.Records;
+using DiskAnalyzer.Infrastructure.Filter;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers;

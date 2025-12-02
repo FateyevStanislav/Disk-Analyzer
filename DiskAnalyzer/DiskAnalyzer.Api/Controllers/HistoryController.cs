@@ -1,5 +1,4 @@
-﻿using DiskAnalyzer.Library.Domain.Records;
-using DiskAnalyzer.Library.Infrastructure.Repositories;
+﻿using DiskAnalyzer.Domain.Records;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
