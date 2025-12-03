@@ -1,5 +1,4 @@
-﻿using DiskAnalyzer.Api.Controllers.Filters;
-using DiskAnalyzer.Api.Factories;
+﻿using DiskAnalyzer.Api.Factories;
 using DiskAnalyzer.Domain.Filters;
 using DiskAnalyzer.Domain.Records.RecordStrategies.Measurement;
 using DiskAnalyzer.Domain.Services;
@@ -25,14 +24,8 @@ public class FilesMeasurementsController : ControllerBase
     [HttpPost]
     public IActionResult Create(FilesMeasurementDto dto)
     {
-        var filters = dto.Filters?
-            .Select(FilterFactory.Create)
-            .ToList() ?? new List<IFileFilter>();
-        var compositeFilter = new CompositeFilter();
-        foreach (var filter in filters)
-        {
-            compositeFilter.Add(filter);
-        }
+
+        var filter = FilterFactory.Create(dto.Filters);
 
         IFilesMeasurementStrategy strategy;
         try
@@ -44,7 +37,7 @@ public class FilesMeasurementsController : ControllerBase
             return BadRequest(ex.Message);
         }
 
-        lastResult = filesMeasurer.MeasureFiles(dto.Path, dto.MaxDepth, strategy, compositeFilter);
+        lastResult = filesMeasurer.MeasureFiles(dto.Path, dto.MaxDepth, strategy, filter);
 
         return Ok(lastResult);
     }

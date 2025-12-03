@@ -11,7 +11,6 @@ builder.Services.AddControllers().AddJsonOptions(
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         //options.JsonSerializerOptions.Converters.Add(new MetricJsonConverter());
-        options.JsonSerializerOptions.Converters.Add(new FilterDtoJsonConverter());
         options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
     });
 

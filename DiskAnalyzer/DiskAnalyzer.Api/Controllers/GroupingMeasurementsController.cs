@@ -1,5 +1,4 @@
-﻿using DiskAnalyzer.Api.Controllers.Filters;
-using DiskAnalyzer.Domain.Filters;
+﻿using DiskAnalyzer.Domain.Filters;
 using DiskAnalyzer.Domain.Groupers;
 using DiskAnalyzer.Domain.Records.RecordStrategies.Grouping;
 using DiskAnalyzer.Domain.Services;
@@ -33,14 +32,7 @@ namespace DiskAnalyzer.Api.Controllers
         [HttpPost]
         public IActionResult Create(GroupingMeasurementDto dto)
         {
-            var filters = dto.Filters?
-                .Select(FilterFactory.Create)
-                .ToList() ?? new List<IFileFilter>();
-            var compositeFilter = new CompositeFilter();
-            foreach (var filter in filters)
-            {
-                compositeFilter.Add(filter);
-            }
+            var filter = FilterFactory.Create(dto.Filters);
 
             IFileGrouper grouper;
 
@@ -62,7 +54,7 @@ namespace DiskAnalyzer.Api.Controllers
                     return BadRequest("Uncorrect grouper type");
             }
 
-            lastResult = filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, new SizeInfoGroupStrategy(), grouper, compositeFilter);
+            lastResult = filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, new SizeInfoGroupStrategy(), grouper, filter);
 
             return Ok(lastResult);
         }

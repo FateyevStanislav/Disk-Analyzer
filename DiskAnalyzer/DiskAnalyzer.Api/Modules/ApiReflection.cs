@@ -1,15 +1,19 @@
 ﻿using DiskAnalyzer.Domain.Filters;
 using DiskAnalyzer.Infrastructure.Filter;
+using Newtonsoft.Json.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
 
 namespace DiskAnalyzer.Api.Modules;
 
 public static class ApiReflection
 {
+    private static Assembly domainAssembly;
     private static Dictionary<string, Dictionary<string, Type>> filtersData;
 
     public static void InitData()
     {
-        var domainAssembly = typeof(ExtensionFilter).Assembly;
+        domainAssembly = typeof(ExtensionFilter).Assembly;
 
         filtersData = new();
 
@@ -35,6 +39,11 @@ public static class ApiReflection
     {
 
         return filtersData.AsReadOnly();
+    }
+
+    public static Type? GetFilterType(string filterName)
+    {
+        return domainAssembly.GetType($"DiskAnalyzer.Domain.Filters.{filterName}");
     }
 }
 
