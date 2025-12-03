@@ -1,25 +1,26 @@
 ﻿using DiskAnalyzer.Api.Controllers.Filters;
+using DiskAnalyzer.Api.Factories;
 using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Domain.Measurements.FilesInDirectory;
-using DiskAnalyzer.Domain.Records;
+using DiskAnalyzer.Domain.Records.RecordStrategies.Measurement;
+using DiskAnalyzer.Domain.Services;
+using DiskAnalyzer.Infrastructure;
 using DiskAnalyzer.Infrastructure.Filter;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers;
 
-public enum FilesMeasurementType
-{
-    Count,
-    Size
-}
-
-public record FilesMeasurementDto(FilesMeasurementType Type, string Path, int MaxDepth, IEnumerable<FilterDto>? Filters);
+public record FilesMeasurementDto(FilesMeasurementStrategyType strategyType, string Path, int MaxDepth, IEnumerable<FilterDto>? Filters);
 
 [ApiController]
 [Route("api/measurements/files")]
 public class FilesMeasurementsController : ControllerBase
 {
-    private static DirectoryMeasurementRecord? lastResult;
+    private static Record? lastResult;
+    private static FilesMeasurer filesMeasurer =
+        new FilesMeasurer(
+            new DirectoryWalker(
+                new Logger<DirectoryWalker>(
+                    new LoggerFactory())));
 
     [HttpPost]
     public IActionResult Create(FilesMeasurementDto dto)
@@ -33,19 +34,17 @@ public class FilesMeasurementsController : ControllerBase
             compositeFilter.Add(filter);
         }
 
-        switch (dto.Type)
+        IFilesMeasurementStrategy strategy;
+        try
         {
-            case FilesMeasurementType.Count:
-                lastResult = new FilesCountMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, compositeFilter);
-                break;
-
-            case FilesMeasurementType.Size:
-                lastResult = new FilesSizeMeasurement().MeasureFilesInDirectory(dto.Path, dto.MaxDepth, compositeFilter);
-                break;
-
-            default:
-                return BadRequest("Uncorrect weighting type");
+            strategy = FilesMesurementStrategyFactory.Create(dto.strategyType);
         }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+
+        lastResult = filesMeasurer.MeasureFiles(dto.Path, dto.MaxDepth, strategy, compositeFilter);
 
         return Ok(lastResult);
     }
@@ -58,7 +57,7 @@ public class FilesMeasurementsController : ControllerBase
             return BadRequest("Measurement is missing or has already been added to history");
         }
 
-        HistoryController.AddIdToHistory(lastResult);
+        HistoryController.history.AddRecord(lastResult);
         lastResult = null;
         return Ok();
     }

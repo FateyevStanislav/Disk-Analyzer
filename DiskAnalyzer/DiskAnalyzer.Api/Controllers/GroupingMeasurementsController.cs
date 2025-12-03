@@ -1,9 +1,11 @@
 ﻿using DiskAnalyzer.Api.Controllers.Filters;
-using DiskAnalyzer.Library.Domain.Measurements.FilesInDirectory;
-using DiskAnalyzer.Library.Domain.Measurements.GroupsInDirectory;
-using DiskAnalyzer.Library.Domain.Records;
-using DiskAnalyzer.Library.Infrastructure.Filters;
-using DiskAnalyzer.Library.Infrastructure.Groupers;
+using DiskAnalyzer.Domain.Filters;
+using DiskAnalyzer.Domain.Groupers;
+using DiskAnalyzer.Domain.Records.RecordStrategies.Grouping;
+using DiskAnalyzer.Domain.Services;
+using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Infrastructure.Filter;
+using DiskAnalyzer.Infrastructure.Grouper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
@@ -21,7 +23,12 @@ namespace DiskAnalyzer.Api.Controllers
     [Route("api/measurements/groups")]
     public class GroupingMeasurementsController : ControllerBase
     {
-        private static List<GroupingRecord>? lastResult;
+        private static Record? lastResult;
+        private static FilesGrouper filesGrouper =
+            new FilesGrouper(
+                new DirectoryWalker(
+                    new Logger<DirectoryWalker>(
+                        new LoggerFactory())));
 
         [HttpPost]
         public IActionResult Create(GroupingMeasurementDto dto)
@@ -35,7 +42,6 @@ namespace DiskAnalyzer.Api.Controllers
                 compositeFilter.Add(filter);
             }
 
-            lastResult = new();
             IFileGrouper grouper;
 
             switch (dto.Type)
@@ -56,10 +62,7 @@ namespace DiskAnalyzer.Api.Controllers
                     return BadRequest("Uncorrect grouper type");
             }
 
-            foreach (var gr in new GroupMeasurement().MeasureGroupsInDirectory(dto.Path, dto.MaxDepth, grouper, compositeFilter))
-            {
-                lastResult.Add(gr);
-            }
+            lastResult = filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, new SizeInfoGroupStrategy(), grouper, compositeFilter);
 
             return Ok(lastResult);
         }

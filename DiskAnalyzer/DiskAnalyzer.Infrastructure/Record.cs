@@ -1,9 +1,7 @@
 ﻿namespace DiskAnalyzer.Infrastructure;
 
-public abstract record Record(string Path, DateTime CreatedAt)
+public abstract record Record(Guid Id, string Path, DateTime CreatedAt)
 {
     protected Record(string path)
-        : this(path, DateTime.UtcNow)
-    {
-    }
+        : this(Guid.NewGuid(), path, DateTime.UtcNow) { }
 }
