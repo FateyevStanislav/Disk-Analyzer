@@ -1,18 +1,14 @@
 ﻿using DiskAnalyzer.Api;
 using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Api.Controllers.Filters;
+using DiskAnalyzer.Api.Factories;
 using DiskAnalyzer.Domain.Extensions;
-using DiskAnalyzer.Domain.Metrics;
 using DiskAnalyzer.Infrastructure;
-using DiskAnalyzer.Library.Domain;
-using DiskAnalyzer.Library.Domain.Attributes;
-using DiskAnalyzer.Library.Infrastructure.Filters;
 using DiskAnalyzer.UI.Forms;
-using DiskAnalyzer.UI.Infrastructure;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Reflection;
+using System.Text.Json;
 using System.Windows.Forms;
 
 namespace DiskAnalyzer.UI
@@ -20,11 +16,8 @@ namespace DiskAnalyzer.UI
     partial class MainWindow
     {
         private System.ComponentModel.IContainer components = null;
-        private IConversionService conversionService = new ConversionsHandler();
-        private ITypeResolver typeResolver = new TypeResolver();
-        private IMetricLoader metricLoader = new MetricLoader();
-        private IFilterLoader filterLoader = new FilterLoader();
         private IApiClient apiClient = new ApiClient(new HttpClient());
+        private Dictionary<string, string> _filterParameters = new();
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -100,11 +93,11 @@ namespace DiskAnalyzer.UI
             depthUpDown.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold, GraphicsUnit.Point, 204);
             depthUpDown.Location = new Point(20, 157);
             depthUpDown.Margin = new Padding(4, 3, 4, 3);
-            depthUpDown.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            depthUpDown.Minimum = new decimal(new int[] { 0, 0, 0, 0 });
             depthUpDown.Name = "depthUpDown";
             depthUpDown.Size = new Size(62, 21);
             depthUpDown.TabIndex = 3;
-            depthUpDown.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            depthUpDown.Value = new decimal(new int[] { 0, 0, 0, 0 });
             // 
             // metricsLabel
             // 
@@ -123,7 +116,6 @@ namespace DiskAnalyzer.UI
             filterListBox.Name = "filterListBox";
             filterListBox.Size = new Size(280, 94);
             filterListBox.TabIndex = 6;
-            filterListBox.Items.AddRange(filterLoader.GetAvailableFilters().ToArray());
             // 
             // filterLabel
             // 
@@ -153,7 +145,11 @@ namespace DiskAnalyzer.UI
             metricsListBox.Name = "metricsListBox";
             metricsListBox.Size = new Size(280, 94);
             metricsListBox.TabIndex = 9;
-            metricsListBox.Items.AddRange(metricLoader.GetAvailableMetrics(typeof(IFileMetric)).ToArray());
+            metricsListBox.Items.AddRange(
+                FilesMeasurementStrategyType.Size, 
+                FilesMeasurementStrategyType.Count 
+                );
+
             // 
             // MainWindow
             // 
@@ -181,34 +177,114 @@ namespace DiskAnalyzer.UI
 
         }
 
-        private void GetSelectedMetrics()
+        private FilesMeasurementStrategyType GetFMSType()
         {
-            var metrics = metricsListBox.CheckedItems;
+            if (metricsListBox.CheckedItems.Count > 1)
+            {
+                return FilesMeasurementStrategyType.Combined;
+            }
+            return Enum.Parse<FilesMeasurementStrategyType>(metricsListBox.CheckedItems[0].ToString());
         }
 
-        private string GetPath()
+        private void FilterListBox_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            return pathTextBox.Text;
-        }
-        
-        private int GetDepth()
-        {
-            return (int)depthUpDown.Value;
-        }
+            if (e.NewValue == CheckState.Checked)
+            {
+                var filterName = filterListBox.Items[e.Index].ToString();
 
-        private bool SetSaveToHistory()
-        {
-            return historyCheckBox.Checked;
+                using (var form = new Form())
+                {
+                    form.Size = new Size(500, 300);
+                    form.Text = $"Введите параметры для {filterName}";
+                    form.StartPosition = FormStartPosition.CenterParent;
+
+                    var buttonPanel = new Panel
+                    {
+                        Dock = DockStyle.Bottom,
+                        Height = 50
+                    };
+
+                    var textBox = new TextBox
+                    {
+                        Multiline = true,
+                        Dock = DockStyle.Fill,
+                        Text = GetDefaultParametersJson(filterName),
+                    };
+
+                    var okButton = new Button
+                    {
+                        Text = "OK",
+                        DialogResult = DialogResult.OK,
+                        Size = new Size(80, 30),
+                        Location = new Point(165, 10)
+                    };
+
+                    buttonPanel.Controls.Add(okButton);
+                    form.Controls.Add(buttonPanel);
+                    form.Controls.Add(textBox);
+
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        _filterParameters[filterName] = textBox.Text;
+                    }
+                    else
+                    {
+                        e.NewValue = CheckState.Unchecked;
+                    }
+                }
+            }
         }
 
         private async void OnAnalyzeButtonClick(object sender, EventArgs e)
         {
             try
             {
-                var path = GetPath().EscapeSlashes();
-                var maxDepth = GetDepth();
-                var selectedMetrics = metricsListBox.CheckedItems.Cast<string>();
-                var saveInHistory = SetSaveToHistory();
+                var path = pathTextBox.Text.EscapeSlashes();
+                var maxDepth = (int)depthUpDown.Value;
+                var strategy = GetFMSType();
+                var saveInHistory = historyCheckBox.Checked;
+                var filterDtos = new List<FilterDto>();
+
+                foreach (var checkedItem in filterListBox.CheckedItems)
+                {
+                    var filterName = checkedItem.ToString();
+
+                    if (_filterParameters.TryGetValue(filterName, out var json))
+                    {
+                        try
+                        {
+                            var jsonDict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+                            if (!jsonDict.TryGetValue("type", out var typeValue))
+                            {
+                                MessageBox.Show($"В JSON фильтра {filterName} нет поля 'type'!");
+                                return;
+                            }
+
+                            var filterDto = new FilterDto(
+                                Type: filterName,
+                                FilterParams: jsonDict
+                                    .Where(kvp => kvp.Key != "type")
+                                    .ToDictionary(
+                                        kvp => kvp.Key,
+                                        kvp => kvp.Value?.ToString() ?? ""
+                                    )
+                            );
+
+                            filterDtos.Add(filterDto);
+                        }
+                        catch (JsonException)
+                        {
+                            MessageBox.Show($"Ошибка в параметрах фильтра {filterName}!");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Для фильтра {filterName} не указаны параметры!");
+                        return;
+                    }
+                }
 
                 if (metricsListBox.CheckedItems.Count == 0)
                 {
@@ -216,28 +292,66 @@ namespace DiskAnalyzer.UI
                     return;
                 }
 
-                var selectedMetric = metricsListBox.CheckedItems.Cast<string>().ToArray()[0];
-                Type metricType = typeResolver.GetTypeByDisplayName(selectedMetric, typeof(IMetric));
-                FilesMeasurementType metric = conversionService.ConvertMetricToMeasurementType(metricType);
-
-                var requestDto = new RequestDto(metric, path, maxDepth, null);
+                var requestDto = new FilesMeasurementDto(
+                    StrategyType: strategy,
+                    Path: path,
+                    MaxDepth: maxDepth,
+                    Filters: filterDtos
+                );
 
                 var result = await apiClient.CreateMeasurementAsync(requestDto);
 
-                if (saveInHistory)
-                {
-                    await apiClient.SaveToHistoryAsync();
-                }
-
                 var resultForm = new ResultForm();
-                resultForm.SetMetric(result.Metrics.FirstOrDefault());
-
+                resultForm.SetResult(result);
                 resultForm.Show();
-
+            }
+            catch (HttpRequestException httpEx)
+            {
+                MessageBox.Show($"Ошибка соединения с сервером:\n{httpEx.Message}");
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка: {ex.Message}");
+            }
+        }
+
+        private string GetDefaultParametersJson(string filterName)
+        {
+            var parameters = filters[filterName];
+
+            var jsonDict = new Dictionary<string, object>
+            {
+                { "type", filterName.Replace("Filter", "") }
+            };
+
+            foreach (var param in parameters)
+            {
+                jsonDict[param.Key] = GetDefaultValueForType(param.Value);
+            }
+
+            return JsonSerializer.Serialize(jsonDict, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+        }
+
+        private object GetDefaultValueForType(string typeName)
+        {
+            if (typeName.Contains("String"))
+            {
+                return "";
+            }
+            else if (typeName.Contains("Int") || typeName.Contains("Long"))
+            {
+                return 0;
+            }
+            else if (typeName.Contains("DateTime"))
+            {
+                return DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+            }
+            else
+            {
+                return "";
             }
         }
 

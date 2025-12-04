@@ -1,11 +1,15 @@
 ﻿using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Domain.Records;
+using DiskAnalyzer.Api.Factories;
+using DiskAnalyzer.Domain.Records.Measurement;
 
-namespace DiskAnalyzer.UI.Infrastructure
+public interface IApiClient
 {
-    public interface IApiClient
-    {
-        Task<DirectoryMeasurementRecord> CreateMeasurementAsync(RequestDto request);
-        Task SaveToHistoryAsync();
-    }
+    Task<FilesMeasurementRecord> CreateMeasurementAsync(FilesMeasurementDto request);
+    Task<Dictionary<string, Dictionary<string, string>>> GetAvailableFiltersAsync();
 }
+
+public record FilesMeasurementDto(
+    FilesMeasurementStrategyType StrategyType,
+    string Path,
+    int MaxDepth,
+    IEnumerable<FilterDto>? Filters);

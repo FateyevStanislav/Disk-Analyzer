@@ -34,11 +34,16 @@ public static class ApiReflection
             }
         }
     }
-    
-    public static IReadOnlyDictionary<string, Dictionary<string, Type>> GetFiltersData()
-    {
 
-        return filtersData.AsReadOnly();
+    public static IReadOnlyDictionary<string, Dictionary<string, string>> GetFiltersData()
+    {
+        return filtersData.ToDictionary(
+            f => f.Key,
+            f => f.Value.ToDictionary(
+                p => p.Key,
+                p => p.Value.FullName
+            )
+        ).AsReadOnly();
     }
 
     public static Type? GetFilterType(string filterName)
