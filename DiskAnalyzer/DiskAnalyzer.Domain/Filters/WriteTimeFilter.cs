@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Domain.Filters;
 
-[FilterType("WriteType")]
+[FilterType("WriteTime")]
 public class WriteTimeFilter : IFileFilter
 {
     [FilterInfo("MinDate")]
