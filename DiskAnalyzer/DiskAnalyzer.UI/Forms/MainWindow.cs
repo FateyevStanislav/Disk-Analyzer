@@ -6,12 +6,13 @@ namespace DiskAnalyzer.UI
 {
     partial class MainWindow : Form
     {
-        private string inputPath;
+        private Dictionary<string, Dictionary<string, string>> filters;
         public MainWindow()
         {
             InitializeComponent();
-
             SetupCustomControls();
+            Load += MainWindow_Load;
+            filterListBox.ItemCheck += FilterListBox_ItemCheck;
         }
 
         private void SetupCustomControls()
@@ -19,9 +20,19 @@ namespace DiskAnalyzer.UI
             this.Controls.AddRange(new Control[] { });
         }
 
-        private void MainWindow_Load(object sender, System.EventArgs e)
+        private async void MainWindow_Load(object sender, EventArgs e)
         {
+            await LoadFiltersAsync();
+        }
 
+        private async Task LoadFiltersAsync()
+        {
+            filters = await apiClient.GetAvailableFiltersAsync();
+            filterListBox.Items.Clear();
+            foreach (var filterName in filters.Keys)
+            {
+                filterListBox.Items.Add(filterName);
+            }
         }
     }
 }

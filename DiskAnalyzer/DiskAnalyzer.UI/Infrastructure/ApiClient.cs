@@ -1,9 +1,8 @@
 ﻿using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Domain.Records;
-using DiskAnalyzer.UI.Infrastructure;
+using DiskAnalyzer.Domain.Records.Measurement;
+using DiskAnalyzer.Infrastructure;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 public class ApiClient : IApiClient
 {
@@ -15,14 +14,20 @@ public class ApiClient : IApiClient
         _httpClient.BaseAddress = new Uri("http://localhost:5122");
     }
 
-    public async Task<DirectoryMeasurementRecord> CreateMeasurementAsync(RequestDto request)
+    public async Task<Dictionary<string, Dictionary<string, string>>> GetAvailableFiltersAsync()
+    {
+        var response = await _httpClient.GetAsync("api/requestInfo/filters");
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<Dictionary<string, Dictionary<string, string>>>();
+    }
+
+    public async Task<FilesMeasurementRecord> CreateMeasurementAsync(FilesMeasurementDto request)
     {
         var jsonOptions = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            PropertyNameCaseInsensitive = true
         };
-        jsonOptions.Converters.Add(new MetricJsonConverter());
 
         var response = await _httpClient.PostAsJsonAsync(
             "api/measurements/files",
@@ -32,24 +37,6 @@ public class ApiClient : IApiClient
 
         response.EnsureSuccessStatusCode();
 
-        try
-        {
-            var result = await response.Content.ReadFromJsonAsync<DirectoryMeasurementRecord>(jsonOptions);
-            return result ?? throw new Exception("Deserialization returned null");
-        }
-        catch (JsonException ex)
-        {
-            throw new Exception($"JSON error at {ex.Path}: {ex.Message}");
-        }
-    }
-
-    public async Task SaveToHistoryAsync()
-    {
-        var response = await _httpClient.PostAsync(
-            "api/measurements/files/saveToHistory",
-            null
-        );
-
-        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<FilesMeasurementRecord>(jsonOptions);
     }
 }
