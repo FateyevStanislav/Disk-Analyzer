@@ -1,5 +1,4 @@
-﻿using DiskAnalyzer.Library.Domain.Attributes;
-using DiskAnalyzer.Library.Domain.Metrics;
+﻿using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.UI.Forms
 {
@@ -28,7 +27,6 @@ namespace DiskAnalyzer.UI.Forms
             metricLabel.Name = "metricLabel";
             metricLabel.Size = new Size(86, 15);
             metricLabel.TabIndex = 1;
-            metricLabel.Text = "Успфвыфывех";
             // 
             // metricResultLabel
             // 
@@ -54,7 +52,7 @@ namespace DiskAnalyzer.UI.Forms
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(353, 131);
+            ClientSize = new Size(600, 131);
             Controls.Add(analyzeLabel);
             Controls.Add(metricResultLabel);
             Controls.Add(metricLabel);
@@ -64,11 +62,6 @@ namespace DiskAnalyzer.UI.Forms
             PerformLayout();
         }
 
-        public void SetMetric(IMetric metric)
-        {
-            metricLabel.Text = metric.GetType().GetDisplayName();
-            metricResultLabel.Text = metric.Value.ToString();
-        }
         private Label metricLabel;
         private Label label2;
         private Label metricResultLabel;
