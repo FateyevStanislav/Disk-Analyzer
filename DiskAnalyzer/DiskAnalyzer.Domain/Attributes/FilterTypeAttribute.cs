@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Infrastructure.Filter;
+﻿namespace DiskAnalyzer.Domain.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
 public class FilterTypeAttribute(string displayName) : Attribute

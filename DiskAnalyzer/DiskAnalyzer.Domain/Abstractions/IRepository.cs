@@ -1,4 +1,6 @@
-﻿namespace DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Domain.Models.Results;
+
+namespace DiskAnalyzer.Domain.Abstractions;
 
 public interface IRepository
 {
@@ -6,9 +8,9 @@ public interface IRepository
     Task<AnalysisResult?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<AnalysisResult>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<AnalysisResult>> GetAllOrderedAsync(
-        bool descending = true, 
+        bool descending = true,
         CancellationToken cancellationToken = default);
     Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken = default);
     Task<int> CountAsync(CancellationToken cancellationToken = default);
-    Task ClearAsync(CancellationToken cancellationToken = default); 
+    Task ClearAsync(CancellationToken cancellationToken = default);
 }

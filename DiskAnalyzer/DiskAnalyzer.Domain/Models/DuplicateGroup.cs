@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Infrastructure;
+﻿namespace DiskAnalyzer.Domain.Models;
 
 public record DuplicateGroup(
     string FileHash,

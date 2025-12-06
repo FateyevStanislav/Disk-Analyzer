@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Infrastructure.Filter;
+﻿namespace DiskAnalyzer.Domain.Models;
 
 public record FilterInfo(
     string Type,

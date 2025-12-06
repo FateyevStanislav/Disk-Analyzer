@@ -1,6 +1,7 @@
-﻿using DiskAnalyzer.Infrastructure.Grouper;
+﻿using DiskAnalyzer.Domain.Attributes;
+using DiskAnalyzer.Infrastructure.Grouper;
 
-namespace DiskAnalyzer.Domain.Groupers;
+namespace DiskAnalyzer.Infrastructure.Groupers;
 
 [GrouperType("Extension")]
 public class ExtensionGrouper : IFileGrouper

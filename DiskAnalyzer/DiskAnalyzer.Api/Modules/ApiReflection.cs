@@ -1,5 +1,5 @@
-﻿using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Infrastructure.Filter;
+﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Filters;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;

@@ -1,12 +1,12 @@
-﻿using DiskAnalyzer.Infrastructure.Filter;
+﻿using DiskAnalyzer.Domain.Abstractions;
 
-namespace DiskAnalyzer.Domain.Filters;
+namespace DiskAnalyzer.Infrastructure.Filters;
 
-public class CompositeFilter : IFileFilter
+public class CompositeFilter : ICompositeFilter
 {
     private readonly List<IFileFilter> filters = [];
 
-    public IReadOnlyCollection<IFileFilter> Filters => filters.AsReadOnly();
+    public IReadOnlyList<IFileFilter> Filters => filters.AsReadOnly();
 
     public void Add(IFileFilter filter) => filters.Add(filter);
 

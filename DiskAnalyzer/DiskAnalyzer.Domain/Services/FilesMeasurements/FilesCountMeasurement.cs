@@ -1,4 +1,5 @@
-﻿
+﻿using DiskAnalyzer.Domain.Abstractions;
+
 namespace DiskAnalyzer.Domain.Services.FilesMeasurements;
 
 public class FilesCountMeasurement : IFilesMeasurement

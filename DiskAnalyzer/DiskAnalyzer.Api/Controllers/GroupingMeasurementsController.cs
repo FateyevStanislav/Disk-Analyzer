@@ -2,7 +2,7 @@
 using DiskAnalyzer.Domain.Groupers;
 using DiskAnalyzer.Domain.Records.RecordStrategies.Grouping;
 using DiskAnalyzer.Domain.Services;
-using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Infrastructure.FileSystem;
 using DiskAnalyzer.Infrastructure.Filter;
 using DiskAnalyzer.Infrastructure.Grouper;
 using Microsoft.AspNetCore.Mvc;

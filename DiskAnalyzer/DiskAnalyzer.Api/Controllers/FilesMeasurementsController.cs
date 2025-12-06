@@ -2,7 +2,7 @@
 using DiskAnalyzer.Domain.Filters;
 using DiskAnalyzer.Domain.Records.RecordStrategies.Measurement;
 using DiskAnalyzer.Domain.Services;
-using DiskAnalyzer.Infrastructure;
+using DiskAnalyzer.Infrastructure.FileSystem;
 using DiskAnalyzer.Infrastructure.Filter;
 using Microsoft.AspNetCore.Mvc;
 

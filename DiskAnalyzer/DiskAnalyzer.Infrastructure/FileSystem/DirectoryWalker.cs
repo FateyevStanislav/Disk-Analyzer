@@ -1,12 +1,12 @@
-﻿using DiskAnalyzer.Infrastructure.Filter;
+﻿using DiskAnalyzer.Domain.Abstractions;
 using Microsoft.Extensions.Logging;
 
-namespace DiskAnalyzer.Infrastructure;
+namespace DiskAnalyzer.Infrastructure.FileSystem;
 
 
-public class DirectoryWalker(ILogger<DirectoryWalker> logger)
+public class DirectoryWalker(ILogger<DirectoryWalker> logger) : IFileSystemScanner
 {
-    public void Walk(
+    public void Scan(
         string rootPath,
         int maxDepth,
         Action<FileInfo>? onFile = null,

@@ -1,7 +1,7 @@
 ﻿using DiskAnalyzer.Api.Controllers;
 using DiskAnalyzer.Api.Modules;
+using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Infrastructure.Filter;
 using System.Reflection.Metadata;
 
 public static class FilterFactory

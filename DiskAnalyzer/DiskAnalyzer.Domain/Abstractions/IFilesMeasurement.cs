@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Domain.Services.FilesMeasurements;
+﻿namespace DiskAnalyzer.Domain.Abstractions;
 
 public interface IFilesMeasurement
 {

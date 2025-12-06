@@ -1,13 +1,12 @@
-﻿using DiskAnalyzer.Domain.Extensions;
-using DiskAnalyzer.Domain.Services.FilesMeasurements;
-using DiskAnalyzer.Infrastructure;
-using DiskAnalyzer.Infrastructure.Filter;
+﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Extensions;
+using DiskAnalyzer.Domain.Models.Results;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class FilesMeasurer(DirectoryWalker walker)
+public class FilesMeasurer(IFileSystemScanner walker)
 {
-    public AnalysisResult MeasureFiles(
+    public MeasurementAnalysisResult MeasureFiles(
         string path,
         int maxDepth,
         IEnumerable<IFilesMeasurement> measurements,
@@ -18,17 +17,22 @@ public class FilesMeasurer(DirectoryWalker walker)
         foreach (var act in measurements)
             onFileAction += act.OnFileAction;
 
-        walker.Walk(path, maxDepth, onFileAction, filter);
+        walker.Scan(path, maxDepth, onFileAction, filter);
 
         var result = new Dictionary<string, string>();
 
         foreach (var measurement in measurements)
             result.Add(measurement.MeasurementType, measurement.Result.ToString());
 
-        return new AnalysisResult(path, "FilesMeasurement", result, filter.ToFilterInfoList());
+        return new MeasurementAnalysisResult(
+            Guid.NewGuid(),
+            DateTime.UtcNow,
+            path,
+            filter?.ToFilterInfoList(),
+            result);
     }
 
-    public Task<AnalysisResult> MeasureFilesAsync(
+    public Task<MeasurementAnalysisResult> MeasureFilesAsync(
         string path,
         int maxDepth,
         IEnumerable<IFilesMeasurement> measurements,

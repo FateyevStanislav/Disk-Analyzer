@@ -1,4 +1,4 @@
-﻿namespace DiskAnalyzer.Infrastructure.Filter;
+﻿namespace DiskAnalyzer.Domain.Attributes;
 
 [AttributeUsage(AttributeTargets.Property)]
 public class FilterInfoAttribute(string name) : Attribute

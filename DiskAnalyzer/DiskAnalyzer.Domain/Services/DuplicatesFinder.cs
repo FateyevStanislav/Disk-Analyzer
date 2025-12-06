@@ -1,12 +1,13 @@
-﻿using DiskAnalyzer.Domain.Extensions;
-using DiskAnalyzer.Infrastructure;
-using DiskAnalyzer.Infrastructure.Filter;
+﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Extensions;
+using DiskAnalyzer.Domain.Models;
+using DiskAnalyzer.Domain.Models.Results;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class DuplicatesFinder(DirectoryWalker walker)
+public class DuplicatesFinder(IFileSystemScanner walker)
 {
-    public AnalysisResult FindDuplicates(
+    public DuplicateAnalysisResult FindDuplicates(
         string path,
         int maxDepth,
         IFileFilter? filter = null)
@@ -15,20 +16,21 @@ public class DuplicatesFinder(DirectoryWalker walker)
         var duplicateGroups = FindDuplicateGroups(filesBySize);
         var totalWastedSpace = CalculateTotalWastedSpace(duplicateGroups);
 
-        var result = new Dictionary<string, string>
+        var metrics = new Dictionary<string, string>
         {
             { "WastedSpace", totalWastedSpace.ToString() }
         };
 
-        return new AnalysisResult(
+        return new DuplicateAnalysisResult(
+            Guid.NewGuid(),
+            DateTime.UtcNow,
             path,
-            "DuplicatesFinding",
-            result,
             filter?.ToFilterInfoList(),
+            metrics,
             duplicateGroups);
     }
 
-    public Task<AnalysisResult> FindDuplicatesAsync(
+    public Task<DuplicateAnalysisResult> FindDuplicatesAsync(
         string path,
         int maxDepth,
         IFileFilter? filter = null,
@@ -44,7 +46,7 @@ public class DuplicatesFinder(DirectoryWalker walker)
     {
         var filesBySize = new Dictionary<long, List<FileInfo>>();
 
-        walker.Walk(path, maxDepth, file =>
+        walker.Scan(path, maxDepth, file =>
         {
             if (file.Length == 0) return;
 
