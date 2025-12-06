@@ -1,6 +1,4 @@
 ﻿using DiskAnalyzer.Domain.Extensions;
-using DiskAnalyzer.Domain.Records;
-using DiskAnalyzer.Domain.Records.DuplicateFind;
 using DiskAnalyzer.Infrastructure;
 using DiskAnalyzer.Infrastructure.Filter;
 
@@ -8,7 +6,7 @@ namespace DiskAnalyzer.Domain.Services;
 
 public class DuplicatesFinder(DirectoryWalker walker)
 {
-    public DuplicatesSearchRecord FindDuplicates(
+    public AnalysisResult FindDuplicates(
         string path,
         int maxDepth,
         IFileFilter? filter = null)
@@ -17,19 +15,20 @@ public class DuplicatesFinder(DirectoryWalker walker)
         var duplicateGroups = FindDuplicateGroups(filesBySize);
         var totalWastedSpace = CalculateTotalWastedSpace(duplicateGroups);
 
-        var sortedGroups = duplicateGroups
-            .OrderByDescending(g => g.TotalWastedSpace)
-            .ToList();
+        var result = new Dictionary<string, string>
+        {
+            { "WastedSpace", totalWastedSpace.ToString() }
+        };
 
-        return new DuplicatesSearchRecord(
+        return new AnalysisResult(
             path,
-            sortedGroups.Count,
-            totalWastedSpace,
-            sortedGroups,
-            filter?.ToFilterInfoList());
+            "DuplicatesFinding",
+            result,
+            filter?.ToFilterInfoList(),
+            duplicateGroups);
     }
 
-    public Task<DuplicatesSearchRecord> FindDuplicatesAsync(
+    public Task<AnalysisResult> FindDuplicatesAsync(
         string path,
         int maxDepth,
         IFileFilter? filter = null,
@@ -104,11 +103,11 @@ public class DuplicatesFinder(DirectoryWalker walker)
         var wastedSpace = fileSize * (count - 1);
 
         return new DuplicateGroup(
-            FileHash: duplicateGroup.Key,
-            FileSize: fileSize,
-            FileCount: count,
-            TotalWastedSpace: wastedSpace,
-            Files: [.. fileList.Select(f => new FileDetails(f.FullName, f.Length))]); 
+            duplicateGroup.Key,
+            fileSize,
+            count,
+            wastedSpace,
+            [.. fileList.Select(f => new FileDetails(f.FullName, f.Length))]);
     }
 
     private static long CalculateTotalWastedSpace(List<DuplicateGroup> groups)

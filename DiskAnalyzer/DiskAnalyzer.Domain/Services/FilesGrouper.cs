@@ -1,7 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Extensions;
-using DiskAnalyzer.Domain.Records;
-using DiskAnalyzer.Domain.Records.Grouping;
-using DiskAnalyzer.Domain.Records.RecordStrategies.Grouping;
+using DiskAnalyzer.Domain.Services.FilesMeasurements;
 using DiskAnalyzer.Infrastructure;
 using DiskAnalyzer.Infrastructure.Filter;
 using DiskAnalyzer.Infrastructure.Grouper;
@@ -10,14 +8,14 @@ namespace DiskAnalyzer.Domain.Services;
 
 public class FilesGrouper(DirectoryWalker walker)
 {
-    public FilesGroupingRecord GroupFiles(
+    public AnalysisResult GroupFiles(
         string path,
         int maxDepth,
-        IFilesGroupStrategy strategy,
+        IEnumerable<IFilesMeasurement> measurements,
         IFileGrouper grouper,
         IFileFilter? filter = null)
     {
-        var groups = new Dictionary<string, (long count, long size, List<FileDetails> files)>();
+        var groups = new Dictionary<string, List<IFilesMeasurement>>();
 
         walker.Walk(
             path,
@@ -27,42 +25,48 @@ public class FilesGrouper(DirectoryWalker walker)
                 var key = grouper.GetKey(file);
 
                 if (!groups.ContainsKey(key))
-                    groups[key] = (0, 0, new List<FileDetails>());
+                    groups[key] = [.. measurements.Select(m => CreateMeasurementInstance(m))];
 
-                var (count, size, files) = groups[key];
-                groups[key] = (
-                    count + 1,
-                    size + file.Length,
-                    files
-                );
-                files.Add(new FileDetails(file.FullName, file.Length)); 
+                foreach (var measurement in groups[key])
+                    measurement.OnFileAction(file);
             },
             filter);
 
-        var fileGroups = groups
-            .Select(kvp => strategy.CreateGroup(
-                kvp.Key, 
-                kvp.Value.count, 
-                kvp.Value.size, 
-                kvp.Value.files))
-            .ToList();
+        var result = new Dictionary<string, string>();
 
-        return new FilesGroupingRecord(
+        foreach (var (key, groupMeasurements) in groups)
+        {
+            foreach (var measurement in groupMeasurements)
+            {
+                var metricKey = $"{key}_{measurement.MeasurementType}";
+                result.Add(metricKey, measurement.Result.ToString());
+            }
+        }
+
+        result.Add("GrouperType", grouper.ToGrouperInfo().ToString());
+
+        return new AnalysisResult(
             path,
-            grouper.ToGrouperInfo(),
-            fileGroups,
+            "FilesGrouping",
+            result,
             filter?.ToFilterInfoList());
     }
 
-    public Task<FilesGroupingRecord> GroupFilesAsync(
+    private static IFilesMeasurement CreateMeasurementInstance(IFilesMeasurement template)
+    {
+        return (IFilesMeasurement)Activator.CreateInstance(template.GetType())!;
+    }
+
+    public Task<AnalysisResult> GroupFilesAsync(
         string path,
         int maxDepth,
-        IFilesGroupStrategy strategy,
+        IEnumerable<IFilesMeasurement> measurements,
         IFileGrouper grouper,
         IFileFilter? filter = null,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(() 
-            => GroupFiles(path, maxDepth, strategy, grouper, filter), cancellationToken);
+        return Task.Run(() =>
+            GroupFiles(path, maxDepth, measurements, grouper, filter),
+            cancellationToken);
     }
 }

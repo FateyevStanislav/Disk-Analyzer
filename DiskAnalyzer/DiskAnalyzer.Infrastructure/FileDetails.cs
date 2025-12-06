@@ -1,3 +1,3 @@
-﻿namespace DiskAnalyzer.Domain.Records;
+﻿namespace DiskAnalyzer.Infrastructure;
 
 public record FileDetails(string Path, long Size);

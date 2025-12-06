@@ -3,14 +3,13 @@ using Microsoft.Extensions.Logging;
 
 namespace DiskAnalyzer.Infrastructure;
 
+
 public class DirectoryWalker(ILogger<DirectoryWalker> logger)
 {
-    public delegate void OnFileAction(FileInfo file);
-
     public void Walk(
         string rootPath,
         int maxDepth,
-        OnFileAction? onFile = null,
+        Action<FileInfo>? onFile = null,
         IFileFilter? filter = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(maxDepth);

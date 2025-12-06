@@ -1,11 +1,11 @@
 ﻿namespace DiskAnalyzer.Infrastructure;
 
-public interface IRepository<TRecord> where TRecord : Record
+public interface IRepository
 {
-    Task AddAsync(TRecord record, CancellationToken cancellationToken = default);
-    Task<TRecord?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<TRecord>> GetAllAsync(CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<TRecord>> GetAllOrderedAsync(
+    Task AddAsync(AnalysisResult record, CancellationToken cancellationToken = default);
+    Task<AnalysisResult?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<AnalysisResult>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<AnalysisResult>> GetAllOrderedAsync(
         bool descending = true, 
         CancellationToken cancellationToken = default);
     Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken = default);
