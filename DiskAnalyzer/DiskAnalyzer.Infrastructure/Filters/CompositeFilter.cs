@@ -8,7 +8,12 @@ public class CompositeFilter : ICompositeFilter
 
     public IReadOnlyList<IFileFilter> Filters => filters.AsReadOnly();
 
-    public void Add(IFileFilter filter) => filters.Add(filter);
+    public void Add(IFileFilter filter)
+    {
+        ArgumentNullException.ThrowIfNull(filter, nameof(filter));
+
+        filters.Add(filter);
+    }
 
     public bool ShouldInclude(FileInfo file) =>
         filters.All(f => f.ShouldInclude(file));

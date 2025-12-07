@@ -2,12 +2,29 @@
 using DiskAnalyzer.Domain.Extensions;
 using DiskAnalyzer.Domain.Models;
 using DiskAnalyzer.Domain.Models.Results;
-using DiskAnalyzer.Infrastructure.Grouper;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class FilesGrouper(IFileSystemScanner walker)
+/// <summary>
+/// Сервис для группировки файлов по заданному критерию с подсчётом метрик.
+/// </summary>
+/// <remarks>
+/// Поддерживает множественные метрики (TotalSize, FilesCount и т.д.).
+/// Каждая группа получает отдельные экземпляры IFilesMeasurement.
+/// </remarks>
+public class FilesGrouper(IFileSystemScanner scanner)
 {
+    /// <summary>
+    /// Выполняет группировку файлов с подсчётом метрик.
+    /// </summary>
+    /// <param name="measurements">
+    /// Набор измерений для сбора. Для каждой группы создаются копии.
+    /// </param>
+    /// <param name="grouper">Стратегия определения ключа группы.</param>
+    /// <returns>
+    /// Результат с группами файлов, метриками и списками файлов в каждой группе.
+    /// <see cref="GroupingAnalysisResult"/>
+    /// </returns>
     public AnalysisResult GroupFiles(
         string path,
         int maxDepth,
@@ -15,56 +32,66 @@ public class FilesGrouper(IFileSystemScanner walker)
         IFileGrouper grouper,
         IFileFilter? filter = null)
     {
-        var groups = new Dictionary<string, (List<IFilesMeasurement> measurements, List<FileInfo> files)>();
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);      
+        ArgumentNullException.ThrowIfNull(grouper);            
+        ArgumentNullException.ThrowIfNull(measurements);
 
-        walker.Scan(
+        var measurementsList = measurements.ToList();
+        if (measurementsList.Count == 0)                       
+            throw new ArgumentException("Нужен минимум 1 тип измерения", nameof(measurements));
+
+        var groups = new Dictionary<string, GroupData>();
+
+        scanner.Scan(
             path,
             maxDepth,
             file =>
             {
                 var key = grouper.GetKey(file);
 
-                if (!groups.ContainsKey(key))
+                if (!groups.TryGetValue(key, out var group))
                 {
-                    groups[key] = (
-                        [.. measurements.Select(m => CreateMeasurementInstance(m))],
-                        []
+                    group = new GroupData();
+                    group.Measurements.AddRange(
+                        measurements.Select(m => CreateMeasurementInstance(m))
                     );
+                    groups[key] = group;
                 }
 
-                foreach (var measurement in groups[key].measurements)
+                foreach (var measurement in group.Measurements)
                     measurement.OnFileAction(file);
 
-                groups[key].files.Add(file);
+                group.Files.Add(file);
             },
             filter);
 
         var fileGroups = new List<FileGroup>();
         var metrics = new Dictionary<string, string>();
 
-        foreach (var (key, (groupMeasurements, files)) in groups)
+        foreach (var (key, group) in groups)
         {
-            var totalSize = groupMeasurements
+            var totalSize = group.Measurements
                 .FirstOrDefault(m => m.MeasurementType == "TotalSize")?.Result ?? 0;
-            var filesCount = groupMeasurements
+            var filesCount = group.Measurements
                 .FirstOrDefault(m => m.MeasurementType == "FilesCount")?.Result ?? 0;
 
             fileGroups.Add(new FileGroup(
                 key,
                 totalSize,
                 (int)filesCount,
-                files.Select(f => new FileDetails(f.FullName, f.Length)).ToList()
+                [.. group.Files.Select(f => new FileDetails(f.FullName, f.Length))]
             ));
 
-            metrics.Add($"{key}_TotalSize", totalSize.ToString());
-            metrics.Add($"{key}_FilesCount", filesCount.ToString());
+            foreach (var measurement in group.Measurements)
+            {
+                var metricKey = $"{key}_{measurement.MeasurementType}";
+                metrics.Add(metricKey, measurement.Result.ToString());
+            }
         }
 
         metrics.Add("GrouperType", grouper.ToGrouperInfo().Type);
 
         return new GroupingAnalysisResult(
-            Guid.NewGuid(),
-            DateTime.UtcNow,
             path,
             filter?.ToFilterInfoList(),
             grouper.ToGrouperInfo().Type,
@@ -73,11 +100,13 @@ public class FilesGrouper(IFileSystemScanner walker)
         );
     }
 
-    private static IFilesMeasurement CreateMeasurementInstance(IFilesMeasurement template)
-    {
-        return (IFilesMeasurement)Activator.CreateInstance(template.GetType())!;
-    }
-
+    /// <summary>
+    /// Асинхронная версия группировки.
+    /// </summary>
+    /// <remarks>
+    /// Выполняется в отдельном потоке через 
+    /// <see cref="Task.Run{TResult}(Func{TResult}, CancellationToken)"/>
+    /// </remarks>
     public Task<AnalysisResult> GroupFilesAsync(
         string path,
         int maxDepth,
@@ -89,5 +118,16 @@ public class FilesGrouper(IFileSystemScanner walker)
         return Task.Run(() =>
             GroupFiles(path, maxDepth, measurements, grouper, filter),
             cancellationToken);
+    }
+
+    private static IFilesMeasurement CreateMeasurementInstance(IFilesMeasurement template)
+    {
+        return (IFilesMeasurement)Activator.CreateInstance(template.GetType())!;
+    }
+
+    private sealed class GroupData
+    {
+        public List<IFilesMeasurement> Measurements { get; } = [];
+        public List<FileInfo> Files { get; } = [];
     }
 }

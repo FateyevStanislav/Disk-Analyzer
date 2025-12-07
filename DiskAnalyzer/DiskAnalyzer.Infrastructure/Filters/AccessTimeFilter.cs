@@ -1,7 +1,7 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Infrastructure.Filter;
+using DiskAnalyzer.Domain.Attributes;
 
-namespace DiskAnalyzer.Domain.Filters;
+namespace DiskAnalyzer.Infrastructure.Filters;
 
 [FilterType("AccessTime")]
 public class AccessTimeFilter : IFileFilter

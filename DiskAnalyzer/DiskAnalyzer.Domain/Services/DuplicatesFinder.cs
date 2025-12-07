@@ -5,13 +5,36 @@ using DiskAnalyzer.Domain.Models.Results;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class DuplicatesFinder(IFileSystemScanner walker)
+/// <summary>
+/// Сервис для поиска дублирующихся файлов на основе содержимого.
+/// </summary>
+/// <remarks>
+/// Алгоритм:
+/// 1. Группировка по размеру (быстрая предфильтрация)
+/// 2. Quick hash первых 8KB (оптимизация для больших файлов)
+/// 3. Full SHA256 hash для финальной проверки
+/// 
+/// Производительность: O(n log n) + I/O время на хеширование.
+/// </remarks>
+public class DuplicatesFinder(IFileSystemScanner scanner)
 {
+    /// <summary>
+    /// Выполняет синхронный поиск дубликатов.
+    /// </summary>
+    /// <param name="path">Корневой путь для поиска.</param>
+    /// <param name="maxDepth">Глубина обхода поддиректорий.</param>
+    /// <param name="filter">Опциональный фильтр файлов.</param>
+    /// <returns>
+    /// Результат анализа с найденными группами дубликатов 
+    /// <see cref="DuplicateAnalysisResult"/>
+    /// </returns>
     public DuplicateAnalysisResult FindDuplicates(
         string path,
         int maxDepth,
         IFileFilter? filter = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
         var filesBySize = CollectFilesBySize(path, maxDepth, filter);
         var duplicateGroups = FindDuplicateGroups(filesBySize);
         var totalWastedSpace = CalculateTotalWastedSpace(duplicateGroups);
@@ -22,14 +45,19 @@ public class DuplicatesFinder(IFileSystemScanner walker)
         };
 
         return new DuplicateAnalysisResult(
-            Guid.NewGuid(),
-            DateTime.UtcNow,
             path,
             filter?.ToFilterInfoList(),
             metrics,
             duplicateGroups);
     }
 
+    /// <summary>
+    /// Асинхронная версия поиска дубликатов.
+    /// </summary>
+    /// <remarks>
+    /// Выполняется в отдельном потоке через 
+    /// <see cref="Task.Run{TResult}(Func{TResult}, CancellationToken)"/>
+    /// </remarks>
     public Task<DuplicateAnalysisResult> FindDuplicatesAsync(
         string path,
         int maxDepth,
@@ -46,7 +74,7 @@ public class DuplicatesFinder(IFileSystemScanner walker)
     {
         var filesBySize = new Dictionary<long, List<FileInfo>>();
 
-        walker.Scan(path, maxDepth, file =>
+        scanner.Scan(path, maxDepth, file =>
         {
             if (file.Length == 0) return;
 

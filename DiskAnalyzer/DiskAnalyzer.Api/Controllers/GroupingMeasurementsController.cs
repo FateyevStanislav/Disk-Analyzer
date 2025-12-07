@@ -1,10 +1,10 @@
-﻿using DiskAnalyzer.Domain.Filters;
+﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Filters;
 using DiskAnalyzer.Domain.Groupers;
 using DiskAnalyzer.Domain.Records.RecordStrategies.Grouping;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
 using DiskAnalyzer.Infrastructure.Filter;
-using DiskAnalyzer.Infrastructure.Grouper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers

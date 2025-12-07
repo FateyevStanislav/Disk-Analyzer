@@ -1,5 +1,5 @@
-﻿using DiskAnalyzer.Domain.Attributes;
-using DiskAnalyzer.Infrastructure.Grouper;
+﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Attributes;
 
 namespace DiskAnalyzer.Infrastructure.Groupers;
 
