@@ -25,7 +25,7 @@ public class FilesGrouper(IFileSystemScanner scanner)
     /// Результат с группами файлов, метриками и списками файлов в каждой группе.
     /// <see cref="GroupingAnalysisResult"/>
     /// </returns>
-    public AnalysisResult GroupFiles(
+    public GroupingAnalysisResult GroupFiles(
         string path,
         int maxDepth,
         IEnumerable<IFilesMeasurement> measurements,
@@ -107,7 +107,7 @@ public class FilesGrouper(IFileSystemScanner scanner)
     /// Выполняется в отдельном потоке через 
     /// <see cref="Task.Run{TResult}(Func{TResult}, CancellationToken)"/>
     /// </remarks>
-    public Task<AnalysisResult> GroupFilesAsync(
+    public Task<GroupingAnalysisResult> GroupFilesAsync(
         string path,
         int maxDepth,
         IEnumerable<IFilesMeasurement> measurements,
