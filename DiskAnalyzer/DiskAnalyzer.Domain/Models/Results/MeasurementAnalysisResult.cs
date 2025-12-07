@@ -1,4 +1,6 @@
-﻿namespace DiskAnalyzer.Domain.Models.Results;
+﻿using System.Text.Json.Serialization;
+
+namespace DiskAnalyzer.Domain.Models.Results;
 
 /// <summary>
 /// Результат сбора метрик файловой системы без группировки.
@@ -11,13 +13,14 @@ public sealed record MeasurementAnalysisResult : AnalysisResult
 {
     public Dictionary<string, string> Measurements { get; init; } = default!;
 
+    [JsonConstructor]
     public MeasurementAnalysisResult(
         Guid Id,
         DateTime CreatedAt,
         string Path,
         IReadOnlyCollection<FilterInfo>? Filters,
         Dictionary<string, string> Measurements)
-        : base(Id, CreatedAt, Path, "FilesMeasurement", Filters)
+        : base(Id, CreatedAt, Path, Filters)
     {
         this.Measurements = Measurements;
     }
@@ -26,7 +29,7 @@ public sealed record MeasurementAnalysisResult : AnalysisResult
         string path,
         IReadOnlyCollection<FilterInfo>? filters,
         Dictionary<string, string> measurements)
-        : base(path, "FilesMeasurement", filters)
+        : base(path, filters)
     {
         Measurements = measurements;
     }

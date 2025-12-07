@@ -1,4 +1,6 @@
-﻿namespace DiskAnalyzer.Domain.Models.Results;
+﻿using System.Text.Json.Serialization;
+
+namespace DiskAnalyzer.Domain.Models.Results;
 
 /// <summary>
 /// Результат группировки файлов по заданному критерию.
@@ -19,6 +21,7 @@ public sealed record GroupingAnalysisResult : AnalysisResult
     public Dictionary<string, string> Metrics { get; init; } = default!;
     public List<FileGroup> Groups { get; init; } = default!;
 
+    [JsonConstructor]
     public GroupingAnalysisResult(
         Guid Id,
         DateTime CreatedAt,
@@ -27,7 +30,7 @@ public sealed record GroupingAnalysisResult : AnalysisResult
         string GrouperType,
         Dictionary<string, string> Metrics,
         List<FileGroup> Groups)
-        : base(Id, CreatedAt, Path, "FilesGrouping", Filters)
+        : base(Id, CreatedAt, Path, Filters)
     {
         this.GrouperType = GrouperType;
         this.Metrics = Metrics;
@@ -40,7 +43,7 @@ public sealed record GroupingAnalysisResult : AnalysisResult
         string grouperType,
         Dictionary<string, string> metrics,
         List<FileGroup> groups)
-        : base(path, "FilesGrouping", filters)
+        : base(path, filters)
     {
         GrouperType = grouperType;
         Metrics = metrics;

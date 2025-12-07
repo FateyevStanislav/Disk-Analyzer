@@ -14,16 +14,33 @@ namespace DiskAnalyzer.Domain.Models.Results;
 [JsonDerivedType(typeof(DuplicateAnalysisResult), "DuplicatesFinding")]
 [JsonDerivedType(typeof(GroupingAnalysisResult), "FilesGrouping")]
 [JsonDerivedType(typeof(MeasurementAnalysisResult), "FilesMeasurement")]
-public abstract record AnalysisResult(
-    Guid Id,
-    DateTime CreatedAt,
-    string Path,
-    string AnalysisType,
-    IReadOnlyCollection<FilterInfo>? Filters = null)
+public abstract record AnalysisResult
 {
+    public Guid Id { get; init; }
+    public DateTime CreatedAt { get; init; }
+    public string Path { get; init; }
+    public IReadOnlyCollection<FilterInfo>? Filters { get; init; }
+
+    [JsonConstructor]
+    protected AnalysisResult(
+        Guid id,
+        DateTime createdAt,
+        string path,
+        IReadOnlyCollection<FilterInfo>? filters)
+    {
+        Id = id;
+        CreatedAt = createdAt;
+        Path = path;
+        Filters = filters;
+    }
+
     protected AnalysisResult(
         string path,
-        string analysisType,
         IReadOnlyCollection<FilterInfo>? filters = null)
-        : this(Guid.NewGuid(), DateTime.UtcNow, path, analysisType, filters) { }
+    {
+        Id = Guid.NewGuid();
+        CreatedAt = DateTime.UtcNow;
+        Path = path;
+        Filters = filters;
+    }
 }

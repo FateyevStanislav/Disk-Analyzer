@@ -1,4 +1,6 @@
-﻿namespace DiskAnalyzer.Domain.Models.Results;
+﻿using System.Text.Json.Serialization;
+
+namespace DiskAnalyzer.Domain.Models.Results;
 
 /// <summary>
 /// Результат поиска дублирующихся файлов.
@@ -12,6 +14,7 @@ public sealed record DuplicateAnalysisResult : AnalysisResult
     public Dictionary<string, string> Metrics { get; init; } = default!;
     public List<DuplicateGroup> DuplicateGroups { get; init; } = default!;
 
+    [JsonConstructor]
     public DuplicateAnalysisResult(
         Guid Id,
         DateTime CreatedAt,
@@ -19,7 +22,7 @@ public sealed record DuplicateAnalysisResult : AnalysisResult
         IReadOnlyCollection<FilterInfo>? Filters,
         Dictionary<string, string> Metrics,
         List<DuplicateGroup> DuplicateGroups)
-        : base(Id, CreatedAt, Path, "DuplicatesFinding", Filters)
+        : base(Id, CreatedAt, Path, Filters)
     {
         this.Metrics = Metrics;
         this.DuplicateGroups = DuplicateGroups;
@@ -30,7 +33,7 @@ public sealed record DuplicateAnalysisResult : AnalysisResult
         IReadOnlyCollection<FilterInfo>? filters,
         Dictionary<string, string> metrics,
         List<DuplicateGroup> duplicateGroups)
-        : base(path, "DuplicatesFinding", filters)
+        : base(path, filters)
     {
         Metrics = metrics;
         DuplicateGroups = duplicateGroups;
