@@ -19,7 +19,7 @@ public sealed record GroupingAnalysisResult : AnalysisResult
 {
     public string GrouperType { get; init; } = default!;
     public Dictionary<string, string> Metrics { get; init; } = default!;
-    public List<FileGroup> Groups { get; init; } = default!;
+    public List<FilesGroup> Groups { get; init; } = default!;
 
     [JsonConstructor]
     public GroupingAnalysisResult(
@@ -29,7 +29,7 @@ public sealed record GroupingAnalysisResult : AnalysisResult
         IReadOnlyCollection<FilterInfo>? Filters,
         string GrouperType,
         Dictionary<string, string> Metrics,
-        List<FileGroup> Groups)
+        List<FilesGroup> Groups)
         : base(Id, CreatedAt, Path, Filters)
     {
         this.GrouperType = GrouperType;
@@ -42,7 +42,7 @@ public sealed record GroupingAnalysisResult : AnalysisResult
         IReadOnlyCollection<FilterInfo>? filters,
         string grouperType,
         Dictionary<string, string> metrics,
-        List<FileGroup> groups)
+        List<FilesGroup> groups)
         : base(path, filters)
     {
         GrouperType = grouperType;

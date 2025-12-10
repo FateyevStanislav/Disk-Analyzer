@@ -4,7 +4,7 @@ namespace DiskAnalyzer.Domain.Services.FilesMeasurements;
 
 public class TotalSizeMeasurement : IFilesMeasurement
 {
-    public string MeasurementType => "TotalSize";
+    public string MeasurementType => "Size";
 
     public long Result { get; private set; }
 

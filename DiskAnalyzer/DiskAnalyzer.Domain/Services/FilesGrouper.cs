@@ -65,28 +65,26 @@ public class FilesGrouper(IFileSystemScanner scanner)
             },
             filter);
 
-        var fileGroups = new List<FileGroup>();
+        var fileGroups = new List<FilesGroup>();
         var metrics = new Dictionary<string, string>();
 
         foreach (var (key, group) in groups)
         {
-            var totalSize = group.Measurements
-                .FirstOrDefault(m => m.MeasurementType == "TotalSize")?.Result ?? 0;
-            var filesCount = group.Measurements
-                .FirstOrDefault(m => m.MeasurementType == "FilesCount")?.Result ?? 0;
-
-            fileGroups.Add(new FileGroup(
-                key,
-                totalSize,
-                (int)filesCount,
-                [.. group.Files.Select(f => new FileDetails(f.FullName, f.Length))]
-            ));
+            var groupMetrics = new Dictionary<string, long>();
 
             foreach (var measurement in group.Measurements)
             {
+                groupMetrics.Add(measurement.MeasurementType, measurement.Result);
+
                 var metricKey = $"{key}_{measurement.MeasurementType}";
                 metrics.Add(metricKey, measurement.Result.ToString());
             }
+
+            fileGroups.Add(new FilesGroup(
+                key,
+                groupMetrics,
+                [.. group.Files.Select(f => new FileDetails(f.FullName, f.Length))]
+            ));
         }
 
         metrics.Add("GrouperType", grouper.ToGrouperInfo().Type);

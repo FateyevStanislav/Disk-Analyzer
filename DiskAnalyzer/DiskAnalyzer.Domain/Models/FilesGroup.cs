@@ -4,11 +4,12 @@
 /// Группа файлов с вычисленными метриками.
 /// </summary>
 /// <param name="Key">Ключ группы (например, ".pdf", "1MB-10MB").</param>
-/// <param name="TotalSize">Суммарный размер всех файлов в группе.</param>
-/// <param name="FilesCount">Количество файлов в группе.</param>
+/// <param name="Measurements">
+/// Словарь метрик: ключ = тип измерения, значение = результат.
+/// Примеры: { "TotalSize": "104857600", "FilesCount": "42" }
 /// <param name="Files">Список файлов в группе.</param>
-public sealed record FileGroup(
+public sealed record FilesGroup(
     string Key,
-    long TotalSize,
-    int FilesCount,
-    IReadOnlyList<FileDetails> Files);
+    Dictionary<string, long> Metrics,  
+    IReadOnlyCollection<FileDetails> Files
+);
