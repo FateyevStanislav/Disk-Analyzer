@@ -5,7 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers;
 
-public record FilesMeasurementDto(IEnumerable<FilesMeasurementType> MeasurementTypes, string Path, int MaxDepth, IEnumerable<FilterDto>? Filters);
+public record FilesMeasurementDto(
+    string Path,
+    int MaxDepth,
+    IEnumerable<FilesMeasurementType> MeasurementTypes,
+    IEnumerable<FilterDto>? Filters);
 
 [ApiController]
 [Route("api/measurements/files")]

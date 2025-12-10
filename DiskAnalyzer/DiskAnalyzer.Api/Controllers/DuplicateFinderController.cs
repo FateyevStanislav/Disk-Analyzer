@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
 {
-    public record DuplicateFinderDto(string Path, int MaxDepth, IEnumerable<FilterDto>? Filters);
+    public record DuplicateFinderDto(
+        string Path,
+        int MaxDepth,
+        IEnumerable<FilterDto>? Filters);
 
     [ApiController]
     [Route("api/measurements/duplicates")]
@@ -23,5 +26,4 @@ namespace DiskAnalyzer.Api.Controllers
             return Ok(duplicatesFinder.FindDuplicates(dto.Path, dto.MaxDepth, filter));
         }
     }
-
 }

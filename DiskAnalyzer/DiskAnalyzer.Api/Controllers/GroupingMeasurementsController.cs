@@ -7,17 +7,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace DiskAnalyzer.Api.Controllers
 {
     public record GroupingMeasurementDto(
-        FilesGroupingType Type,
-        IEnumerable<FilesMeasurementType> MeasurementTypes,
         string Path,
         int MaxDepth,
+        IEnumerable<FilesMeasurementType> MeasurementTypes,
+        FilesGroupingType GroupingType,
         IEnumerable<FilterDto>? Filters);
 
     [ApiController]
     [Route("api/measurements/groups")]
     public class GroupingMeasurementsController : ControllerBase
     {
-        private static AnalysisResult? lastResult;
         private static FilesGrouper filesGrouper =
             new FilesGrouper(
                 new DirectoryWalker(
@@ -29,7 +28,7 @@ namespace DiskAnalyzer.Api.Controllers
         {
             var filter = FilterFactory.Create(dto.Filters);
             var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
-            var grouper = GrouperFactory.Create(dto.Type);
+            var grouper = GrouperFactory.Create(dto.GroupingType);
 
             return Ok(filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, measurment, grouper, filter));
         }
