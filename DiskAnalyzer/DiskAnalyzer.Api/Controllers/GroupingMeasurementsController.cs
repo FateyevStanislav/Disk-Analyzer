@@ -16,7 +16,7 @@ namespace DiskAnalyzer.Api.Controllers
 
     [ApiController]
     [Route("api/measurements/groups")]
-    public class GroupingMeasurementsController : ControllerBase
+    public class GroupingMeasurementsController : AnalysisControllerBase
     {
         private static FilesGrouper filesGrouper =
             new FilesGrouper(
@@ -32,8 +32,8 @@ namespace DiskAnalyzer.Api.Controllers
                 var filter = FilterFactory.Create(dto.Filters);
                 var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
                 var grouper = GrouperFactory.Create(dto.GroupingType);
-
-                return Ok(filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, measurment, grouper, filter));
+                var result = filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, measurment, grouper, filter);
+                return OkAnalysis(result);
             }
 
             catch (ArgumentException e)

@@ -12,7 +12,7 @@ namespace DiskAnalyzer.Api.Controllers
 
     [ApiController]
     [Route("api/measurements/duplicates")]
-    public class DuplicateFinderController : ControllerBase
+    public class DuplicateFinderController : AnalysisControllerBase
     {
         private static DuplicatesFinder duplicatesFinder =
             new DuplicatesFinder(
@@ -26,7 +26,8 @@ namespace DiskAnalyzer.Api.Controllers
             try
             {
                 var filter = FilterFactory.Create(dto.Filters);
-                return Ok(duplicatesFinder.FindDuplicates(dto.Path, dto.MaxDepth, filter));
+                var result = duplicatesFinder.FindDuplicates(dto.Path, dto.MaxDepth, filter);
+                return OkAnalysis(result);
             }
 
             catch (ArgumentException e)

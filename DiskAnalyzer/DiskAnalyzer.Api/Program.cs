@@ -1,6 +1,7 @@
 using DiskAnalyzer.Api.Converters;
 using DiskAnalyzer.Api.Modules;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 ApiReflection.InitData();
 

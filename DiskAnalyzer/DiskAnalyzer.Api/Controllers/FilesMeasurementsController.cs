@@ -1,8 +1,10 @@
 ﻿using DiskAnalyzer.Api.Factories;
+using DiskAnalyzer.Domain.Models.Results;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace DiskAnalyzer.Api.Controllers;
 
@@ -14,7 +16,7 @@ public record FilesMeasurementDto(
 
 [ApiController]
 [Route("api/measurements/files")]
-public class FilesMeasurementsController : ControllerBase
+public class FilesMeasurementsController : AnalysisControllerBase
 {
     private static FilesMeasurer filesMeasurer =
         new FilesMeasurer(
@@ -29,7 +31,8 @@ public class FilesMeasurementsController : ControllerBase
         {
             var filter = FilterFactory.Create(dto.Filters);
             var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
-            return Ok(filesMeasurer.MeasureFiles(dto.Path, dto.MaxDepth, measurment, filter));
+            var result = filesMeasurer.MeasureFiles(dto.Path, dto.MaxDepth, measurment, filter);
+            return OkAnalysis(result);
         }
 
         catch (ArgumentException e)
