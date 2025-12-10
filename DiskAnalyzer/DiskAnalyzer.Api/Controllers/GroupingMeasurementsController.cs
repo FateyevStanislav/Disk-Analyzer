@@ -1,28 +1,23 @@
-﻿using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Domain.Groupers;
-using DiskAnalyzer.Domain.Records.RecordStrategies.Grouping;
+﻿using DiskAnalyzer.Api.Factories;
+using DiskAnalyzer.Domain.Models.Results;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
-using DiskAnalyzer.Infrastructure.Filter;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
 {
-    public enum FilesGroupingType
-    {
-        Extension,
-        LastAcessTime,
-        SizeBucket
-    }
-
-    public record GroupingMeasurementDto(FilesGroupingType Type, string Path, int MaxDepth, IEnumerable<FilterDto>? Filters);
+    public record GroupingMeasurementDto(
+        FilesGroupingType Type,
+        IEnumerable<FilesMeasurementType> MeasurementTypes,
+        string Path,
+        int MaxDepth,
+        IEnumerable<FilterDto>? Filters);
 
     [ApiController]
     [Route("api/measurements/groups")]
     public class GroupingMeasurementsController : ControllerBase
     {
-        private static Record? lastResult;
+        private static AnalysisResult? lastResult;
         private static FilesGrouper filesGrouper =
             new FilesGrouper(
                 new DirectoryWalker(
@@ -33,43 +28,10 @@ namespace DiskAnalyzer.Api.Controllers
         public IActionResult Create(GroupingMeasurementDto dto)
         {
             var filter = FilterFactory.Create(dto.Filters);
+            var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
+            var grouper = GrouperFactory.Create(dto.Type);
 
-            IFileGrouper grouper;
-
-            switch (dto.Type)
-            {
-                case FilesGroupingType.Extension:
-                    grouper = new ExtensionGrouper();
-                    break;
-
-                case FilesGroupingType.LastAcessTime:
-                    grouper = new LastAccessTimeGrouper();
-                    break;
-
-                case FilesGroupingType.SizeBucket:
-                    grouper = new SizeBucketGrouper();
-                    break;
-
-                default:
-                    return BadRequest("Uncorrect grouper type");
-            }
-
-            lastResult = filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, new SizeInfoGroupStrategy(), grouper, filter);
-
-            return Ok(lastResult);
+            return Ok(filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, measurment, grouper, filter));
         }
-
-        //[HttpPost("saveToHistory")]
-        //public IActionResult Save()
-        //{
-        //    if (lastResult == null)
-        //    {
-        //        return BadRequest("Measurement is missing or has already been added to history");
-        //    }
-
-        //    HistoryController.AddIdToHistory(lastResult);
-        //    lastResult = null;
-        //    return Ok();
-        //}
     }
 }

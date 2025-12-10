@@ -1,5 +1,5 @@
 ﻿using DiskAnalyzer.Api.Modules;
-using DiskAnalyzer.Domain.Records;
+using DiskAnalyzer.Domain.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers
@@ -14,7 +14,8 @@ namespace DiskAnalyzer.Api.Controllers
         [HttpGet("{countOfRecords:int}")]
         public IActionResult Get(int countOfRecords = 0)
         {
-            if (countOfRecords == 0) {
+            if (countOfRecords == 0)
+            {
                 return Ok(history.GetAllRecords());
             }
 
@@ -22,6 +23,13 @@ namespace DiskAnalyzer.Api.Controllers
             {
                 return Ok(history.GetLastRecords(countOfRecords));
             }
+        }
+
+        [HttpPost]
+        public IActionResult Add([FromBody] AnalysisResult result)
+        {
+            history.AddRecord(result);
+            return Ok();
         }
     }
 }

@@ -1,21 +1,18 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Domain.Filters;
-using Newtonsoft.Json.Linq;
+using DiskAnalyzer.Infrastructure.Filters;
 using System.Reflection;
-using System.Reflection.Metadata;
 
 namespace DiskAnalyzer.Api.Modules;
 
+public record FilterFactoryInfo(Type filterType, ParameterInfo[] parameters);
+
 public static class ApiReflection
 {
-    private static Assembly domainAssembly;
-    private static Dictionary<string, Dictionary<string, Type>> filtersData;
+    private static Dictionary<string, FilterFactoryInfo> filtersInfo = new();
 
     public static void InitData()
     {
-        domainAssembly = typeof(ExtensionFilter).Assembly;
-
-        filtersData = new();
+        var domainAssembly = typeof(ExtensionFilter).Assembly;
 
         var filterTypes = domainAssembly.GetTypes().
             Where(t => t.GetInterfaces().Contains(typeof(IFileFilter)));
@@ -27,28 +24,27 @@ public static class ApiReflection
                 continue;
             }
 
-            filtersData[f.Name] = new();
-            foreach (var param in f.GetConstructors()[0].GetParameters())
-            {
-                filtersData[f.Name].Add(param.Name, param.ParameterType);
-            }
+            var constructor = f.GetConstructors().FirstOrDefault();
+            var constructorParams = constructor.GetParameters();
+
+            filtersInfo.Add(f.Name, new FilterFactoryInfo(f, constructorParams));
         }
     }
 
     public static IReadOnlyDictionary<string, Dictionary<string, string>> GetFiltersData()
     {
-        return filtersData.ToDictionary(
+        return filtersInfo.ToDictionary(
             f => f.Key,
-            f => f.Value.ToDictionary(
-                p => p.Key,
-                p => p.Value.FullName
+            f => f.Value.parameters.ToDictionary(
+                p => p.Name,
+                p => p.ParameterType.FullName
             )
         ).AsReadOnly();
     }
 
-    public static Type? GetFilterType(string filterName)
+    public static FilterFactoryInfo? GetFilterInfo(string filterName)
     {
-        return domainAssembly.GetType($"DiskAnalyzer.Domain.Filters.{filterName}");
+        return filtersInfo[filterName];
     }
 }
 

@@ -1,27 +1,27 @@
-﻿using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Domain.Models.Results;
 
 namespace DiskAnalyzer.Api.Modules
 {
     public class History
     {
-        private List<Record> historyList;
+        private List<AnalysisResult> historyList;
 
         public History()
         {
             this.historyList = new();
         }
 
-        public void AddRecord(Record record)
+        public void AddRecord(AnalysisResult record)
         {
             historyList.Add(record);
         }
 
-        public IEnumerable<Record> GetAllRecords()
+        public IEnumerable<AnalysisResult> GetAllRecords()
         {
             return historyList.AsReadOnly().Reverse();
         }
 
-        public IEnumerable<Record> GetLastRecords(int count)
+        public IEnumerable<AnalysisResult> GetLastRecords(int count)
         {
             if (count >= historyList.Count)
             {

@@ -1,8 +1,7 @@
 ﻿using DiskAnalyzer.Api.Controllers;
 using DiskAnalyzer.Api.Modules;
 using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Domain.Filters;
-using System.Reflection.Metadata;
+using DiskAnalyzer.Infrastructure.Filters;
 
 public static class FilterFactory
 {
@@ -17,26 +16,15 @@ public static class FilterFactory
 
         foreach (var dto in filters)
         {
-            var filterType = ApiReflection.GetFilterType(dto.Type);
-            if (filterType == null)
+            var filterInfo = ApiReflection.GetFilterInfo(dto.Type);
+
+            var paramValues = new object?[filterInfo.parameters.Length];
+
+            for (int i = 0; i < filterInfo.parameters.Length; i++)
             {
-                throw new ArgumentException($"Unknown filter type: {dto.Type}");
-            }
+                var param = filterInfo.parameters[i];
 
-            var constructor = filterType.GetConstructors().FirstOrDefault();
-            if (constructor == null)
-            {
-                throw new ArgumentException($"Filter {dto.Type} has no constructor");
-            }
-
-            var constructorParams = constructor.GetParameters();
-            var paramValues = new object?[constructorParams.Length];
-
-            for (int i = 0; i < constructorParams.Length; i++)
-            {
-                var param = constructorParams[i];
-
-                if(!dto.FilterParams.TryGetValue(param.Name!, out var rawValue))
+                if (!dto.FilterParams.TryGetValue(param.Name!, out var rawValue))
                 {
                     throw new ArgumentException($"Missing requited parameter {param.Name}");
                 }
@@ -52,7 +40,7 @@ public static class FilterFactory
                 }
             }
 
-            var newFilter = (IFileFilter)Activator.CreateInstance(filterType, paramValues)!;
+            var newFilter = (IFileFilter)Activator.CreateInstance(filterInfo.filterType, paramValues)!;
             result.Add(newFilter);
         }
 
