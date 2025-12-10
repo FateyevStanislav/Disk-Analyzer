@@ -58,18 +58,5 @@ namespace DiskAnalyzer.Api.Controllers
 
             return Ok(lastResult);
         }
-
-        //[HttpPost("saveToHistory")]
-        //public IActionResult Save()
-        //{
-        //    if (lastResult == null)
-        //    {
-        //        return BadRequest("Measurement is missing or has already been added to history");
-        //    }
-
-        //    HistoryController.AddIdToHistory(lastResult);
-        //    lastResult = null;
-        //    return Ok();
-        //}
     }
 }

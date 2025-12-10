@@ -15,27 +15,27 @@ namespace DiskAnalyzer.UI.Forms
         }
         private void InitializeComponent()
         {
-            metricLabel = new Label();
-            metricResultLabel = new Label();
+            typeLabel = new Label();
+            ResultLabel = new Label();
             analyzeLabel = new Label();
             SuspendLayout();
             // 
-            // metricLabel
+            // typeLabel
             // 
-            metricLabel.AutoSize = true;
-            metricLabel.Location = new Point(12, 66);
-            metricLabel.Name = "metricLabel";
-            metricLabel.Size = new Size(86, 15);
-            metricLabel.TabIndex = 1;
+            typeLabel.AutoSize = true;
+            typeLabel.Location = new Point(12, 66);
+            typeLabel.Name = "typeLabel";
+            typeLabel.Size = new Size(86, 15);
+            typeLabel.TabIndex = 1;
             // 
-            // metricResultLabel
+            // ResultLabel
             // 
-            metricResultLabel.AutoSize = true;
-            metricResultLabel.Location = new Point(255, 66);
-            metricResultLabel.Name = "metricResultLabel";
-            metricResultLabel.Size = new Size(86, 15);
-            metricResultLabel.TabIndex = 3;
-            metricResultLabel.Text = "fill";
+            ResultLabel.AutoSize = true;
+            ResultLabel.Location = new Point(255, 66);
+            ResultLabel.Name = "ResultLabel";
+            ResultLabel.Size = new Size(86, 15);
+            ResultLabel.TabIndex = 3;
+            ResultLabel.Text = "fill";
             // 
             // analyzeLabel
             // 
@@ -54,17 +54,17 @@ namespace DiskAnalyzer.UI.Forms
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(600, 131);
             Controls.Add(analyzeLabel);
-            Controls.Add(metricResultLabel);
-            Controls.Add(metricLabel);
+            Controls.Add(ResultLabel);
+            Controls.Add(typeLabel);
             Name = "ResultForm";
             Text = "AnalyzeResult";
             ResumeLayout(false);
             PerformLayout();
         }
 
-        private Label metricLabel;
+        private Label typeLabel;
         private Label label2;
-        private Label metricResultLabel;
+        private Label ResultLabel;
         private Label label4;
         private Label analyzeLabel;
     }

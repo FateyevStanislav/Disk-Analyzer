@@ -1,6 +1,7 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.ComponentModel;
 using System.Drawing;
-using System;
+using System.Windows.Forms;
 
 namespace DiskAnalyzer.UI
 {
@@ -10,10 +11,20 @@ namespace DiskAnalyzer.UI
         public MainWindow()
         {
             InitializeComponent();
-            SetupCustomControls();
-            Load += MainWindow_Load;
-            filterListBox.ItemCheck += FilterListBox_ItemCheck;
+
+            if (!IsInDesigner())
+            {
+                SetupCustomControls();
+                Load += MainWindow_Load;
+                filterListBox.ItemCheck += FilterListBox_ItemCheck;
+            }
         }
+
+        private bool IsInDesigner()
+        {
+            return LicenseManager.UsageMode == LicenseUsageMode.Designtime;
+        }
+
 
         private void SetupCustomControls()
         {
@@ -22,11 +33,15 @@ namespace DiskAnalyzer.UI
 
         private async void MainWindow_Load(object sender, EventArgs e)
         {
-            await LoadFiltersAsync();
+            if (!IsInDesigner())
+                await LoadFiltersAsync();
         }
+
 
         private async Task LoadFiltersAsync()
         {
+            if (apiClient == null) return;
+
             filters = await apiClient.GetAvailableFiltersAsync();
             filterListBox.Items.Clear();
             foreach (var filterName in filters.Keys)

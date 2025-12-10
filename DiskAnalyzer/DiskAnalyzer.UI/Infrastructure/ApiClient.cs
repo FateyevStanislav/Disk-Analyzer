@@ -1,8 +1,13 @@
 ﻿using DiskAnalyzer.Api.Controllers;
+using DiskAnalyzer.Api.Controllers;
+using DiskAnalyzer.Api.Factories;
+using DiskAnalyzer.Domain.Records.Grouping;
+using DiskAnalyzer.Domain.Records.Measurement;
 using DiskAnalyzer.Domain.Records.Measurement;
 using DiskAnalyzer.Infrastructure;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 public class ApiClient : IApiClient
 {
@@ -38,5 +43,23 @@ public class ApiClient : IApiClient
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<FilesMeasurementRecord>(jsonOptions);
+    }
+
+    public async Task<FilesGroupingRecord> CreateGroupingAsync(GroupingMeasurementDto request)
+    {
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        var response = await _httpClient.PostAsJsonAsync(
+            "api/measurements/groups",
+            request,
+            jsonOptions
+        );
+
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<FilesGroupingRecord>(jsonOptions);
     }
 }

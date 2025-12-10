@@ -39,6 +39,8 @@ namespace DiskAnalyzer.UI
             filterLabel = new Label();
             historyCheckBox = new CheckBox();
             metricsListBox = new CheckedListBox();
+            groupingListBox = new CheckedListBox();
+            groupingLabel = new Label();
             ((System.ComponentModel.ISupportInitialize)depthUpDown).BeginInit();
             SuspendLayout();
             // 
@@ -67,7 +69,7 @@ namespace DiskAnalyzer.UI
             // analyzeButton
             // 
             analyzeButton.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            analyzeButton.Location = new Point(269, 456);
+            analyzeButton.Location = new Point(269, 560);
             analyzeButton.Margin = new Padding(4, 3, 4, 3);
             analyzeButton.Name = "analyzeButton";
             analyzeButton.Size = new Size(112, 33);
@@ -86,6 +88,16 @@ namespace DiskAnalyzer.UI
             depthLabel.Size = new Size(263, 24);
             depthLabel.TabIndex = 0;
             depthLabel.Text = "Введите глубину анализа";
+            // 
+            // groupingLabel
+            // 
+            groupingLabel.AutoSize = true;
+            groupingLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            groupingLabel.Location = new Point(59, 390); // под groupingListBox
+            groupingLabel.Name = "groupingLabel";
+            groupingLabel.Size = new Size(253, 24);
+            groupingLabel.TabIndex = 10; // следующий индекс
+            groupingLabel.Text = "Выберите тип группировки";
             // 
             // depthUpDown
             // 
@@ -131,7 +143,7 @@ namespace DiskAnalyzer.UI
             // 
             historyCheckBox.AutoSize = true;
             historyCheckBox.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            historyCheckBox.Location = new Point(20, 368);
+            historyCheckBox.Location = new Point(20, 350); // было 368
             historyCheckBox.Name = "historyCheckBox";
             historyCheckBox.Size = new Size(236, 29);
             historyCheckBox.TabIndex = 8;
@@ -149,14 +161,27 @@ namespace DiskAnalyzer.UI
                 FilesMeasurementStrategyType.Size, 
                 FilesMeasurementStrategyType.Count 
                 );
-
+            // 
+            // groupingListBox
+            // 
+            groupingListBox.FormattingEnabled = true;
+            groupingListBox.Location = new Point(20, 430);
+            groupingListBox.Name = "groupingListBox";
+            groupingListBox.Size = new Size(280, 94);
+            groupingListBox.TabIndex = 11;
+            groupingListBox.Items.AddRange(
+                FilesGroupingType.Extension,
+                FilesGroupingType.LastAcessTime,
+                FilesGroupingType.SizeBucket
+                );
             // 
             // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientInactiveCaption;
-            ClientSize = new Size(649, 501);
+            ClientSize = new Size(649, 620);
+            Controls.Add(groupingListBox);
             Controls.Add(metricsListBox);
             Controls.Add(historyCheckBox);
             Controls.Add(filterLabel);
@@ -167,6 +192,7 @@ namespace DiskAnalyzer.UI
             Controls.Add(analyzeButton);
             Controls.Add(pathTextBox);
             Controls.Add(pathLabel);
+            Controls.Add(groupingLabel);
             Margin = new Padding(4, 3, 4, 3);
             Name = "MainWindow";
             Text = "DiskAnalyzer";
@@ -174,7 +200,6 @@ namespace DiskAnalyzer.UI
             ((System.ComponentModel.ISupportInitialize)depthUpDown).EndInit();
             ResumeLayout(false);
             PerformLayout();
-
         }
 
         private FilesMeasurementStrategyType GetFMSType()
@@ -184,6 +209,11 @@ namespace DiskAnalyzer.UI
                 return FilesMeasurementStrategyType.Combined;
             }
             return Enum.Parse<FilesMeasurementStrategyType>(metricsListBox.CheckedItems[0].ToString());
+        }
+
+        private FilesGroupingType GetFGSType()
+        {
+            return Enum.Parse<FilesGroupingType>(groupingListBox.CheckedItems[0].ToString());
         }
 
         private void FilterListBox_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -241,69 +271,37 @@ namespace DiskAnalyzer.UI
             {
                 var path = pathTextBox.Text.EscapeSlashes();
                 var maxDepth = (int)depthUpDown.Value;
-                var strategy = GetFMSType();
                 var saveInHistory = historyCheckBox.Checked;
-                var filterDtos = new List<FilterDto>();
+                var filterDtos = BuildFilterDtos();
 
-                foreach (var checkedItem in filterListBox.CheckedItems)
+                bool hasMetrics = metricsListBox.CheckedItems.Count > 0;
+                bool hasGrouping = groupingListBox.CheckedItems.Count > 0;
+
+                if (!hasMetrics && !hasGrouping)
                 {
-                    var filterName = checkedItem.ToString();
-
-                    if (_filterParameters.TryGetValue(filterName, out var json))
-                    {
-                        try
-                        {
-                            var jsonDict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-
-                            if (!jsonDict.TryGetValue("type", out var typeValue))
-                            {
-                                MessageBox.Show($"В JSON фильтра {filterName} нет поля 'type'!");
-                                return;
-                            }
-
-                            var filterDto = new FilterDto(
-                                Type: filterName,
-                                FilterParams: jsonDict
-                                    .Where(kvp => kvp.Key != "type")
-                                    .ToDictionary(
-                                        kvp => kvp.Key,
-                                        kvp => kvp.Value?.ToString() ?? ""
-                                    )
-                            );
-
-                            filterDtos.Add(filterDto);
-                        }
-                        catch (JsonException)
-                        {
-                            MessageBox.Show($"Ошибка в параметрах фильтра {filterName}!");
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show($"Для фильтра {filterName} не указаны параметры!");
-                        return;
-                    }
-                }
-
-                if (metricsListBox.CheckedItems.Count == 0)
-                {
-                    MessageBox.Show("Выберите хотя бы одну метрику!");
+                    MessageBox.Show("Выберите либо метрики, либо группировку!");
                     return;
                 }
 
-                var requestDto = new FilesMeasurementDto(
-                    StrategyType: strategy,
-                    Path: path,
-                    MaxDepth: maxDepth,
-                    Filters: filterDtos
-                );
+                if (hasMetrics && hasGrouping)
+                {
+                    MessageBox.Show("Выберите что-то одно: либо метрики, либо группировку!");
+                    return;
+                }
 
-                var result = await apiClient.CreateMeasurementAsync(requestDto);
+                if (hasMetrics)
+                {
+                    await RunMeasurementAnalysis(path, maxDepth, filterDtos);
+                }
+                else if (hasGrouping)
+                {
+                    await RunGroupingAnalysis(path, maxDepth, filterDtos);
+                }
 
-                var resultForm = new ResultForm();
-                resultForm.SetResult(result);
-                resultForm.Show();
+                if (saveInHistory)
+                {
+                    // await apiClient.SaveToHistoryAsync();
+                }
             }
             catch (HttpRequestException httpEx)
             {
@@ -313,6 +311,80 @@ namespace DiskAnalyzer.UI
             {
                 MessageBox.Show($"Ошибка: {ex.Message}");
             }
+        }
+
+        private async Task RunMeasurementAnalysis(string path, int maxDepth, List<FilterDto> filterDtos)
+        {
+            var strategy = GetFMSType();
+
+            var requestDto = new FilesMeasurementDto(
+                StrategyType: strategy,
+                Path: path,
+                MaxDepth: maxDepth,
+                Filters: filterDtos
+            );
+
+            var result = await apiClient.CreateMeasurementAsync(requestDto);
+
+            var resultForm = new ResultForm();
+            resultForm.SetMetricsResult(result);
+            resultForm.Show();
+        }
+
+        private async Task RunGroupingAnalysis(string path, int maxDepth, List<FilterDto> filterDtos)
+        {
+            var groupingType = GetFGSType();
+
+            var requestDto = new GroupingMeasurementDto(
+                Type: groupingType,
+                Path: path,
+                MaxDepth: maxDepth,
+                Filters: filterDtos
+            );
+
+            var result = await apiClient.CreateGroupingAsync(requestDto);
+
+            var resultForm = new ResultForm();
+            resultForm.SetGroupingResult(result);
+            resultForm.Show();
+        }
+
+        private List<FilterDto> BuildFilterDtos()
+        {
+            var filterDtos = new List<FilterDto>();
+
+            foreach (var checkedItem in filterListBox.CheckedItems)
+            {
+                var filterName = checkedItem.ToString();
+
+                if (_filterParameters.TryGetValue(filterName, out var json))
+                {
+                    var jsonDict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+
+                    if (!jsonDict.TryGetValue("type", out var typeValue))
+                    {
+                        throw new Exception($"В JSON фильтра {filterName} нет поля 'type'!");
+                    }
+
+                    var filterDto = new FilterDto(
+                        Type: filterName,
+                        FilterParams: jsonDict
+                            .Where(kvp => kvp.Key != "type")
+                            .ToDictionary(
+                                kvp => kvp.Key,
+                                kvp => kvp.Value?.ToString() ?? ""
+                            )
+                    );
+
+                    filterDtos.Add(filterDto);
+                }
+                else
+                {
+                    throw new Exception($"Для фильтра {filterName} не указаны параметры!");
+                }
+            }
+
+            return filterDtos;
         }
 
         private string GetDefaultParametersJson(string filterName)
@@ -362,10 +434,12 @@ namespace DiskAnalyzer.UI
         private System.Windows.Forms.Label depthLabel;
         private System.Windows.Forms.NumericUpDown depthUpDown;
         private Label metricsLabel;
+        private Label groupingLabel;
         private CheckedListBox filterListBox;
         private Label filterLabel;
         private CheckBox historyCheckBox;
         private CheckedListBox metricsListBox;
+        private CheckedListBox groupingListBox;
     }
 }
 
