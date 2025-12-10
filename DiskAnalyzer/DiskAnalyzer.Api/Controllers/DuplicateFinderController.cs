@@ -1,12 +1,13 @@
 ﻿using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace DiskAnalyzer.Api.Controllers
 {
     public record DuplicateFinderDto(
         string Path,
-        int MaxDepth,
+        [param: Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
         IEnumerable<FilterDto>? Filters);
 
     [ApiController]
@@ -20,10 +21,23 @@ namespace DiskAnalyzer.Api.Controllers
                         new LoggerFactory())));
 
         [HttpPost]
-        public IActionResult Create(DuplicateFinderDto dto)
+        public IActionResult Make(DuplicateFinderDto dto)
         {
-            var filter = FilterFactory.Create(dto.Filters);
-            return Ok(duplicatesFinder.FindDuplicates(dto.Path, dto.MaxDepth, filter));
+            try
+            {
+                var filter = FilterFactory.Create(dto.Filters);
+                return Ok(duplicatesFinder.FindDuplicates(dto.Path, dto.MaxDepth, filter));
+            }
+
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
     }
 }

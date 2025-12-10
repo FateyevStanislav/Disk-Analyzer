@@ -25,6 +25,11 @@ public static class ApiReflection
             }
 
             var constructor = f.GetConstructors().FirstOrDefault();
+
+            if (constructor == null)
+            {
+                throw new Exception($"No constructor in filter {f.Name}");
+            }
             var constructorParams = constructor.GetParameters();
 
             filtersInfo.Add(f.Name, new FilterFactoryInfo(f, constructorParams));
@@ -36,15 +41,19 @@ public static class ApiReflection
         return filtersInfo.ToDictionary(
             f => f.Key,
             f => f.Value.parameters.ToDictionary(
-                p => p.Name,
+                p => p.Name!,
                 p => p.ParameterType.FullName
             )
-        ).AsReadOnly();
+        ).AsReadOnly()!;
     }
 
-    public static FilterFactoryInfo? GetFilterInfo(string filterName)
+    public static FilterFactoryInfo GetFilterInfo(string filterName)
     {
+        if (!filtersInfo.ContainsKey(filterName))
+        {
+            throw new ArgumentException($"Unknown filter type: {filterName}");
+        }
+
         return filtersInfo[filterName];
     }
 }
-

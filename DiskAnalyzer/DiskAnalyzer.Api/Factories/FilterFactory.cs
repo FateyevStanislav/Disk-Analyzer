@@ -16,32 +16,40 @@ public static class FilterFactory
 
         foreach (var dto in filters)
         {
-            var filterInfo = ApiReflection.GetFilterInfo(dto.Type);
-
-            var paramValues = new object?[filterInfo.parameters.Length];
-
-            for (int i = 0; i < filterInfo.parameters.Length; i++)
+            try
             {
-                var param = filterInfo.parameters[i];
+                var filterInfo = ApiReflection.GetFilterInfo(dto.Type);
 
-                if (!dto.FilterParams.TryGetValue(param.Name!, out var rawValue))
+                var paramValues = new object?[filterInfo.parameters.Length];
+
+                for (int i = 0; i < filterInfo.parameters.Length; i++)
                 {
-                    throw new ArgumentException($"Missing requited parameter {param.Name}");
+                    var param = filterInfo.parameters[i];
+
+                    if (!dto.FilterParams.TryGetValue(param.Name!, out var rawValue))
+                    {
+                        throw new ArgumentException($"Missing requited parameter {param.Name}");
+                    }
+
+                    try
+                    {
+                        paramValues[i] = Convert.ChangeType(rawValue, param.ParameterType);
+                    }
+
+                    catch
+                    {
+                        throw new ArgumentException($"Invalid value \"{rawValue}\" for parameter {param.Name}");
+                    }
                 }
 
-                try
-                {
-                    paramValues[i] = Convert.ChangeType(rawValue, param.ParameterType);
-                }
-
-                catch
-                {
-                    throw new ArgumentException($"Invalid value \"{rawValue}\" for parameter {param.Name}");
-                }
+                var newFilter = (IFileFilter)Activator.CreateInstance(filterInfo.filterType, paramValues)!;
+                result.Add(newFilter);
             }
 
-            var newFilter = (IFileFilter)Activator.CreateInstance(filterInfo.filterType, paramValues)!;
-            result.Add(newFilter);
+            catch
+            {
+                throw;
+            }
         }
 
         return result;

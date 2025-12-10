@@ -3,12 +3,13 @@ using DiskAnalyzer.Domain.Models.Results;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace DiskAnalyzer.Api.Controllers
 {
     public record GroupingMeasurementDto(
         string Path,
-        int MaxDepth,
+        [param: Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
         IEnumerable<FilesMeasurementType> MeasurementTypes,
         FilesGroupingType GroupingType,
         IEnumerable<FilterDto>? Filters);
@@ -24,13 +25,26 @@ namespace DiskAnalyzer.Api.Controllers
                         new LoggerFactory())));
 
         [HttpPost]
-        public IActionResult Create(GroupingMeasurementDto dto)
+        public IActionResult Make(GroupingMeasurementDto dto)
         {
-            var filter = FilterFactory.Create(dto.Filters);
-            var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
-            var grouper = GrouperFactory.Create(dto.GroupingType);
+            try
+            {
+                var filter = FilterFactory.Create(dto.Filters);
+                var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
+                var grouper = GrouperFactory.Create(dto.GroupingType);
 
-            return Ok(filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, measurment, grouper, filter));
+                return Ok(filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, measurment, grouper, filter));
+            }
+
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
     }
 }

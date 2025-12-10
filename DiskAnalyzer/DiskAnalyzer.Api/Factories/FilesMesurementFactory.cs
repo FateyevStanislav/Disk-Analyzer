@@ -28,7 +28,7 @@ public static class FilesMesurementFactory
                     break;
 
                 default:
-                    throw new Exception("Unknown strategy type");
+                    throw new Exception($"Unknown mesurement type {m}");
             }
         }
 
