@@ -18,11 +18,12 @@ public record FilesMeasurementDto(
 [Route("api/measurements/files")]
 public class FilesMeasurementsController : AnalysisControllerBase
 {
-    private static FilesMeasurer filesMeasurer =
-        new FilesMeasurer(
-            new DirectoryWalker(
-                new Logger<DirectoryWalker>(
-                    new LoggerFactory())));
+    private readonly FilesMeasurer filesMeasurer;
+
+    public FilesMeasurementsController(FilesMeasurer filesMeasurer)
+    {
+        this.filesMeasurer = filesMeasurer;
+    }
 
     [HttpPost]
     public IActionResult Make(FilesMeasurementDto dto)

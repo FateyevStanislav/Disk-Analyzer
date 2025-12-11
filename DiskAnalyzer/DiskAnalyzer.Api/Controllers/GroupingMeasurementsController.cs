@@ -18,11 +18,12 @@ namespace DiskAnalyzer.Api.Controllers
     [Route("api/measurements/groups")]
     public class GroupingMeasurementsController : AnalysisControllerBase
     {
-        private static FilesGrouper filesGrouper =
-            new FilesGrouper(
-                new DirectoryWalker(
-                    new Logger<DirectoryWalker>(
-                        new LoggerFactory())));
+        private readonly FilesGrouper filesGrouper;
+
+        public GroupingMeasurementsController(FilesGrouper filesGrouper)
+        {
+            this.filesGrouper = filesGrouper;
+        }
 
         [HttpPost]
         public IActionResult Make(GroupingMeasurementDto dto)

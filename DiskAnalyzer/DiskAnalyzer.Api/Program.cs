@@ -1,17 +1,23 @@
 using DiskAnalyzer.Api.Converters;
 using DiskAnalyzer.Api.Modules;
+using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Services;
+using DiskAnalyzer.Infrastructure.FileSystem;
 using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 
 ApiReflection.InitData();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<IFileSystemScanner, DirectoryWalker>();
+builder.Services.AddScoped<FilesMeasurer>();
+builder.Services.AddScoped<FilesGrouper>();
+builder.Services.AddScoped<DuplicatesFinder>();
+
 builder.Services.AddControllers().AddJsonOptions(
     options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        //options.JsonSerializerOptions.Converters.Add(new MetricJsonConverter());
         options.JsonSerializerOptions.Converters.Add(new TypeJsonConverter());
     });
 

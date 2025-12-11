@@ -14,11 +14,12 @@ namespace DiskAnalyzer.Api.Controllers
     [Route("api/measurements/duplicates")]
     public class DuplicateFinderController : AnalysisControllerBase
     {
-        private static DuplicatesFinder duplicatesFinder =
-            new DuplicatesFinder(
-                new DirectoryWalker(
-                    new Logger<DirectoryWalker>(
-                        new LoggerFactory())));
+        private readonly DuplicatesFinder duplicatesFinder;
+
+        public DuplicateFinderController(DuplicatesFinder duplicatesFinder)
+        {
+            this.duplicatesFinder = duplicatesFinder;
+        }
 
         [HttpPost]
         public IActionResult Make(DuplicateFinderDto dto)
