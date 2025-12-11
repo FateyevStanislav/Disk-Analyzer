@@ -1,57 +1,59 @@
 ﻿using DiskAnalyzer.Api.Factories;
-using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Domain.Records.RecordStrategies.Measurement;
+using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Models.Results;
 using DiskAnalyzer.Domain.Services;
-using DiskAnalyzer.Infrastructure;
-using DiskAnalyzer.Infrastructure.Filter;
+using DiskAnalyzer.Infrastructure.FileSystem;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace DiskAnalyzer.Api.Controllers;
 
-public record FilesMeasurementDto(FilesMeasurementStrategyType strategyType, string Path, int MaxDepth, IEnumerable<FilterDto>? Filters);
+public record FilesMeasurementDto(
+    string Path,
+    [param: Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
+    IEnumerable<FilesMeasurementType> MeasurementTypes,
+    IEnumerable<FilterDto>? Filters,
+    bool SaveToHistory = false);
 
 [ApiController]
 [Route("api/measurements/files")]
-public class FilesMeasurementsController : ControllerBase
+public class FilesMeasurementsController : AnalysisControllerBase
 {
-    private static Record? lastResult;
-    private static FilesMeasurer filesMeasurer =
-        new FilesMeasurer(
-            new DirectoryWalker(
-                new Logger<DirectoryWalker>(
-                    new LoggerFactory())));
+    private readonly FilesMeasurer filesMeasurer;
+    private readonly IRepository repository;
 
-    [HttpPost]
-    public IActionResult Create(FilesMeasurementDto dto)
+    public FilesMeasurementsController(FilesMeasurer filesMeasurer, IRepository repository)
     {
-
-        var filter = FilterFactory.Create(dto.Filters);
-
-        IFilesMeasurementStrategy strategy;
-        try
-        {
-            strategy = FilesMesurementStrategyFactory.Create(dto.strategyType);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-
-        lastResult = filesMeasurer.MeasureFiles(dto.Path, dto.MaxDepth, strategy, filter);
-
-        return Ok(lastResult);
+        this.filesMeasurer = filesMeasurer;
+        this.repository = repository;
     }
 
-    [HttpPost("saveToHistory")]
-    public IActionResult Save()
+    [HttpPost]
+    public async Task<IActionResult> Make(FilesMeasurementDto dto)
     {
-        if (lastResult == null)
+        try
         {
-            return BadRequest("Measurement is missing or has already been added to history");
+            var filter = FilterFactory.Create(dto.Filters);
+            var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
+            var result = filesMeasurer.MeasureFiles(dto.Path, dto.MaxDepth, measurment, filter);
+
+            if (dto.SaveToHistory)
+            {
+                await repository.AddAsync(result);
+            }
+
+            return OkAnalysis(result);
         }
 
-        HistoryController.history.AddRecord(lastResult);
-        lastResult = null;
-        return Ok();
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
+
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 }

@@ -4,17 +4,6 @@ namespace DiskAnalyzer.Domain.Extensions;
 
 public static class FileInfoExtensions
 {
-    public static bool IsEqualTo(this FileInfo file1, FileInfo file2)
-    {
-        if (file1.Length != file2.Length)
-            return false;
-
-        var hash1 = file1.GetFileContentHash();
-        var hash2 = file2.GetFileContentHash();
-
-        return hash1.SequenceEqual(hash2);
-    }
-
     public static byte[] GetFileContentHash(this FileInfo file)
     {
         using var sha256 = SHA256.Create();

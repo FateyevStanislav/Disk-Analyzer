@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DiskAnalyzer.Domain\DiskAnalyzer.Domain.csproj" />
+    <ProjectReference Include="..\DiskAnalyzer.Infrastructure\DiskAnalyzer.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

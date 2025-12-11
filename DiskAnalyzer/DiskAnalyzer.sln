@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskAnalyzer.Domain", "DiskAnalyzer.Domain\DiskAnalyzer.Domain.csproj", "{42952A73-99B3-4E04-B211-27E8DF33E270}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskAnalyzer.Api", "DiskAnalyzer.Api\DiskAnalyzer.Api.csproj", "{DFC47AD9-0FB0-4D10-BCF9-9ADB523FEEDA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{91B492C4-F649-48DF-983F-A21AE9736157} = {91B492C4-F649-48DF-983F-A21AE9736157}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiskAnalyzer.UI", "DiskAnalyzer.UI\DiskAnalyzer.UI.csproj", "{C8EA3AA7-BAE3-4985-B45B-A739EA0D697B}"
 EndProject

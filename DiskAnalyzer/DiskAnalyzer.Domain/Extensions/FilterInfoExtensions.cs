@@ -1,5 +1,6 @@
-﻿using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Infrastructure.Filter;
+﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Attributes;
+using DiskAnalyzer.Domain.Models;
 using System.Collections.Concurrent;
 using System.Reflection;
 
@@ -7,14 +8,13 @@ namespace DiskAnalyzer.Domain.Extensions;
 
 public static class FilterInfoExtensions
 {
-    private static readonly ConcurrentDictionary<Type, (string typeName, PropertyInfo[] props)> cache
-        = new();
+    private static readonly ConcurrentDictionary<Type, (string typeName, PropertyInfo[] props)> _cache = new();
 
     public static FilterInfo ToFilterInfo(this IFileFilter filter)
     {
         var type = filter.GetType();
 
-        var cached = cache.GetOrAdd(type, t =>
+        var cached = _cache.GetOrAdd(type, t =>
         {
             var filterType = t.GetCustomAttribute<FilterTypeAttribute>()
                 ?? new FilterTypeAttribute(t.Name.Replace("Filter", ""));
@@ -41,7 +41,7 @@ public static class FilterInfoExtensions
 
         return filter switch
         {
-            CompositeFilter composite => composite.Filters.Select(ToFilterInfo).ToList(),
+            ICompositeFilter composite => composite.Filters.Select(ToFilterInfo).ToList(),
             _ => new[] { filter.ToFilterInfo() }
         };
     }
@@ -51,10 +51,10 @@ public static class FilterInfoExtensions
         if (value == null) return "null";
 
         if (value is DateTime dateTime)
-            return dateTime.ToString("o"); 
+            return dateTime.ToString("o");
 
         if (value is bool boolean)
-            return boolean.ToString().ToLowerInvariant(); 
+            return boolean.ToString().ToLowerInvariant();
 
         return value.ToString() ?? "null";
     }
