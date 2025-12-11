@@ -3,12 +3,14 @@ using DiskAnalyzer.Api.Modules;
 using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
+using DiskAnalyzer.Infrastructure.Repositories;
 using System.Text.Json.Serialization;
 
 ApiReflection.InitData();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<IRepository, InMemoryRepository>();
 builder.Services.AddScoped<IFileSystemScanner, DirectoryWalker>();
 builder.Services.AddScoped<FilesMeasurer>();
 builder.Services.AddScoped<FilesGrouper>();

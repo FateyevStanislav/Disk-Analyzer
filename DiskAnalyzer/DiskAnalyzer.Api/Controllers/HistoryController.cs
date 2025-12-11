@@ -1,35 +1,69 @@
-﻿using DiskAnalyzer.Api.Modules;
-using DiskAnalyzer.Domain.Models.Results;
+﻿using DiskAnalyzer.Domain.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DiskAnalyzer.Api.Controllers
+namespace DiskAnalyzer.Api.Controllers;
+
+[Route("api/history")]
+[ApiController]
+public class HistoryController : ControllerBase
 {
-    [Route("api/history")]
-    [ApiController]
-    public class HistoryController : ControllerBase
+    private readonly IRepository repository;
+
+    public HistoryController(IRepository repository)
     {
-        public static History history = new();
+        this.repository = repository;
+    }
 
-        [HttpGet]
-        [HttpGet("{countOfRecords:int}")]
-        public IActionResult Get(int countOfRecords = 0)
-        {
-            if (countOfRecords == 0)
-            {
-                return Ok(history.GetAllRecords());
-            }
+    /// <summary>
+    /// Получить всю историю результатов анализа
+    /// </summary>
+    /// <param name="descending">true - от новых к старым, false - от старых к новым (по умолчанию)</param>
+    [HttpGet]
+    public async Task<IActionResult> GetAll([FromQuery] bool descending = false)
+    {
+        var results = await repository.GetAllOrderedAsync(descending);
+        return Ok(results);
+    }
 
-            else
-            {
-                return Ok(history.GetLastRecords(countOfRecords));
-            }
-        }
+    /// <summary>
+    /// Получить конкретный результат по ID
+    /// </summary>
+    /// <param name="id">Идентификатор результата</param>
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var result = await repository.GetByIdAsync(id);
+        return result == null ? NotFound() : Ok(result);
+    }
 
-        [HttpPost]
-        public IActionResult Add([FromBody] AnalysisResult result)
-        {
-            history.AddRecord(result);
-            return Ok();
-        }
+    /// <summary>
+    /// Удалить результат из истории
+    /// </summary>
+    /// <param name="id">Идентификатор результата</param>
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deleted = await repository.RemoveAsync(id);
+        return deleted ? NoContent() : NotFound();
+    }
+
+    /// <summary>
+    /// Очистить всю историю
+    /// </summary>
+    [HttpDelete]
+    public async Task<IActionResult> Clear()
+    {
+        await repository.ClearAsync();
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Получить количество записей в истории
+    /// </summary>
+    [HttpGet("count")]
+    public async Task<IActionResult> Count()
+    {
+        var count = await repository.CountAsync();
+        return Ok(new { count });
     }
 }
