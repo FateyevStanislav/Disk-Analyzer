@@ -57,40 +57,5 @@ namespace DiskAnalyzer.Api.Controllers
                 return StatusCode(500, e.Message);
             }
         }
-        //        return BadRequest("Measurement is missing or has already been added to history");
-        //    }
-
-        //    HistoryController.AddIdToHistory(lastResult);
-        //    lastResult = null;
-        //    return Ok();
-        //}
-        //        return BadRequest("Measurement is missing or has already been added to history");
-        //    }
-
-        //    HistoryController.AddIdToHistory(lastResult);
-        //    lastResult = null;
-        //    return Ok();
-        //}
-        //        return BadRequest("Measurement is missing or has already been added to history");
-        //    }
-
-        //    HistoryController.AddIdToHistory(lastResult);
-        //    lastResult = null;
-        //    return Ok();
-        //}
-        //        return BadRequest("Measurement is missing or has already been added to history");
-        //    }
-
-        //    HistoryController.AddIdToHistory(lastResult);
-        //    lastResult = null;
-        //    return Ok();
-        //}
-        //        return BadRequest("Measurement is missing or has already been added to history");
-        //    }
-
-        //    HistoryController.AddIdToHistory(lastResult);
-        //    lastResult = null;
-        //    return Ok();
-        //}
     }
 }

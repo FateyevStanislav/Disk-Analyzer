@@ -10,6 +10,8 @@ using System.Net.Http.Json;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows.Forms;
+using DiskAnalyzer.Api.Factories;
+using System.Reflection.Metadata.Ecma335;
 
 namespace DiskAnalyzer.UI
 {
@@ -93,10 +95,10 @@ namespace DiskAnalyzer.UI
             // 
             groupingLabel.AutoSize = true;
             groupingLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            groupingLabel.Location = new Point(59, 390); // под groupingListBox
+            groupingLabel.Location = new Point(59, 390);
             groupingLabel.Name = "groupingLabel";
             groupingLabel.Size = new Size(253, 24);
-            groupingLabel.TabIndex = 10; // следующий индекс
+            groupingLabel.TabIndex = 10;
             groupingLabel.Text = "Выберите тип группировки";
             // 
             // depthUpDown
@@ -143,7 +145,7 @@ namespace DiskAnalyzer.UI
             // 
             historyCheckBox.AutoSize = true;
             historyCheckBox.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            historyCheckBox.Location = new Point(20, 350); // было 368
+            historyCheckBox.Location = new Point(20, 350);
             historyCheckBox.Name = "historyCheckBox";
             historyCheckBox.Size = new Size(236, 29);
             historyCheckBox.TabIndex = 8;
@@ -158,8 +160,8 @@ namespace DiskAnalyzer.UI
             metricsListBox.Size = new Size(280, 94);
             metricsListBox.TabIndex = 9;
             metricsListBox.Items.AddRange(
-                FilesMeasurementStrategyType.Size, 
-                FilesMeasurementStrategyType.Count 
+                FilesMeasurementType.Size,
+                FilesMeasurementType.Count 
                 );
             // 
             // groupingListBox
@@ -202,13 +204,13 @@ namespace DiskAnalyzer.UI
             PerformLayout();
         }
 
-        private FilesMeasurementStrategyType GetFMSType()
+        private IEnumerable<FilesMeasurementType> GetFMSType()
         {
             if (metricsListBox.CheckedItems.Count > 1)
             {
-                return FilesMeasurementStrategyType.Combined;
+                return new List<FilesMeasurementType>() { FilesMeasurementType.Count, FilesMeasurementType.Size };
             }
-            return Enum.Parse<FilesMeasurementStrategyType>(metricsListBox.CheckedItems[0].ToString());
+            return new List<FilesMeasurementType>() { Enum.Parse<FilesMeasurementType>(metricsListBox.CheckedItems[0].ToString()) };
         }
 
         private FilesGroupingType GetFGSType()
@@ -277,23 +279,23 @@ namespace DiskAnalyzer.UI
                 bool hasMetrics = metricsListBox.CheckedItems.Count > 0;
                 bool hasGrouping = groupingListBox.CheckedItems.Count > 0;
 
+                if (!hasMetrics && hasGrouping)
+                {
+                    MessageBox.Show("Выберите метрики для группировки!");
+                    return;
+                }
+
                 if (!hasMetrics && !hasGrouping)
                 {
-                    MessageBox.Show("Выберите либо метрики, либо группировку!");
+                    MessageBox.Show("Выберите!");
                     return;
                 }
 
-                if (hasMetrics && hasGrouping)
-                {
-                    MessageBox.Show("Выберите что-то одно: либо метрики, либо группировку!");
-                    return;
-                }
-
-                if (hasMetrics)
+                if (hasMetrics && !hasGrouping)
                 {
                     await RunMeasurementAnalysis(path, maxDepth, filterDtos);
                 }
-                else if (hasGrouping)
+                else if (hasGrouping && hasMetrics)
                 {
                     await RunGroupingAnalysis(path, maxDepth, filterDtos);
                 }
@@ -318,7 +320,7 @@ namespace DiskAnalyzer.UI
             var strategy = GetFMSType();
 
             var requestDto = new FilesMeasurementDto(
-                StrategyType: strategy,
+                MeasurementTypes: strategy,
                 Path: path,
                 MaxDepth: maxDepth,
                 Filters: filterDtos
@@ -335,8 +337,11 @@ namespace DiskAnalyzer.UI
         {
             var groupingType = GetFGSType();
 
+            var strategy = GetFMSType();
+
             var requestDto = new GroupingMeasurementDto(
-                Type: groupingType,
+                GroupingType: groupingType,
+                MeasurementTypes: strategy,
                 Path: path,
                 MaxDepth: maxDepth,
                 Filters: filterDtos

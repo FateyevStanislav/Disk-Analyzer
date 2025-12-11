@@ -1,5 +1,4 @@
-﻿using DiskAnalyzer.Domain.Records.Grouping;
-using DiskAnalyzer.Domain.Records.Measurement;
+﻿using DiskAnalyzer.Domain.Models.Results;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,36 +18,41 @@ namespace DiskAnalyzer.UI.Forms
             InitializeComponent();
         }
 
-        public void SetMetricsResult(FilesMeasurementRecord result)
+        public void SetMetricsResult(MeasurementAnalysisResult result)
         {
-            typeLabel.Text = $"Количество файлов: {result.FileCount}\n" +
-                              $"Общий размер: {FormatSize(result.TotalSize)}";
+            var countText = result.Measurements.TryGetValue("Count", out var count)
+                ? "Количество файлов: " + count
+                : string.Empty;
+
+            var sizeText = result.Measurements.TryGetValue("Size", out var size)
+                ? "Размер файлов: " + FormatSize(long.Parse(size))
+                : string.Empty;
+
+            typeLabel.Text = $"{countText}\n{sizeText}";
+
 
             ResultLabel.Text = $"Путь: {result.Path}";
         }
 
-        public void SetGroupingResult(FilesGroupingRecord result)
+        public void SetGroupingResult(GroupingAnalysisResult result)
         {
             Controls.Clear();
+
+            var rows = result.Groups.Select(g => new
+            {
+                Группа = g.Key,
+                Файлов = g.Metrics.TryGetValue("Count", out var filesCount) ? filesCount : 0,
+                Размер = g.Metrics.TryGetValue("Size", out var totalSize) ? FormatSize(totalSize) : "-"
+            }).ToList();
 
             var dataGrid = new DataGridView
             {
                 Dock = DockStyle.Fill,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                DataSource = result.Groups.Select(g => new
-                {
-                    Группа = g.Key,
-                    Файлов = g.Files.Count,
-                    Размер = FormatSize(GetGroupSize(g))
-                }).ToList()
+                DataSource = rows
             };
 
             Controls.Add(dataGrid);
-        }
-
-        private long GetGroupSize(Group group)
-        {
-            return group.Files.Sum(f => f.Size);
         }
 
         private string FormatSize(long bytes)
