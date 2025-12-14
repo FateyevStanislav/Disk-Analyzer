@@ -39,13 +39,11 @@ public class DuplicatesFinder(IFileSystemScanner scanner) : IDuplicatesFinder
         var filesBySize = CollectFilesBySize(path, maxDepth, filter);
         var duplicateGroups = FindDuplicateGroups(filesBySize);
         var totalWastedSpace = CalculateTotalWastedSpace(duplicateGroups);
-        var oldestOriginal = FindOldestFile(duplicateGroups);
 
         return new DuplicateAnalysisResult(
             path,
             filter?.ToFilterInfoList(),
             totalWastedSpace.ToString(),
-            oldestOriginal,
             duplicateGroups);
     }
 
@@ -123,37 +121,29 @@ public class DuplicatesFinder(IFileSystemScanner scanner) : IDuplicatesFinder
     }
 
     private static DuplicateGroup CreateDuplicateGroup(
-    IGrouping<string, FileInfo> duplicateGroup,
-    long fileSize)
+        IGrouping<string, FileInfo> duplicateGroup,
+        long fileSize)
     {
         var fileList = duplicateGroup.ToList();
         var count = fileList.Count;
         var wastedSpace = fileSize * (count - 1);
+
+        var original = fileList
+            .OrderBy(f => f.CreationTime)
+            .ThenBy(f => f.LastWriteTime)
+            .First();
 
         return new DuplicateGroup(
             duplicateGroup.Key,
             fileSize,
             count,
             wastedSpace,
+            new FileDetails(original.FullName, original.Length),
             [.. fileList.Select(f => new FileDetails(f.FullName, f.Length))]);
     }
 
     private static long CalculateTotalWastedSpace(List<DuplicateGroup> groups)
     {
         return groups.Sum(g => g.TotalWastedSpace);
-    }
-
-    private static string FindOldestFile(List<DuplicateGroup> groups)
-    {
-        if (groups.Count == 0) return "N/A";
-
-        var allFiles = groups
-            .SelectMany(g => g.Files)
-            .Select(f => new FileInfo(f.Path))
-            .OrderBy(f => f.LastWriteTime)
-            .ThenBy(f => f.CreationTime)
-            .FirstOrDefault();
-
-        return allFiles?.FullName ?? "N/A";
     }
 }

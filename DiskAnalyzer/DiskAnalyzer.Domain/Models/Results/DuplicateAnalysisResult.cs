@@ -13,9 +13,7 @@ public sealed record DuplicateAnalysisResult : AnalysisResult
 {
     public string WastedSpace { get; init; } = default!;
 
-    public string OldestOriginal { get; init; } = default!;
-
-    public List<DuplicateGroup> DuplicateGroups { get; init; } = default!;
+    public IReadOnlyList<DuplicateGroup> DuplicateGroups { get; init; } = default!;
 
     [JsonConstructor]
     public DuplicateAnalysisResult(
@@ -24,12 +22,10 @@ public sealed record DuplicateAnalysisResult : AnalysisResult
         string Path,
         IReadOnlyCollection<FilterInfo>? Filters,
         string WastedSpace,
-        string OldestOriginal,
-        List<DuplicateGroup> DuplicateGroups)
+        IReadOnlyList<DuplicateGroup> DuplicateGroups)
         : base(Id, CreatedAt, Path, Filters)
     {
         this.WastedSpace = WastedSpace;
-        this.OldestOriginal = OldestOriginal;
         this.DuplicateGroups = DuplicateGroups;
     }
 
@@ -37,12 +33,10 @@ public sealed record DuplicateAnalysisResult : AnalysisResult
         string path,
         IReadOnlyCollection<FilterInfo>? filters,
         string wastedSpace,
-        string oldestOriginal,
-        List<DuplicateGroup> duplicateGroups)
+        IReadOnlyList<DuplicateGroup> duplicateGroups)
         : base(path, filters)
     {
         WastedSpace = wastedSpace;
-        OldestOriginal = oldestOriginal;
         DuplicateGroups = duplicateGroups;
     }
 }
