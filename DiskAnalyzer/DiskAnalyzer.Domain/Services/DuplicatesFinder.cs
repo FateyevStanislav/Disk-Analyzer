@@ -42,7 +42,8 @@ public class DuplicatesFinder(IFileSystemScanner scanner) : IDuplicatesFinder
 
         var metrics = new Dictionary<string, string>
         {
-            { "WastedSpace", totalWastedSpace.ToString() }
+            { "WastedSpace", totalWastedSpace.ToString() },
+            { "OldestOriginal", FindOldestFile(duplicateGroups) }
         };
 
         return new DuplicateAnalysisResult(
@@ -126,8 +127,8 @@ public class DuplicatesFinder(IFileSystemScanner scanner) : IDuplicatesFinder
     }
 
     private static DuplicateGroup CreateDuplicateGroup(
-        IGrouping<string, FileInfo> duplicateGroup,
-        long fileSize)
+    IGrouping<string, FileInfo> duplicateGroup,
+    long fileSize)
     {
         var fileList = duplicateGroup.ToList();
         var count = fileList.Count;
@@ -144,5 +145,19 @@ public class DuplicatesFinder(IFileSystemScanner scanner) : IDuplicatesFinder
     private static long CalculateTotalWastedSpace(List<DuplicateGroup> groups)
     {
         return groups.Sum(g => g.TotalWastedSpace);
+    }
+
+    private static string FindOldestFile(List<DuplicateGroup> groups)
+    {
+        if (groups.Count == 0) return "N/A";
+
+        var allFiles = groups
+            .SelectMany(g => g.Files)
+            .Select(f => new FileInfo(f.Path))
+            .OrderBy(f => f.LastWriteTime)
+            .ThenBy(f => f.CreationTime)
+            .FirstOrDefault();
+
+        return allFiles?.FullName ?? "N/A";
     }
 }
