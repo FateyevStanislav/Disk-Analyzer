@@ -39,17 +39,13 @@ public class DuplicatesFinder(IFileSystemScanner scanner) : IDuplicatesFinder
         var filesBySize = CollectFilesBySize(path, maxDepth, filter);
         var duplicateGroups = FindDuplicateGroups(filesBySize);
         var totalWastedSpace = CalculateTotalWastedSpace(duplicateGroups);
-
-        var metrics = new Dictionary<string, string>
-        {
-            { "WastedSpace", totalWastedSpace.ToString() },
-            { "OldestOriginal", FindOldestFile(duplicateGroups) }
-        };
+        var oldestOriginal = FindOldestFile(duplicateGroups);
 
         return new DuplicateAnalysisResult(
             path,
             filter?.ToFilterInfoList(),
-            metrics,
+            totalWastedSpace.ToString(),
+            oldestOriginal,
             duplicateGroups);
     }
 

@@ -11,7 +11,10 @@ namespace DiskAnalyzer.Domain.Models.Results;
 /// </remarks>
 public sealed record DuplicateAnalysisResult : AnalysisResult
 {
-    public Dictionary<string, string> Metrics { get; init; } = default!;
+    public string WastedSpace { get; init; } = default!;
+
+    public string OldestOriginal { get; init; } = default!;
+
     public List<DuplicateGroup> DuplicateGroups { get; init; } = default!;
 
     [JsonConstructor]
@@ -20,22 +23,26 @@ public sealed record DuplicateAnalysisResult : AnalysisResult
         DateTime CreatedAt,
         string Path,
         IReadOnlyCollection<FilterInfo>? Filters,
-        Dictionary<string, string> Metrics,
+        string WastedSpace,
+        string OldestOriginal,
         List<DuplicateGroup> DuplicateGroups)
         : base(Id, CreatedAt, Path, Filters)
     {
-        this.Metrics = Metrics;
+        this.WastedSpace = WastedSpace;
+        this.OldestOriginal = OldestOriginal;
         this.DuplicateGroups = DuplicateGroups;
     }
 
     public DuplicateAnalysisResult(
         string path,
         IReadOnlyCollection<FilterInfo>? filters,
-        Dictionary<string, string> metrics,
+        string wastedSpace,
+        string oldestOriginal,
         List<DuplicateGroup> duplicateGroups)
         : base(path, filters)
     {
-        Metrics = metrics;
+        WastedSpace = wastedSpace;
+        OldestOriginal = oldestOriginal;
         DuplicateGroups = duplicateGroups;
     }
 }
