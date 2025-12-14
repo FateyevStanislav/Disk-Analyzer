@@ -14,9 +14,3 @@ public interface IApiClient
     Task<Dictionary<string, Dictionary<string, string>>> GetAvailableFiltersAsync();
     Task<DuplicateAnalysisResult> FindDuplicatesAsync(DuplicateFinderDto request);
 }
-
-//public record FilesMeasurementDto(
-//    FilesMeasurementStrategyType StrategyType,
-//    string Path,
-//    int MaxDepth,
-//    IEnumerable<FilterDto>? Filters);

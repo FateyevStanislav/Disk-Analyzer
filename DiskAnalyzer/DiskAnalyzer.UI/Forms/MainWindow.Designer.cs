@@ -40,7 +40,6 @@ namespace DiskAnalyzer.UI
             metricsLabel = new Label();
             filterListBox = new CheckedListBox();
             filterLabel = new Label();
-            historyCheckBox = new CheckBox();
             metricsListBox = new CheckedListBox();
             groupingListBox = new CheckedListBox();
             groupingLabel = new Label();
@@ -72,7 +71,7 @@ namespace DiskAnalyzer.UI
             // analyzeButton
             // 
             analyzeButton.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            analyzeButton.Location = new Point(270, 560);
+            analyzeButton.Location = new Point(270, 520);
             analyzeButton.Margin = new Padding(4, 3, 4, 3);
             analyzeButton.Name = "analyzeButton";
             analyzeButton.Size = new Size(112, 33);
@@ -96,7 +95,7 @@ namespace DiskAnalyzer.UI
             // 
             groupingLabel.AutoSize = true;
             groupingLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            groupingLabel.Location = new Point(15, 390);
+            groupingLabel.Location = new Point(15, 350);
             groupingLabel.Name = "groupingLabel";
             groupingLabel.Size = new Size(253, 24);
             groupingLabel.TabIndex = 10;
@@ -142,17 +141,6 @@ namespace DiskAnalyzer.UI
             filterLabel.TabIndex = 7;
             filterLabel.Text = "Выберите фильтры";
             // 
-            // historyCheckBox
-            // 
-            historyCheckBox.AutoSize = true;
-            historyCheckBox.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-            historyCheckBox.Location = new Point(20, 350);
-            historyCheckBox.Name = "historyCheckBox";
-            historyCheckBox.Size = new Size(236, 29);
-            historyCheckBox.TabIndex = 8;
-            historyCheckBox.Text = "Сохранить в историю";
-            historyCheckBox.UseVisualStyleBackColor = true;
-            // 
             // metricsListBox
             // 
             duplicateCheckBox.AutoSize = true;
@@ -179,7 +167,7 @@ namespace DiskAnalyzer.UI
             // groupingListBox
             // 
             groupingListBox.FormattingEnabled = true;
-            groupingListBox.Location = new Point(20, 430);
+            groupingListBox.Location = new Point(20, 390);
             groupingListBox.Name = "groupingListBox";
             groupingListBox.Size = new Size(280, 94);
             groupingListBox.TabIndex = 11;
@@ -193,12 +181,11 @@ namespace DiskAnalyzer.UI
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = SystemColors.GradientInactiveCaption;
-            ClientSize = new Size(649, 620);
+            BackColor = SystemColors.GradientActiveCaption;
+            ClientSize = new Size(649, 580);
             Controls.Add(duplicateCheckBox);
             Controls.Add(groupingListBox);
             Controls.Add(metricsListBox);
-            Controls.Add(historyCheckBox);
             Controls.Add(filterLabel);
             Controls.Add(filterListBox);
             Controls.Add(metricsLabel);
@@ -209,6 +196,9 @@ namespace DiskAnalyzer.UI
             Controls.Add(pathLabel);
             Controls.Add(groupingLabel);
             Margin = new Padding(4, 3, 4, 3);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "MainWindow";
             Text = "DiskAnalyzer";
             Load += MainWindow_Load;
@@ -286,7 +276,7 @@ namespace DiskAnalyzer.UI
             {
                 var path = pathTextBox.Text.EscapeSlashes();
                 var maxDepth = (int)depthUpDown.Value;
-                var saveInHistory = historyCheckBox.Checked;
+                var saveInHistory = false;
                 var filterDtos = BuildFilterDtos();
 
                 bool findDuplicates = duplicateCheckBox.Checked;
@@ -314,10 +304,6 @@ namespace DiskAnalyzer.UI
                 else if (!hasGrouping && findDuplicates)
                 {
                     await RunDuplicateAnalysis(path, maxDepth, filterDtos);
-                }
-                if (saveInHistory)
-                {
-                    // await apiClient.SaveToHistoryAsync();
                 }
             }
             catch (HttpRequestException httpEx)
@@ -472,7 +458,6 @@ namespace DiskAnalyzer.UI
         private Label groupingLabel;
         private CheckedListBox filterListBox;
         private Label filterLabel;
-        private CheckBox historyCheckBox;
         private CheckedListBox metricsListBox;
         private CheckedListBox groupingListBox;
         private CheckBox duplicateCheckBox;

@@ -79,4 +79,6 @@ public class ApiClient : IApiClient
         var result = await response.Content.ReadFromJsonAsync<DuplicateAnalysisResult>(jsonOptions);
         return result;
     }
+
+
 }
