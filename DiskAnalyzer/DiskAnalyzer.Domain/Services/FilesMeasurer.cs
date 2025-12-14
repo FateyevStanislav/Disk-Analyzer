@@ -1,45 +1,73 @@
-﻿using DiskAnalyzer.Domain.Extensions;
-using DiskAnalyzer.Domain.Records.RecordStrategies.Measurement;
-using DiskAnalyzer.Infrastructure;
-using DiskAnalyzer.Infrastructure.Filter;
+﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Extensions;
+using DiskAnalyzer.Domain.Models.Results;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class FilesMeasurer(DirectoryWalker walker)
+/// <summary>
+/// Сервис для сбора общих метрик файловой системы без группировки.
+/// </summary>
+/// <remarks>
+/// Более производительный чем FilesGrouper, когда группировка не требуется.
+/// Все измерения работают на общих экземплярах IFilesMeasurement.
+/// </remarks>
+public class FilesMeasurer(IFileSystemScanner scanner)
 {
-    public Record MeasureFiles(
+    /// <summary>
+    /// Собирает метрики по всем файлам в указанном пути.
+    /// </summary>
+    /// <param name="measurements">
+    /// Набор измерений. Используются одни и те же экземпляры для всех файлов.
+    /// </param>
+    /// <returns>
+    /// Результат с вычисленными метриками.
+    /// <see cref="MeasurementAnalysisResult"/>
+    /// </returns>
+    public MeasurementAnalysisResult MeasureFiles(
         string path,
         int maxDepth,
-        IFilesMeasurementStrategy strategy,
+        IEnumerable<IFilesMeasurement> measurements,
         IFileFilter? filter = null)
     {
-        long fileCount = 0;
-        long totalSize = 0;
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);      
+        ArgumentNullException.ThrowIfNull(measurements);
 
-        walker.Walk(
-            path,
-            maxDepth,
-            file =>
-            {
-                fileCount++;
-                totalSize += file.Length;
-            },
-            filter);
+        var measurementsList = measurements.ToList();
+        if (measurementsList.Count == 0)
+            throw new ArgumentException("Нужен минимум 1 тип измерения", nameof(measurements));
 
-        return strategy.CreateRecord(
+        Action<FileInfo>? onFileAction = null;
+
+        foreach (var act in measurements)
+            onFileAction += act.OnFileAction;
+
+        scanner.Scan(path, maxDepth, onFileAction, filter);
+
+        var result = new Dictionary<string, string>();
+
+        foreach (var measurement in measurements)
+            result.Add(measurement.MeasurementType, measurement.Result.ToString());
+
+        return new MeasurementAnalysisResult(
             path,
-            fileCount,
-            totalSize,
-            filter?.ToFilterInfoList());
+            filter?.ToFilterInfoList(),
+            result);
     }
 
-    public Task<Record> MeasureFilesAsync(
+    /// <summary>
+    /// Асинхронная версия измерения файлов.
+    /// </summary>
+    /// <remarks>
+    /// Выполняется в отдельном потоке через 
+    /// <see cref="Task.Run{TResult}(Func{TResult}, CancellationToken)"/>
+    /// </remarks>
+    public Task<MeasurementAnalysisResult> MeasureFilesAsync(
         string path,
         int maxDepth,
-        IFilesMeasurementStrategy strategy,
+        IEnumerable<IFilesMeasurement> measurements,
         IFileFilter? filter = null,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(() => MeasureFiles(path, maxDepth, strategy, filter), cancellationToken);
+        return Task.Run(() => MeasureFiles(path, maxDepth, measurements, filter), cancellationToken);
     }
 }

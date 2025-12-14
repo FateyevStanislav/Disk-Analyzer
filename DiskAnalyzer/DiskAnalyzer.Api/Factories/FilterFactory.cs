@@ -1,8 +1,7 @@
 ﻿using DiskAnalyzer.Api.Controllers;
 using DiskAnalyzer.Api.Modules;
-using DiskAnalyzer.Domain.Filters;
-using DiskAnalyzer.Infrastructure.Filter;
-using System.Reflection.Metadata;
+using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Infrastructure.Filters;
 
 public static class FilterFactory
 {
@@ -17,43 +16,40 @@ public static class FilterFactory
 
         foreach (var dto in filters)
         {
-            var filterType = ApiReflection.GetFilterType(dto.Type);
-            if (filterType == null)
+            try
             {
-                throw new ArgumentException($"Unknown filter type: {dto.Type}");
-            }
+                var filterInfo = ApiReflection.GetFilterInfo(dto.Type);
 
-            var constructor = filterType.GetConstructors().FirstOrDefault();
-            if (constructor == null)
-            {
-                throw new ArgumentException($"Filter {dto.Type} has no constructor");
-            }
+                var paramValues = new object?[filterInfo.parameters.Length];
 
-            var constructorParams = constructor.GetParameters();
-            var paramValues = new object?[constructorParams.Length];
-
-            for (int i = 0; i < constructorParams.Length; i++)
-            {
-                var param = constructorParams[i];
-
-                if(!dto.FilterParams.TryGetValue(param.Name!, out var rawValue))
+                for (int i = 0; i < filterInfo.parameters.Length; i++)
                 {
-                    throw new ArgumentException($"Missing requited parameter {param.Name}");
+                    var param = filterInfo.parameters[i];
+
+                    if (!dto.FilterParams.TryGetValue(param.Name!, out var rawValue))
+                    {
+                        throw new ArgumentException($"Missing requited parameter {param.Name}");
+                    }
+
+                    try
+                    {
+                        paramValues[i] = Convert.ChangeType(rawValue, param.ParameterType);
+                    }
+
+                    catch
+                    {
+                        throw new ArgumentException($"Invalid value \"{rawValue}\" for parameter {param.Name}");
+                    }
                 }
 
-                try
-                {
-                    paramValues[i] = Convert.ChangeType(rawValue, param.ParameterType);
-                }
-
-                catch
-                {
-                    throw new ArgumentException($"Invalid value \"{rawValue}\" for parameter {param.Name}");
-                }
+                var newFilter = (IFileFilter)Activator.CreateInstance(filterInfo.filterType, paramValues)!;
+                result.Add(newFilter);
             }
 
-            var newFilter = (IFileFilter)Activator.CreateInstance(filterType, paramValues)!;
-            result.Add(newFilter);
+            catch
+            {
+                throw;
+            }
         }
 
         return result;

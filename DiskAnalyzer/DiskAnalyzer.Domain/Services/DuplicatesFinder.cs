@@ -1,35 +1,64 @@
-﻿using DiskAnalyzer.Domain.Extensions;
-using DiskAnalyzer.Domain.Records;
-using DiskAnalyzer.Domain.Records.DuplicateFind;
-using DiskAnalyzer.Infrastructure;
-using DiskAnalyzer.Infrastructure.Filter;
+﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Extensions;
+using DiskAnalyzer.Domain.Models;
+using DiskAnalyzer.Domain.Models.Results;
 
 namespace DiskAnalyzer.Domain.Services;
 
-public class DuplicatesFinder(DirectoryWalker walker)
+/// <summary>
+/// Сервис для поиска дублирующихся файлов на основе содержимого.
+/// </summary>
+/// <remarks>
+/// Алгоритм:
+/// 1. Группировка по размеру (быстрая предфильтрация)
+/// 2. Quick hash первых 8KB (оптимизация для больших файлов)
+/// 3. Full SHA256 hash для финальной проверки
+/// 
+/// Производительность: O(n log n) + I/O время на хеширование.
+/// </remarks>
+public class DuplicatesFinder(IFileSystemScanner scanner)
 {
-    public DuplicatesSearchRecord FindDuplicates(
+    /// <summary>
+    /// Выполняет синхронный поиск дубликатов.
+    /// </summary>
+    /// <param name="path">Корневой путь для поиска.</param>
+    /// <param name="maxDepth">Глубина обхода поддиректорий.</param>
+    /// <param name="filter">Опциональный фильтр файлов.</param>
+    /// <returns>
+    /// Результат анализа с найденными группами дубликатов 
+    /// <see cref="DuplicateAnalysisResult"/>
+    /// </returns>
+    public DuplicateAnalysisResult FindDuplicates(
         string path,
         int maxDepth,
         IFileFilter? filter = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
         var filesBySize = CollectFilesBySize(path, maxDepth, filter);
         var duplicateGroups = FindDuplicateGroups(filesBySize);
         var totalWastedSpace = CalculateTotalWastedSpace(duplicateGroups);
 
-        var sortedGroups = duplicateGroups
-            .OrderByDescending(g => g.TotalWastedSpace)
-            .ToList();
+        var metrics = new Dictionary<string, string>
+        {
+            { "WastedSpace", totalWastedSpace.ToString() }
+        };
 
-        return new DuplicatesSearchRecord(
+        return new DuplicateAnalysisResult(
             path,
-            sortedGroups.Count,
-            totalWastedSpace,
-            sortedGroups,
-            filter?.ToFilterInfoList());
+            filter?.ToFilterInfoList(),
+            metrics,
+            duplicateGroups);
     }
 
-    public Task<DuplicatesSearchRecord> FindDuplicatesAsync(
+    /// <summary>
+    /// Асинхронная версия поиска дубликатов.
+    /// </summary>
+    /// <remarks>
+    /// Выполняется в отдельном потоке через 
+    /// <see cref="Task.Run{TResult}(Func{TResult}, CancellationToken)"/>
+    /// </remarks>
+    public Task<DuplicateAnalysisResult> FindDuplicatesAsync(
         string path,
         int maxDepth,
         IFileFilter? filter = null,
@@ -45,7 +74,7 @@ public class DuplicatesFinder(DirectoryWalker walker)
     {
         var filesBySize = new Dictionary<long, List<FileInfo>>();
 
-        walker.Walk(path, maxDepth, file =>
+        scanner.Scan(path, maxDepth, file =>
         {
             if (file.Length == 0) return;
 
@@ -104,11 +133,11 @@ public class DuplicatesFinder(DirectoryWalker walker)
         var wastedSpace = fileSize * (count - 1);
 
         return new DuplicateGroup(
-            FileHash: duplicateGroup.Key,
-            FileSize: fileSize,
-            FileCount: count,
-            TotalWastedSpace: wastedSpace,
-            Files: [.. fileList.Select(f => new FileDetails(f.FullName, f.Length))]); 
+            duplicateGroup.Key,
+            fileSize,
+            count,
+            wastedSpace,
+            [.. fileList.Select(f => new FileDetails(f.FullName, f.Length))]);
     }
 
     private static long CalculateTotalWastedSpace(List<DuplicateGroup> groups)

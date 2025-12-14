@@ -1,15 +1,21 @@
 ﻿using DiskAnalyzer.Api.Controllers;
+using DiskAnalyzer.Api.Controllers;
 using DiskAnalyzer.Api.Factories;
-using DiskAnalyzer.Domain.Records.Measurement;
+using DiskAnalyzer.Infrastructure;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using DiskAnalyzer.Domain.Models.Results;
 
 public interface IApiClient
 {
-    Task<FilesMeasurementRecord> CreateMeasurementAsync(FilesMeasurementDto request);
+    Task<MeasurementAnalysisResult> CreateMeasurementAsync(FilesMeasurementDto request);
+    Task<GroupingAnalysisResult> CreateGroupingAsync(GroupingMeasurementDto request);
     Task<Dictionary<string, Dictionary<string, string>>> GetAvailableFiltersAsync();
 }
 
-public record FilesMeasurementDto(
-    FilesMeasurementStrategyType StrategyType,
-    string Path,
-    int MaxDepth,
-    IEnumerable<FilterDto>? Filters);
+//public record FilesMeasurementDto(
+//    FilesMeasurementStrategyType StrategyType,
+//    string Path,
+//    int MaxDepth,
+//    IEnumerable<FilterDto>? Filters);

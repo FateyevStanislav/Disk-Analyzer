@@ -1,6 +1,4 @@
-﻿using DiskAnalyzer.Api.Factories;
-using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Domain.Models.Results;
+﻿using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
 using Microsoft.AspNetCore.Mvc;
@@ -8,36 +6,32 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DiskAnalyzer.Api.Controllers
 {
-    public record GroupingMeasurementDto(
+    public record DuplicateFinderDto(
         string Path,
         [param: Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
-        IEnumerable<FilesMeasurementType> MeasurementTypes,
-        FilesGroupingType GroupingType,
         IEnumerable<FilterDto>? Filters,
         bool SaveToHistory = false);
 
     [ApiController]
-    [Route("api/measurements/groups")]
-    public class GroupingMeasurementsController : AnalysisControllerBase
+    [Route("api/measurements/duplicates")]
+    public class DuplicateFinderController : AnalysisControllerBase
     {
-        private readonly FilesGrouper filesGrouper;
+        private readonly DuplicatesFinder duplicatesFinder;
         private readonly IRepository repository;
 
-        public GroupingMeasurementsController(FilesGrouper filesGrouper, IRepository repository)
+        public DuplicateFinderController(DuplicatesFinder duplicatesFinder, IRepository repository)
         {
-            this.filesGrouper = filesGrouper;
+            this.duplicatesFinder = duplicatesFinder;
             this.repository = repository;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Make(GroupingMeasurementDto dto)
+        public async Task<IActionResult> Make(DuplicateFinderDto dto)
         {
             try
             {
                 var filter = FilterFactory.Create(dto.Filters);
-                var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
-                var grouper = GrouperFactory.Create(dto.GroupingType);
-                var result = filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, measurment, grouper, filter);
+                var result = duplicatesFinder.FindDuplicates(dto.Path, dto.MaxDepth, filter);
 
                 if (dto.SaveToHistory)
                 {
