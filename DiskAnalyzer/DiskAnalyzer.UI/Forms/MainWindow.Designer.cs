@@ -31,6 +31,7 @@ namespace DiskAnalyzer.UI
 
         private void InitializeComponent()
         {
+            duplicateCheckBox = new CheckBox();
             pathLabel = new Label();
             pathTextBox = new TextBox();
             analyzeButton = new Button();
@@ -71,7 +72,7 @@ namespace DiskAnalyzer.UI
             // analyzeButton
             // 
             analyzeButton.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            analyzeButton.Location = new Point(269, 560);
+            analyzeButton.Location = new Point(270, 560);
             analyzeButton.Margin = new Padding(4, 3, 4, 3);
             analyzeButton.Name = "analyzeButton";
             analyzeButton.Size = new Size(112, 33);
@@ -95,7 +96,7 @@ namespace DiskAnalyzer.UI
             // 
             groupingLabel.AutoSize = true;
             groupingLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            groupingLabel.Location = new Point(59, 390);
+            groupingLabel.Location = new Point(15, 390);
             groupingLabel.Name = "groupingLabel";
             groupingLabel.Size = new Size(253, 24);
             groupingLabel.TabIndex = 10;
@@ -121,7 +122,7 @@ namespace DiskAnalyzer.UI
             metricsLabel.Name = "metricsLabel";
             metricsLabel.Size = new Size(195, 24);
             metricsLabel.TabIndex = 5;
-            metricsLabel.Text = "Выберите метрику";
+            metricsLabel.Text = "Выберите метрики";
             // 
             // filterListBox
             // 
@@ -154,6 +155,17 @@ namespace DiskAnalyzer.UI
             // 
             // metricsListBox
             // 
+            duplicateCheckBox.AutoSize = true;
+            duplicateCheckBox.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            duplicateCheckBox.Location = new Point(356, 350);
+            duplicateCheckBox.Name = "historyCheckBox";
+            duplicateCheckBox.Size = new Size(236, 29);
+            duplicateCheckBox.TabIndex = 8;
+            duplicateCheckBox.Text = "Найти дубликаты";
+            duplicateCheckBox.UseVisualStyleBackColor = true;
+            //
+            // duplicateCheckBox
+            //
             metricsListBox.FormattingEnabled = true;
             metricsListBox.Location = new Point(20, 241);
             metricsListBox.Name = "metricsListBox";
@@ -183,6 +195,7 @@ namespace DiskAnalyzer.UI
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientInactiveCaption;
             ClientSize = new Size(649, 620);
+            Controls.Add(duplicateCheckBox);
             Controls.Add(groupingListBox);
             Controls.Add(metricsListBox);
             Controls.Add(historyCheckBox);
@@ -276,30 +289,32 @@ namespace DiskAnalyzer.UI
                 var saveInHistory = historyCheckBox.Checked;
                 var filterDtos = BuildFilterDtos();
 
+                bool findDuplicates = duplicateCheckBox.Checked;
                 bool hasMetrics = metricsListBox.CheckedItems.Count > 0;
                 bool hasGrouping = groupingListBox.CheckedItems.Count > 0;
 
-                if (!hasMetrics && hasGrouping)
+                if (!hasMetrics && !findDuplicates)
                 {
-                    MessageBox.Show("Выберите метрики для группировки!");
+                    MessageBox.Show("Выберите метрики!");
                     return;
                 }
-
-                if (!hasMetrics && !hasGrouping)
+                if (hasGrouping && findDuplicates)
                 {
-                    MessageBox.Show("Выберите!");
+                    MessageBox.Show("Либо группировка либо дубликаты!");
                     return;
                 }
-
-                if (hasMetrics && !hasGrouping)
+                if (!hasGrouping && !findDuplicates)
                 {
                     await RunMeasurementAnalysis(path, maxDepth, filterDtos);
                 }
-                else if (hasGrouping && hasMetrics)
+                else if (hasGrouping && !findDuplicates)
                 {
                     await RunGroupingAnalysis(path, maxDepth, filterDtos);
                 }
-
+                else if (!hasGrouping && findDuplicates)
+                {
+                    await RunDuplicateAnalysis(path, maxDepth, filterDtos);
+                }
                 if (saveInHistory)
                 {
                     // await apiClient.SaveToHistoryAsync();
@@ -351,6 +366,21 @@ namespace DiskAnalyzer.UI
 
             var resultForm = new ResultForm();
             resultForm.SetGroupingResult(result);
+            resultForm.Show();
+        }
+
+        private async Task RunDuplicateAnalysis(string path, int maxDepth, List<FilterDto> filterDtos)
+        {
+            var requestDto = new DuplicateFinderDto(
+                Path: path,
+                MaxDepth: maxDepth,
+                Filters: filterDtos
+            );
+
+            var result = await apiClient.FindDuplicatesAsync(requestDto);
+
+            var resultForm = new ResultForm();
+            resultForm.SetDuplicateResult(result);
             resultForm.Show();
         }
 
@@ -445,6 +475,7 @@ namespace DiskAnalyzer.UI
         private CheckBox historyCheckBox;
         private CheckedListBox metricsListBox;
         private CheckedListBox groupingListBox;
+        private CheckBox duplicateCheckBox;
     }
 }
 

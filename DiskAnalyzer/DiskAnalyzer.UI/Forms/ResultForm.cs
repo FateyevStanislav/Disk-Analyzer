@@ -55,6 +55,27 @@ namespace DiskAnalyzer.UI.Forms
             Controls.Add(dataGrid);
         }
 
+        public void SetDuplicateResult(DuplicateAnalysisResult result)
+        {
+            Controls.Clear();
+
+            var rows = result.DuplicateGroups.Select(g => new
+            {
+                размер_одного = FormatSize(g.FileSize),
+                одинаковых_файлов = g.FileCount,
+                потерянное_место = FormatSize(g.TotalWastedSpace)
+            }).ToList();
+
+            var dataGrid = new DataGridView
+            {
+                Dock = DockStyle.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                DataSource = rows
+            };
+
+            Controls.Add(dataGrid);
+        }
+
         private string FormatSize(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };

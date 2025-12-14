@@ -61,4 +61,22 @@ public class ApiClient : IApiClient
         var result = await response.Content.ReadFromJsonAsync<GroupingAnalysisResult>(jsonOptions);
         return result;
     }
+
+    public async Task<DuplicateAnalysisResult> FindDuplicatesAsync(DuplicateFinderDto request)
+    {
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        var response = await _httpClient.PostAsJsonAsync(
+            "api/measurements/duplicates",
+            request,
+            jsonOptions
+        );
+
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<DuplicateAnalysisResult>(jsonOptions);
+        return result;
+    }
 }

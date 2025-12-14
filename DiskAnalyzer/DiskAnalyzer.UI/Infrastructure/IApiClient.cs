@@ -12,6 +12,7 @@ public interface IApiClient
     Task<MeasurementAnalysisResult> CreateMeasurementAsync(FilesMeasurementDto request);
     Task<GroupingAnalysisResult> CreateGroupingAsync(GroupingMeasurementDto request);
     Task<Dictionary<string, Dictionary<string, string>>> GetAvailableFiltersAsync();
+    Task<DuplicateAnalysisResult> FindDuplicatesAsync(DuplicateFinderDto request);
 }
 
 //public record FilesMeasurementDto(
