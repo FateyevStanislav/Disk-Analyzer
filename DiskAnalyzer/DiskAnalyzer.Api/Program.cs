@@ -1,6 +1,7 @@
 using DiskAnalyzer.Api.Converters;
 using DiskAnalyzer.Api.Modules;
 using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
 using DiskAnalyzer.Infrastructure.Repositories;
@@ -11,10 +12,10 @@ ApiReflection.InitData();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IRepository, InMemoryRepository>();
-builder.Services.AddScoped<IFileSystemScanner, DirectoryWalker>();
-builder.Services.AddScoped<FilesMeasurer>();
-builder.Services.AddScoped<FilesGrouper>();
-builder.Services.AddScoped<DuplicatesFinder>();
+builder.Services.AddSingleton<IFileSystemScanner, DirectoryWalker>();
+builder.Services.AddScoped<IFilesMeasurer, FilesMeasurer>();
+builder.Services.AddScoped<IFilesGrouper, FilesGrouper>();
+builder.Services.AddScoped<IDuplicatesFinder, DuplicatesFinder>();
 
 builder.Services.AddControllers().AddJsonOptions(
     options =>

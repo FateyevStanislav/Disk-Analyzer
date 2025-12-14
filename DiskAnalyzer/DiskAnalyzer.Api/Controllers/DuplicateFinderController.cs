@@ -1,6 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Domain.Services;
-using DiskAnalyzer.Infrastructure.FileSystem;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -16,10 +15,10 @@ namespace DiskAnalyzer.Api.Controllers
     [Route("api/measurements/duplicates")]
     public class DuplicateFinderController : AnalysisControllerBase
     {
-        private readonly DuplicatesFinder duplicatesFinder;
+        private readonly IDuplicatesFinder duplicatesFinder;
         private readonly IRepository repository;
 
-        public DuplicateFinderController(DuplicatesFinder duplicatesFinder, IRepository repository)
+        public DuplicateFinderController(IDuplicatesFinder duplicatesFinder, IRepository repository)
         {
             this.duplicatesFinder = duplicatesFinder;
             this.repository = repository;

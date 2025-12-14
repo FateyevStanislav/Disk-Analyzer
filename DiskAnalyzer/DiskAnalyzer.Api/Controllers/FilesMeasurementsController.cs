@@ -1,11 +1,8 @@
 ﻿using DiskAnalyzer.Api.Factories;
 using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Domain.Models.Results;
-using DiskAnalyzer.Domain.Services;
-using DiskAnalyzer.Infrastructure.FileSystem;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 
 namespace DiskAnalyzer.Api.Controllers;
 
@@ -20,10 +17,10 @@ public record FilesMeasurementDto(
 [Route("api/measurements/files")]
 public class FilesMeasurementsController : AnalysisControllerBase
 {
-    private readonly FilesMeasurer filesMeasurer;
+    private readonly IFilesMeasurer filesMeasurer;
     private readonly IRepository repository;
 
-    public FilesMeasurementsController(FilesMeasurer filesMeasurer, IRepository repository)
+    public FilesMeasurementsController(IFilesMeasurer filesMeasurer, IRepository repository)
     {
         this.filesMeasurer = filesMeasurer;
         this.repository = repository;

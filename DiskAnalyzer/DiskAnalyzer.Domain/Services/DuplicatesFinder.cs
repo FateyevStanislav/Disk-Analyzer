@@ -1,4 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using DiskAnalyzer.Domain.Extensions;
 using DiskAnalyzer.Domain.Models;
 using DiskAnalyzer.Domain.Models.Results;
@@ -16,7 +17,7 @@ namespace DiskAnalyzer.Domain.Services;
 /// 
 /// Производительность: O(n log n) + I/O время на хеширование.
 /// </remarks>
-public class DuplicatesFinder(IFileSystemScanner scanner)
+public class DuplicatesFinder(IFileSystemScanner scanner) : IDuplicatesFinder
 {
     /// <summary>
     /// Выполняет синхронный поиск дубликатов.
