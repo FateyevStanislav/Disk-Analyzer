@@ -51,12 +51,15 @@ namespace DiskAnalyzer.UI.Forms
             {
                 размер_одного = FormatSize(g.FileSize),
                 одинаковых_файлов = g.FileCount,
-                потерянное_место = FormatSize(g.TotalWastedSpace)
+                потерянное_место = FormatSize(g.TotalWastedSpace),
+                оригинал = g.OriginalFile.Path
             }).ToList();
 
             dataGrid.DataSource = rows;
             Text = "РЕЗУЛЬТАТ ПОИСКА ДУБЛИКАТОВ";
             SetPathLabel(result.Path);
+
+            ConfigureDuplicateResultColumns();
         }
 
         private static string FormatSize(long bytes)

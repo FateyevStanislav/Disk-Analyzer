@@ -49,17 +49,21 @@ namespace DiskAnalyzer.UI.Forms
             dataGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom |
                              AnchorStyles.Left | AnchorStyles.Right;
             dataGrid.Location = new Point(10, 120);
-            dataGrid.Size = new Size(580, 150);
-            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dataGrid.Size = new Size(980, 270);
+
+            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            dataGrid.RowTemplate.Height = 40;
+            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            dataGrid.RowTemplate.Height = 40;
             // 
             // ResultForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(600, 300);
-            Controls.Add(dataGrid);
+            ClientSize = new Size(1000, 400);
             Controls.Add(pathLabel);
             Controls.Add(historyButton);
+            Controls.Add(dataGrid);
             Name = "ResultForm";
             Text = "AnalyzeResult";
             ResumeLayout(false);
@@ -74,6 +78,20 @@ namespace DiskAnalyzer.UI.Forms
         private void SetPathLabel(string path)
         {
             pathLabel.Text = $"Путь: {path}";
+        }
+
+        private void ConfigureDuplicateResultColumns()
+        {
+            if (dataGrid.Columns.Count >= 4)
+            {
+                dataGrid.Columns[0].Width = 120;
+                dataGrid.Columns[1].Width = 150;
+                dataGrid.Columns[2].Width = 150;
+
+                dataGrid.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+                dataGrid.Columns[3].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            }
         }
 
         private Label typeLabel;
