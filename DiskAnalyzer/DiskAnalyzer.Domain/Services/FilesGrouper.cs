@@ -1,4 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using DiskAnalyzer.Domain.Extensions;
 using DiskAnalyzer.Domain.Models;
 using DiskAnalyzer.Domain.Models.Results;
@@ -12,7 +13,7 @@ namespace DiskAnalyzer.Domain.Services;
 /// Поддерживает множественные метрики (TotalSize, FilesCount и т.д.).
 /// Каждая группа получает отдельные экземпляры IFilesMeasurement.
 /// </remarks>
-public class FilesGrouper(IFileSystemScanner scanner)
+public class FilesGrouper(IFileSystemScanner scanner) : IFilesGrouper
 {
     /// <summary>
     /// Выполняет группировку файлов с подсчётом метрик.

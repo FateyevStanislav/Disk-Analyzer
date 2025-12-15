@@ -1,8 +1,6 @@
 ﻿using DiskAnalyzer.Api.Factories;
 using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Domain.Models.Results;
-using DiskAnalyzer.Domain.Services;
-using DiskAnalyzer.Infrastructure.FileSystem;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -20,10 +18,10 @@ namespace DiskAnalyzer.Api.Controllers
     [Route("api/measurements/groups")]
     public class GroupingMeasurementsController : AnalysisControllerBase
     {
-        private readonly FilesGrouper filesGrouper;
+        private readonly IFilesGrouper filesGrouper;
         private readonly IRepository repository;
 
-        public GroupingMeasurementsController(FilesGrouper filesGrouper, IRepository repository)
+        public GroupingMeasurementsController(IFilesGrouper filesGrouper, IRepository repository)
         {
             this.filesGrouper = filesGrouper;
             this.repository = repository;

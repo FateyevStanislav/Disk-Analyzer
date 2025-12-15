@@ -1,4 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using DiskAnalyzer.Domain.Extensions;
 using DiskAnalyzer.Domain.Models;
 using DiskAnalyzer.Domain.Models.Results;
@@ -16,7 +17,7 @@ namespace DiskAnalyzer.Domain.Services;
 /// 
 /// Производительность: O(n log n) + I/O время на хеширование.
 /// </remarks>
-public class DuplicatesFinder(IFileSystemScanner scanner)
+public class DuplicatesFinder(IFileSystemScanner scanner) : IDuplicatesFinder
 {
     /// <summary>
     /// Выполняет синхронный поиск дубликатов.
@@ -39,15 +40,10 @@ public class DuplicatesFinder(IFileSystemScanner scanner)
         var duplicateGroups = FindDuplicateGroups(filesBySize);
         var totalWastedSpace = CalculateTotalWastedSpace(duplicateGroups);
 
-        var metrics = new Dictionary<string, string>
-        {
-            { "WastedSpace", totalWastedSpace.ToString() }
-        };
-
         return new DuplicateAnalysisResult(
             path,
             filter?.ToFilterInfoList(),
-            metrics,
+            totalWastedSpace.ToString(),
             duplicateGroups);
     }
 
@@ -132,11 +128,17 @@ public class DuplicatesFinder(IFileSystemScanner scanner)
         var count = fileList.Count;
         var wastedSpace = fileSize * (count - 1);
 
+        var original = fileList
+            .OrderBy(f => f.CreationTime)
+            .ThenBy(f => f.LastWriteTime)
+            .First();
+
         return new DuplicateGroup(
             duplicateGroup.Key,
             fileSize,
             count,
             wastedSpace,
+            new FileDetails(original.FullName, original.Length),
             [.. fileList.Select(f => new FileDetails(f.FullName, f.Length))]);
     }
 
