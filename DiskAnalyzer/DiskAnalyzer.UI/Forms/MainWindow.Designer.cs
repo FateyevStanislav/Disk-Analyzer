@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.Windows.Forms;
 using DiskAnalyzer.Api.Factories;
 using System.Reflection.Metadata.Ecma335;
+using DiskAnalyzer.Api.Controllers.Dtos;
 
 namespace DiskAnalyzer.UI
 {

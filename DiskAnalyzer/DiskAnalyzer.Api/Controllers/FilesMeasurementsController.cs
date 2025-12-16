@@ -1,17 +1,11 @@
-﻿using DiskAnalyzer.Api.Factories;
+﻿using DiskAnalyzer.Api.Controllers.Dtos;
+using DiskAnalyzer.Api.Factories;
 using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace DiskAnalyzer.Api.Controllers;
-
-public record FilesMeasurementDto(
-    string Path,
-    [param: Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
-    IEnumerable<FilesMeasurementType> MeasurementTypes,
-    IEnumerable<FilterDto>? Filters,
-    bool SaveToHistory = false);
 
 [ApiController]
 [Route("api/measurements/files")]

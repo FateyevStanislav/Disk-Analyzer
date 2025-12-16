@@ -1,16 +1,11 @@
-﻿using DiskAnalyzer.Domain.Abstractions;
+﻿using DiskAnalyzer.Api.Controllers.Dtos;
+using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace DiskAnalyzer.Api.Controllers
 {
-    public record DuplicateFinderDto(
-        string Path,
-        [param: Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
-        IEnumerable<FilterDto>? Filters,
-        bool SaveToHistory = false);
-
     [ApiController]
     [Route("api/measurements/duplicates")]
     public class DuplicateFinderController : AnalysisControllerBase

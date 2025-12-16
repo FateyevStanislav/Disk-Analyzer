@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Api.Controllers;
+﻿using DiskAnalyzer.Api.Controllers.Dtos;
 using DiskAnalyzer.Api.Modules;
 using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Infrastructure.Filters;
