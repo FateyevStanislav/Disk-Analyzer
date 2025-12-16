@@ -28,12 +28,6 @@ public class FilesMeasurementsController : AnalysisControllerBase
             var filter = FilterFactory.Create(dto.Filters);
             var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
             var result = filesMeasurer.MeasureFiles(dto.Path, dto.MaxDepth, measurment, filter);
-
-            if (dto.SaveToHistory)
-            {
-                await repository.AddAsync(result);
-            }
-
             return OkAnalysis(result);
         }
 

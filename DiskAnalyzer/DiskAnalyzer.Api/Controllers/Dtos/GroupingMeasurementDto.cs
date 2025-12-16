@@ -9,5 +9,4 @@ public record GroupingMeasurementDto(
     [Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
     IEnumerable<FilesMeasurementType> MeasurementTypes,
     FilesGroupingType GroupingType,
-    IEnumerable<FilterDto>? Filters,
-    bool SaveToHistory = false);
+    IEnumerable<FilterDto>? Filters);

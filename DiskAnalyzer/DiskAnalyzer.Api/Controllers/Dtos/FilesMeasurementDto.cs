@@ -8,5 +8,4 @@ public record FilesMeasurementDto(
     [ExistingPath] string Path,
     [Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
     IEnumerable<FilesMeasurementType> MeasurementTypes,
-    IEnumerable<FilterDto>? Filters,
-    bool SaveToHistory = false);
+    IEnumerable<FilterDto>? Filters);

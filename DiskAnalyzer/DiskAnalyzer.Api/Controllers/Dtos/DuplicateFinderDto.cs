@@ -6,5 +6,4 @@ namespace DiskAnalyzer.Api.Controllers.Dtos;
 public record DuplicateFinderDto(
     [ExistingPath] string Path,
     [Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
-    IEnumerable<FilterDto>? Filters,
-    bool SaveToHistory = false);
+    IEnumerable<FilterDto>? Filters);

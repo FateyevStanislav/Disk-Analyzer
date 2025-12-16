@@ -29,12 +29,6 @@ namespace DiskAnalyzer.Api.Controllers
                 var measurment = FilesMesurementFactory.Create(dto.MeasurementTypes);
                 var grouper = GrouperFactory.Create(dto.GroupingType);
                 var result = filesGrouper.GroupFiles(dto.Path, dto.MaxDepth, measurment, grouper, filter);
-
-                if (dto.SaveToHistory)
-                {
-                    await repository.AddAsync(result);
-                }
-
                 return OkAnalysis(result);
             }
 

@@ -27,11 +27,6 @@ namespace DiskAnalyzer.Api.Controllers
                 var filter = FilterFactory.Create(dto.Filters);
                 var result = duplicatesFinder.FindDuplicates(dto.Path, dto.MaxDepth, filter);
 
-                if (dto.SaveToHistory)
-                {
-                    await repository.AddAsync(result);
-                }
-
                 return OkAnalysis(result);
             }
 

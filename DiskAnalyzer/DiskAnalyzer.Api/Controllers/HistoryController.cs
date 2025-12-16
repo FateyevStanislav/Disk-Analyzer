@@ -1,4 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiskAnalyzer.Api.Controllers;
@@ -34,6 +35,25 @@ public class HistoryController : ControllerBase
     {
         var result = await repository.GetByIdAsync(id);
         return result == null ? NotFound() : Ok(result);
+    }
+
+    /// <summary>
+    /// Добавить новый результат измерений в историю
+    /// </summary>
+    /// <param name="result">Результат измерения</param>
+    [HttpPost("append")]
+    public async Task<IActionResult> Append([FromBody] AnalysisResult result)
+    {
+        try
+        {
+            await repository.AddAsync(result);
+            return Ok();
+        }
+
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 
     /// <summary>
