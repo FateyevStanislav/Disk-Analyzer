@@ -38,8 +38,6 @@ public class FilesGrouper(IFileSystemScanner scanner) : IFilesGrouper
         ArgumentNullException.ThrowIfNull(measurements);
 
         var measurementsList = measurements.ToList();
-        if (measurementsList.Count == 0)                       
-            throw new ArgumentException("Нужен минимум 1 тип измерения", nameof(measurements));
 
         var groups = new Dictionary<string, GroupData>();
 

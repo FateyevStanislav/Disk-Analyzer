@@ -34,8 +34,6 @@ public class FilesMeasurer(IFileSystemScanner scanner) : IFilesMeasurer
         ArgumentNullException.ThrowIfNull(measurements);
 
         var measurementsList = measurements.ToList();
-        if (measurementsList.Count == 0)
-            throw new ArgumentException("Нужен минимум 1 тип измерения", nameof(measurements));
 
         Action<FileInfo>? onFileAction = null;
 

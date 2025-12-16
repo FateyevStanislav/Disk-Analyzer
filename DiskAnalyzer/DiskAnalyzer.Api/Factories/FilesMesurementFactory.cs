@@ -15,20 +15,24 @@ public static class FilesMesurementFactory
     {
         var result = new List<IFilesMeasurement>();
 
-        foreach (var m in measurements)
+
+        if (measurements != null)
         {
-            switch (m)
+            foreach (var m in measurements)
             {
-                case FilesMeasurementType.Count:
-                    result.Add(new FilesCountMeasurement());
-                    break;
+                switch (m)
+                {
+                    case FilesMeasurementType.Count:
+                        result.Add(new FilesCountMeasurement());
+                        break;
 
-                case FilesMeasurementType.Size:
-                    result.Add(new TotalSizeMeasurement());
-                    break;
+                    case FilesMeasurementType.Size:
+                        result.Add(new TotalSizeMeasurement());
+                        break;
 
-                default:
-                    throw new Exception($"Unknown mesurement type {m}");
+                    default:
+                        throw new Exception($"Unknown mesurement type {m}");
+                }
             }
         }
 
