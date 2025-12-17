@@ -20,6 +20,7 @@ namespace DiskAnalyzer.UI.Forms
 
         public void SetMetricsResult(MeasurementAnalysisResult result)
         {
+            this.result = result;
             var rows = result.Measurements.Select(m => new
             {
                 Метрика = m.Key,
@@ -33,6 +34,7 @@ namespace DiskAnalyzer.UI.Forms
 
         public void SetGroupingResult(GroupingAnalysisResult result)
         {
+            this.result = result;
             var rows = result.Groups.Select(g => new
             {
                 Группа = g.Key,
@@ -47,6 +49,7 @@ namespace DiskAnalyzer.UI.Forms
 
         public void SetDuplicateResult(DuplicateAnalysisResult result)
         {
+            this.result = result;
             var rows = result.DuplicateGroups.Select(g => new
             {
                 размер_одного = FormatSize(g.FileSize),
@@ -62,7 +65,7 @@ namespace DiskAnalyzer.UI.Forms
             ConfigureDuplicateResultColumns();
         }
 
-        private static string FormatSize(long bytes)
+        public static string FormatSize(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };
             double size = bytes;
@@ -77,12 +80,12 @@ namespace DiskAnalyzer.UI.Forms
             return $"{size:0.##} {sizes[order]}";
         }
 
-        private static string FormatSize(string bytes)
+        public static string FormatSize(string bytes)
         {
             return FormatSize(long.Parse(bytes));
         }
 
-        private static string FormatCount(string count)
+        public static string FormatCount(string count)
         {
             int.TryParse(count, out var intCount);
             int mod10 = intCount % 10;

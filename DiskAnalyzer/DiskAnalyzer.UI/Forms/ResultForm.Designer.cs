@@ -1,10 +1,13 @@
-﻿using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Domain.Models.Results;
+using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.UI.Forms
 {
-    partial class ResultForm
+    public partial class ResultForm
     {
+        private IApiClient apiClient = new ApiClient(new HttpClient());
         private System.ComponentModel.IContainer components = null;
+        private AnalysisResult result;
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -42,7 +45,7 @@ namespace DiskAnalyzer.UI.Forms
             historyButton.TabIndex = 2;
             historyButton.Text = "Добавить в историю";
             historyButton.UseVisualStyleBackColor = true;
-            historyButton.Click += HistoryButton_Click;
+            historyButton.Click += SaveToHistoryButton_Click;
             //
             // DataGrid
             //
@@ -50,7 +53,6 @@ namespace DiskAnalyzer.UI.Forms
                              AnchorStyles.Left | AnchorStyles.Right;
             dataGrid.Location = new Point(10, 120);
             dataGrid.Size = new Size(980, 270);
-
             dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
             dataGrid.RowTemplate.Height = 40;
             dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
@@ -70,9 +72,13 @@ namespace DiskAnalyzer.UI.Forms
             PerformLayout();
         }
 
-        private void HistoryButton_Click(object sender, EventArgs e)
+        private async void SaveToHistoryButton_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            var saved = await apiClient.SaveToHistoryAsync(result);
+            if (saved)
+                MessageBox.Show("Сохранено!");
+            else
+                MessageBox.Show("Ошибка сохранения");
         }
 
         private void SetPathLabel(string path)
