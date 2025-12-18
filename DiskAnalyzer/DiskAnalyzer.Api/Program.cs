@@ -21,6 +21,10 @@ builder.Services.AddScoped<IFilesGrouper, FilesGrouper>();
 builder.Services.AddScoped<IDuplicatesFinder, DuplicatesFinder>();
 
 FilterValidation.RegisterValidator(typeof(SizeFilter), new SizeFilterValidator());
+var tv = new TimeValidator();
+FilterValidation.RegisterValidator(typeof(AccessTimeFilter), tv);
+FilterValidation.RegisterValidator(typeof(CreationTimeFilter), tv);
+FilterValidation.RegisterValidator(typeof(WriteTimeFilter), tv);
 
 builder.Services.AddControllers().AddJsonOptions(
     options =>

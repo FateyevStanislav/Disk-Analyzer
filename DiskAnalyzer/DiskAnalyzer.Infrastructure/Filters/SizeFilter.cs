@@ -20,5 +20,4 @@ public class SizeFilter : IFileFilter
 
     public bool ShouldInclude(FileInfo file)
         => file.Length <= MaxSizeBytes && file.Length >= MinSizeBytes;
-
 }
