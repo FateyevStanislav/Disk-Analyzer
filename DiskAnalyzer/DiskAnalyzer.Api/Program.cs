@@ -1,9 +1,12 @@
 using DiskAnalyzer.Api.Converters;
 using DiskAnalyzer.Api.Modules;
+using DiskAnalyzer.Api.Validation;
+using DiskAnalyzer.Api.Validation.Filters;
 using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Abstractions.Services;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
+using DiskAnalyzer.Infrastructure.Filters;
 using DiskAnalyzer.Infrastructure.Repositories;
 using System.Text.Json.Serialization;
 
@@ -16,6 +19,8 @@ builder.Services.AddSingleton<IFileSystemScanner, DirectoryWalker>();
 builder.Services.AddScoped<IFilesMeasurer, FilesMeasurer>();
 builder.Services.AddScoped<IFilesGrouper, FilesGrouper>();
 builder.Services.AddScoped<IDuplicatesFinder, DuplicatesFinder>();
+
+FilterValidation.RegisterValidator(typeof(SizeFilter), new SizeFilterValidator());
 
 builder.Services.AddControllers().AddJsonOptions(
     options =>

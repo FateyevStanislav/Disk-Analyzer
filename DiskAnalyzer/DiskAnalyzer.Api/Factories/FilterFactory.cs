@@ -1,5 +1,6 @@
 ﻿using DiskAnalyzer.Api.Controllers.Dtos;
 using DiskAnalyzer.Api.Modules;
+using DiskAnalyzer.Api.Validation;
 using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Infrastructure.Filters;
 
@@ -43,6 +44,7 @@ public static class FilterFactory
                 }
 
                 var newFilter = (IFileFilter)Activator.CreateInstance(filterInfo.filterType, paramValues)!;
+                FilterValidation.ValidateFilter(newFilter, filterInfo.filterType);
                 result.Add(newFilter);
             }
 
