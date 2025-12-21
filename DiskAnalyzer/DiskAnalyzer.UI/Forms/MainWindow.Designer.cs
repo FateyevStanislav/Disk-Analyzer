@@ -372,7 +372,7 @@ namespace DiskAnalyzer.UI
                     form.StartPosition = FormStartPosition.CenterParent;
 
                     var buttonPanel = new Panel { Dock = DockStyle.Bottom, Height = 50 };
-                    var textBox = new TextBox { Multiline = true, Dock = DockStyle.Fill };
+                    var textBox = new TextBox { Multiline = true, Dock = DockStyle.Fill, Text = GetDefaultParametersJson(filterName) };
                     var okButton = new Button { Text = "OK", DialogResult = DialogResult.OK, Size = new Size(80, 30), Location = new Point(165, 10) };
 
                     buttonPanel.Controls.Add(okButton);
@@ -734,6 +734,46 @@ namespace DiskAnalyzer.UI
             if (mod10 == 1) return $"{count} файл";
             if (mod10 >= 2 && mod10 <= 4) return $"{count} файла";
             return $"{count} файлов";
+        }
+
+        private string GetDefaultParametersJson(string filterName)
+        {
+            var parameters = filters[filterName];
+
+            var jsonDict = new Dictionary<string, object>
+            {
+                { "type", filterName.Replace("Filter", "") }
+            };
+
+            foreach (var param in parameters)
+            {
+                jsonDict[param.Key] = GetDefaultValueForType(param.Value);
+            }
+
+            return JsonSerializer.Serialize(jsonDict, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+        }
+
+        private object GetDefaultValueForType(string typeName)
+        {
+            if (typeName.Contains("String"))
+            {
+                return "";
+            }
+            else if (typeName.Contains("Int") || typeName.Contains("Long"))
+            {
+                return 0;
+            }
+            else if (typeName.Contains("DateTime"))
+            {
+                return DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }
