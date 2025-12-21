@@ -1,21 +1,18 @@
-﻿using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Api.Factories;
-using DiskAnalyzer.Infrastructure;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using DiskAnalyzer.Api.Controllers.Dtos;
 using DiskAnalyzer.Domain.Models.Results;
-
 public interface IApiClient
 {
+    // Основные методы анализа
     Task<MeasurementAnalysisResult> CreateMeasurementAsync(FilesMeasurementDto request);
     Task<GroupingAnalysisResult> CreateGroupingAsync(GroupingMeasurementDto request);
     Task<Dictionary<string, Dictionary<string, string>>> GetAvailableFiltersAsync();
-}
+    Task<DuplicateAnalysisResult> FindDuplicatesAsync(DuplicateFinderDto request);
 
-//public record FilesMeasurementDto(
-//    FilesMeasurementStrategyType StrategyType,
-//    string Path,
-//    int MaxDepth,
-//    IEnumerable<FilterDto>? Filters);
+    // Методы работы с историей
+    Task<bool> SaveToHistoryAsync(AnalysisResult request);
+    Task<bool> DeleteFromHistoryAsync(Guid id);
+    Task<IReadOnlyList<AnalysisResult>> GetRecordsFromHistoryAsync(bool descending = false);
+    Task<AnalysisResult> GetHistoryRecordByIdAsync(Guid id);
+    //Task<int> GetHistoryCountAsync();
+    //Task<bool> ClearHistoryAsync();
+}

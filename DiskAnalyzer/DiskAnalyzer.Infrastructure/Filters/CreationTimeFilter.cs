@@ -14,19 +14,10 @@ public class CreationTimeFilter : IFileFilter
 
     public CreationTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
-        ValidateDateSpan(minDateUtc, maxDateUtc);
         MinDateUtc = minDateUtc;
         MaxDateUtc = maxDateUtc;
     }
 
     public bool ShouldInclude(FileInfo file)
         => file.CreationTimeUtc <= MaxDateUtc && file.CreationTimeUtc >= MinDateUtc;
-
-    private static void ValidateDateSpan(DateTime minDateUtc, DateTime maxDateUtc)
-    {
-        if (minDateUtc > maxDateUtc)
-            throw new ArgumentOutOfRangeException(
-                nameof(maxDateUtc),
-                "Максимальная дата должна быть не меньше минимальной");
-    }
 }

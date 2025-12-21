@@ -1,10 +1,13 @@
-﻿using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Domain.Models.Results;
+using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.UI.Forms
 {
-    partial class ResultForm
+    public partial class ResultForm
     {
+        private IApiClient apiClient = new ApiClient(new HttpClient());
         private System.ComponentModel.IContainer components = null;
+        private AnalysisResult result;
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -18,54 +21,91 @@ namespace DiskAnalyzer.UI.Forms
             typeLabel = new Label();
             ResultLabel = new Label();
             analyzeLabel = new Label();
+            dataGrid = new DataGridView();
+            pathLabel = new Label();
+            historyButton = new Button();
             SuspendLayout();
-            // 
-            // typeLabel
-            // 
-            typeLabel.AutoSize = true;
-            typeLabel.Location = new Point(12, 66);
-            typeLabel.Name = "typeLabel";
-            typeLabel.Size = new Size(86, 15);
-            typeLabel.TabIndex = 1;
-            // 
-            // ResultLabel
-            // 
-            ResultLabel.AutoSize = true;
-            ResultLabel.Location = new Point(255, 66);
-            ResultLabel.Name = "ResultLabel";
-            ResultLabel.Size = new Size(86, 15);
-            ResultLabel.TabIndex = 3;
-            ResultLabel.Text = "fill";
-            // 
-            // analyzeLabel
-            // 
-            analyzeLabel.AutoSize = true;
-            analyzeLabel.Font = new Font("Microsoft Sans Serif", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            analyzeLabel.Location = new Point(136, 9);
-            analyzeLabel.Margin = new Padding(4, 0, 4, 0);
-            analyzeLabel.Name = "analyzeLabel";
-            analyzeLabel.Size = new Size(69, 24);
-            analyzeLabel.TabIndex = 4;
-            analyzeLabel.Text = "УСПЕХ";
+            //
+            // PathLabel
+            //
+            pathLabel.Text = "default";
+            pathLabel.AutoSize = true;
+            pathLabel.Location = new Point(10, 10);
+            pathLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            pathLabel.Name = "pathLabel";
+            pathLabel.TabIndex = 0;
+            //
+            // HistoryButton
+            //
+            historyButton.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            historyButton.Location = new Point(10, 50);
+            historyButton.Margin = new Padding(4, 3, 4, 3);
+            historyButton.Name = "historyButton";
+            historyButton.AutoSize = true;
+            historyButton.TabIndex = 2;
+            historyButton.Text = "Добавить в историю";
+            historyButton.UseVisualStyleBackColor = true;
+            historyButton.Click += SaveToHistoryButton_Click;
+            //
+            // DataGrid
+            //
+            dataGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom |
+                             AnchorStyles.Left | AnchorStyles.Right;
+            dataGrid.Location = new Point(10, 120);
+            dataGrid.Size = new Size(980, 270);
+            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            dataGrid.RowTemplate.Height = 40;
+            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+            dataGrid.RowTemplate.Height = 40;
             // 
             // ResultForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(600, 131);
-            Controls.Add(analyzeLabel);
-            Controls.Add(ResultLabel);
-            Controls.Add(typeLabel);
+            ClientSize = new Size(1000, 400);
+            Controls.Add(pathLabel);
+            Controls.Add(historyButton);
+            Controls.Add(dataGrid);
             Name = "ResultForm";
             Text = "AnalyzeResult";
             ResumeLayout(false);
             PerformLayout();
         }
 
+        private async void SaveToHistoryButton_Click(object sender, EventArgs e)
+        {
+            var saved = await apiClient.SaveToHistoryAsync(result);
+            if (saved)
+                MessageBox.Show("Сохранено!");
+            else
+                MessageBox.Show("Ошибка сохранения");
+        }
+
+        private void SetPathLabel(string path)
+        {
+            pathLabel.Text = $"Путь: {path}";
+        }
+
+        private void ConfigureDuplicateResultColumns()
+        {
+            if (dataGrid.Columns.Count >= 4)
+            {
+                dataGrid.Columns[0].Width = 120;
+                dataGrid.Columns[1].Width = 150;
+                dataGrid.Columns[2].Width = 150;
+
+                dataGrid.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+                dataGrid.Columns[3].DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+            }
+        }
+
         private Label typeLabel;
-        private Label label2;
         private Label ResultLabel;
-        private Label label4;
         private Label analyzeLabel;
+        private Label pathLabel;
+        private DataGridView dataGrid;
+        private object rows;
+        private Button historyButton;
     }
 }

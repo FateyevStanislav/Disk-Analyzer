@@ -14,19 +14,10 @@ public class WriteTimeFilter : IFileFilter
 
     public WriteTimeFilter(DateTime minDateUtc, DateTime maxDateUtc)
     {
-        ValidateDateSpan(minDateUtc, maxDateUtc);
         MinDateUtc = minDateUtc;
         MaxDateUtc = maxDateUtc;
     }
 
     public bool ShouldInclude(FileInfo file)
         => file.LastWriteTimeUtc <= MaxDateUtc && file.LastWriteTimeUtc >= MinDateUtc;
-
-    private static void ValidateDateSpan(DateTime minDateUtc, DateTime maxDateUtc)
-    {
-        if (minDateUtc > maxDateUtc)
-            throw new ArgumentOutOfRangeException(
-                nameof(maxDateUtc),
-                "Максимальная дата должна быть не меньше минимальной");
-    }
 }

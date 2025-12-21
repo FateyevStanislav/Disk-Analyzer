@@ -1,25 +1,19 @@
-﻿using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Domain.Services;
-using DiskAnalyzer.Infrastructure.FileSystem;
+﻿using DiskAnalyzer.Api.Controllers.Dtos;
+using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace DiskAnalyzer.Api.Controllers
 {
-    public record DuplicateFinderDto(
-        string Path,
-        [param: Range(0, int.MaxValue, ErrorMessage = "Max depth cannot be less than 0")] int MaxDepth,
-        IEnumerable<FilterDto>? Filters,
-        bool SaveToHistory = false);
-
     [ApiController]
     [Route("api/measurements/duplicates")]
     public class DuplicateFinderController : AnalysisControllerBase
     {
-        private readonly DuplicatesFinder duplicatesFinder;
+        private readonly IDuplicatesFinder duplicatesFinder;
         private readonly IRepository repository;
 
-        public DuplicateFinderController(DuplicatesFinder duplicatesFinder, IRepository repository)
+        public DuplicateFinderController(IDuplicatesFinder duplicatesFinder, IRepository repository)
         {
             this.duplicatesFinder = duplicatesFinder;
             this.repository = repository;
@@ -32,11 +26,6 @@ namespace DiskAnalyzer.Api.Controllers
             {
                 var filter = FilterFactory.Create(dto.Filters);
                 var result = duplicatesFinder.FindDuplicates(dto.Path, dto.MaxDepth, filter);
-
-                if (dto.SaveToHistory)
-                {
-                    await repository.AddAsync(result);
-                }
 
                 return OkAnalysis(result);
             }

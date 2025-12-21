@@ -1,7 +1,4 @@
-﻿using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Api.Controllers;
-using DiskAnalyzer.Api.Factories;
-using DiskAnalyzer.Infrastructure;
+﻿using DiskAnalyzer.Api.Controllers.Dtos;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -60,5 +57,109 @@ public class ApiClient : IApiClient
         response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadFromJsonAsync<GroupingAnalysisResult>(jsonOptions);
         return result;
+    }
+
+    public async Task<DuplicateAnalysisResult> FindDuplicatesAsync(DuplicateFinderDto request)
+    {
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        var response = await _httpClient.PostAsJsonAsync(
+            "api/measurements/duplicates",
+            request,
+            jsonOptions
+        );
+
+        response.EnsureSuccessStatusCode();
+        var result = await response.Content.ReadFromJsonAsync<DuplicateAnalysisResult>(jsonOptions);
+        return result;
+    }
+
+    public async Task<bool> SaveToHistoryAsync(AnalysisResult request)
+    {
+        try
+        {
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var response = await _httpClient.PostAsJsonAsync(
+                "api/history/append",
+                request,
+                jsonOptions
+            );
+
+            return response.IsSuccessStatusCode;   
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Исключение при сохранении в историю: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> DeleteFromHistoryAsync(Guid id)
+    {
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"api/history/{id}");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Исключение при удалении из истории: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<IReadOnlyList<AnalysisResult>> GetRecordsFromHistoryAsync(bool descending = false)
+    {
+        try
+        {
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var response = await _httpClient.GetAsync($"api/history?descending={descending}");
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<IReadOnlyList<AnalysisResult>>(jsonOptions);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Исключение при получении истории: {ex.Message}");
+            return new List<AnalysisResult>().AsReadOnly();
+        }
+    }
+
+    public async Task<AnalysisResult> GetHistoryRecordByIdAsync(Guid id)
+    {
+        try
+        {
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var response = await _httpClient.GetAsync($"api/history/{id}");
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadFromJsonAsync<AnalysisResult>(jsonOptions);
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Исключение при получении записи по ID: {ex.Message}");
+            return null;
+        }
     }
 }

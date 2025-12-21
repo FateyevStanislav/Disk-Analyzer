@@ -40,3 +40,35 @@
   - `IValueFormatter.cs`, `CountFormatter.cs`, `SizeFormatter.cs` — форматтеры для представления значений метрик в удобном виде.
 
 Доменный слой описывает бизнес-модель приложения DiskAnalyzer, включая основные сущности, метрики, измерения и правила представления информации[IDirectoryMeasurement.cs, FilesSizeMeasurement.cs, SizeFormatter.cs и др.].
+
+## API
+
+- **Контроллеры:**
+  - `AnalysisControllerBase.cs` — базовый класс для контроллеров анализа 
+  - `DuplicateFinderController.cs` — контроллер для запросов поиска дубликатов
+  - `FilesMeasurementsController.cs` — контроллер для запросов на измерение файлов
+  - `GroupingMeasurementsController.cs` — контроллер для запросов на группировку файлов
+  - `HistoryController.cs` — контроллер для работы с иторией запросов
+  - `RequestInfoController.cs` — контроллер для получения информации об актуальных фильтрах
+
+- **DTO (Data Transfer Object):**
+  - `DuplicateFinderDto.cs` — данные для запроса на поиск дубликатов
+  - `FilesMeasurementDto.cs` — данные для запроса на измерение файлов
+  - `GroupingMeasurementDto.cs` — данные для запроса на группировку файлов
+  - `FilterDto.cs` — данные для добавления фильтра к запросу
+
+- **Фабрики и конвертеры**
+  - `FilesMesurementFactory.cs, FilterFactory.cs, GrouperFactory.cs` — фабрики для создания объектов измерений, фильтров и группировщиков на основе DTO
+  - `TypeJsonConverter.cs` — конвертер для удобной конвертации Type
+
+- **Валидация**
+  - `FilterValidation.cs` — класс валидации фильтров
+  - `IFilterValidator.cs` — интерфейс валидатора фильтра
+  - `SizeFilterValidator.cs` — валидатор фильта размера
+  - `TimeValidator.cs` — универсальных валидатор фильтров времени
+  - `ExistingPathAttribute.cs` — аттрибут параметра DTO для проверки корректности пути
+  
+- **Модули**
+  - `ApiReflection.cs` — класс содержащий данные рефлексии, нужные для работы приложения
+
+API слой обеспечивает взаимодействие с приложением через HTTP-запросы и предоставляет клиентам доступ к функционалу DiskAnalyzer

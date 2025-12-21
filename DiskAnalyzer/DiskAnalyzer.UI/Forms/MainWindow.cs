@@ -11,7 +11,7 @@ namespace DiskAnalyzer.UI
         public MainWindow()
         {
             InitializeComponent();
-
+            this.Resize += MainWindow_Resize;
             if (!IsInDesigner())
             {
                 SetupCustomControls();
@@ -20,6 +20,15 @@ namespace DiskAnalyzer.UI
             }
         }
 
+        private void MainWindow_Resize(object sender, EventArgs e)
+        {
+            if (historyDataGrid.Visible)
+            {
+                historyDataGrid.Width = ClientSize.Width - historyDataGrid.Left - 20;
+                historyDataGrid.Height = ClientSize.Height - historyDataGrid.Top -
+                                       (historyDetailPanel.Visible ? historyDetailPanel.Height : 20);
+            }
+        }
         private bool IsInDesigner()
         {
             return LicenseManager.UsageMode == LicenseUsageMode.Designtime;

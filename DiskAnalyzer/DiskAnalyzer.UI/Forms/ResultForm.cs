@@ -20,24 +20,21 @@ namespace DiskAnalyzer.UI.Forms
 
         public void SetMetricsResult(MeasurementAnalysisResult result)
         {
-            var countText = result.Measurements.TryGetValue("Count", out var count)
-                ? "Количество файлов: " + count
-                : string.Empty;
+            this.result = result;
+            var rows = result.Measurements.Select(m => new
+            {
+                Метрика = m.Key,
+                Измерение = m.Key == "Count" ? FormatCount(m.Value) : FormatSize(m.Value)
+            }).ToList();
 
-            var sizeText = result.Measurements.TryGetValue("Size", out var size)
-                ? "Размер файлов: " + FormatSize(long.Parse(size))
-                : string.Empty;
-
-            typeLabel.Text = $"{countText}\n{sizeText}";
-
-
-            ResultLabel.Text = $"Путь: {result.Path}";
+            dataGrid.DataSource = rows;
+            Text = "РЕЗУЛЬТАТ АНАЛИЗА";
+            SetPathLabel(result.Path);
         }
 
         public void SetGroupingResult(GroupingAnalysisResult result)
         {
-            Controls.Clear();
-
+            this.result = result;
             var rows = result.Groups.Select(g => new
             {
                 Группа = g.Key,
@@ -45,17 +42,30 @@ namespace DiskAnalyzer.UI.Forms
                 Размер = g.Metrics.TryGetValue("Size", out var totalSize) ? FormatSize(totalSize) : "-"
             }).ToList();
 
-            var dataGrid = new DataGridView
-            {
-                Dock = DockStyle.Fill,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                DataSource = rows
-            };
-
-            Controls.Add(dataGrid);
+            dataGrid.DataSource = rows;
+            Text = "РЕЗУЛЬТАТ ГРУППИРОВКИ";
+            SetPathLabel(result.Path);
         }
 
-        private string FormatSize(long bytes)
+        public void SetDuplicateResult(DuplicateAnalysisResult result)
+        {
+            this.result = result;
+            var rows = result.DuplicateGroups.Select(g => new
+            {
+                размер_одного = FormatSize(g.FileSize),
+                одинаковых_файлов = g.FileCount,
+                потерянное_место = FormatSize(g.TotalWastedSpace),
+                оригинал = g.OriginalFile.Path
+            }).ToList();
+
+            dataGrid.DataSource = rows;
+            Text = "РЕЗУЛЬТАТ ПОИСКА ДУБЛИКАТОВ";
+            SetPathLabel(result.Path);
+
+            ConfigureDuplicateResultColumns();
+        }
+
+        public static string FormatSize(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB", "TB" };
             double size = bytes;
@@ -68,6 +78,23 @@ namespace DiskAnalyzer.UI.Forms
             }
 
             return $"{size:0.##} {sizes[order]}";
+        }
+
+        public static string FormatSize(string bytes)
+        {
+            return FormatSize(long.Parse(bytes));
+        }
+
+        public static string FormatCount(string count)
+        {
+            int.TryParse(count, out var intCount);
+            int mod10 = intCount % 10;
+            int mod100 = intCount % 100;
+
+            if (mod100 >= 11 && mod100 <= 14) return $"{count} файлов";
+            if (mod10 == 1) return $"{count} файл";
+            if (mod10 >= 2 && mod10 <= 4) return $"{count} файла";
+            return $"{count} файлов";
         }
     }
 }

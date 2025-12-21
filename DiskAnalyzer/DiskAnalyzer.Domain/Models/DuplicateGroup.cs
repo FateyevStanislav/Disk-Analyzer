@@ -15,4 +15,5 @@ public record DuplicateGroup(
     long FileSize,
     int FileCount,
     long TotalWastedSpace,
+    FileDetails OriginalFile,  
     IReadOnlyList<FileDetails> Files);

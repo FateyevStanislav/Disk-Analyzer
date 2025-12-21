@@ -1,8 +1,12 @@
 using DiskAnalyzer.Api.Converters;
 using DiskAnalyzer.Api.Modules;
+using DiskAnalyzer.Api.Validation;
+using DiskAnalyzer.Api.Validation.Filters;
 using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using DiskAnalyzer.Domain.Services;
 using DiskAnalyzer.Infrastructure.FileSystem;
+using DiskAnalyzer.Infrastructure.Filters;
 using DiskAnalyzer.Infrastructure.Repositories;
 using System.Text.Json.Serialization;
 
@@ -11,10 +15,16 @@ ApiReflection.InitData();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IRepository, InMemoryRepository>();
-builder.Services.AddScoped<IFileSystemScanner, DirectoryWalker>();
-builder.Services.AddScoped<FilesMeasurer>();
-builder.Services.AddScoped<FilesGrouper>();
-builder.Services.AddScoped<DuplicatesFinder>();
+builder.Services.AddSingleton<IFileSystemScanner, DirectoryWalker>();
+builder.Services.AddScoped<IFilesMeasurer, FilesMeasurer>();
+builder.Services.AddScoped<IFilesGrouper, FilesGrouper>();
+builder.Services.AddScoped<IDuplicatesFinder, DuplicatesFinder>();
+
+FilterValidation.RegisterValidator(typeof(SizeFilter), new SizeFilterValidator());
+var tv = new TimeValidator();
+FilterValidation.RegisterValidator(typeof(AccessTimeFilter), tv);
+FilterValidation.RegisterValidator(typeof(CreationTimeFilter), tv);
+FilterValidation.RegisterValidator(typeof(WriteTimeFilter), tv);
 
 builder.Services.AddControllers().AddJsonOptions(
     options =>

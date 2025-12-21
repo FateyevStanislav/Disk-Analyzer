@@ -1,4 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Domain.Abstractions.Services;
 using DiskAnalyzer.Domain.Extensions;
 using DiskAnalyzer.Domain.Models.Results;
 
@@ -11,7 +12,7 @@ namespace DiskAnalyzer.Domain.Services;
 /// Более производительный чем FilesGrouper, когда группировка не требуется.
 /// Все измерения работают на общих экземплярах IFilesMeasurement.
 /// </remarks>
-public class FilesMeasurer(IFileSystemScanner scanner)
+public class FilesMeasurer(IFileSystemScanner scanner) : IFilesMeasurer
 {
     /// <summary>
     /// Собирает метрики по всем файлам в указанном пути.
@@ -33,8 +34,6 @@ public class FilesMeasurer(IFileSystemScanner scanner)
         ArgumentNullException.ThrowIfNull(measurements);
 
         var measurementsList = measurements.ToList();
-        if (measurementsList.Count == 0)
-            throw new ArgumentException("Нужен минимум 1 тип измерения", nameof(measurements));
 
         Action<FileInfo>? onFileAction = null;
 
