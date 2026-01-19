@@ -1,8 +1,7 @@
 ﻿using DiskAnalyzer.Api.Controllers.Dtos;
-using DiskAnalyzer.Domain.Abstractions;
+using DiskAnalyzer.Api.Factories;
 using DiskAnalyzer.Domain.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace DiskAnalyzer.Api.Controllers
 {
@@ -11,12 +10,10 @@ namespace DiskAnalyzer.Api.Controllers
     public class DuplicateFinderController : AnalysisControllerBase
     {
         private readonly IDuplicatesFinder duplicatesFinder;
-        private readonly IRepository repository;
 
-        public DuplicateFinderController(IDuplicatesFinder duplicatesFinder, IRepository repository)
+        public DuplicateFinderController(IDuplicatesFinder duplicatesFinder)
         {
             this.duplicatesFinder = duplicatesFinder;
-            this.repository = repository;
         }
 
         [HttpPost]

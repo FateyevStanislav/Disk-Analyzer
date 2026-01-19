@@ -1,5 +1,5 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Infrastructure.Filters;
+using DiskAnalyzer.Domain.Models.Filters;
 using System.Reflection;
 
 namespace DiskAnalyzer.Api.Modules;
@@ -12,27 +12,27 @@ public static class ApiReflection
 
     public static void InitData()
     {
-        var domainAssembly = typeof(ExtensionFilter).Assembly;
+        var infrastructureAssembly = typeof(ExtensionFilter).Assembly;
 
-        var filterTypes = domainAssembly.GetTypes().
-            Where(t => t.GetInterfaces().Contains(typeof(IFileFilter)));
+        var filterTypes = infrastructureAssembly.GetTypes()
+            .Where(t =>
+                t.IsClass 
+                && !t.IsAbstract 
+                && t.GetInterfaces().Contains(typeof(IFileFilter)) 
+                && t != typeof(CompositeFilter)              
+            );
 
-        foreach (var f in filterTypes)
+        foreach (var filterType in filterTypes)
         {
-            if (f == typeof(CompositeFilter))
-            {
-                continue;
-            }
-
-            var constructor = f.GetConstructors().FirstOrDefault();
+            var constructor = filterType.GetConstructors().FirstOrDefault();
 
             if (constructor == null)
             {
-                throw new Exception($"No constructor in filter {f.Name}");
+                throw new Exception($"No public constructor in filter {filterType.Name}");
             }
-            var constructorParams = constructor.GetParameters();
 
-            filtersInfo.Add(f.Name, new FilterFactoryInfo(f, constructorParams));
+            var constructorParams = constructor.GetParameters();
+            filtersInfo.Add(filterType.Name, new FilterFactoryInfo(filterType, constructorParams));
         }
     }
 

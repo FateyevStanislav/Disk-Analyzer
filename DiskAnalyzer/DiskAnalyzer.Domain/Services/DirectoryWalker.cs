@@ -1,8 +1,7 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
 using Microsoft.Extensions.Logging;
 
-namespace DiskAnalyzer.Infrastructure.FileSystem;
-
+namespace DiskAnalyzer.Domain.Services;
 
 public class DirectoryWalker(ILogger<DirectoryWalker> logger) : IFileSystemScanner
 {

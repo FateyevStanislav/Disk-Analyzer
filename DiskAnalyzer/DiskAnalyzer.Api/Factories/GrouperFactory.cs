@@ -1,33 +1,32 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Infrastructure.Groupers;
+using DiskAnalyzer.Domain.Models.Groupers;
 
-namespace DiskAnalyzer.Api.Factories
+namespace DiskAnalyzer.Api.Factories;
+
+public enum FilesGroupingType
 {
-    public enum FilesGroupingType
-    {
-        Extension,
-        LastAcessTime,
-        SizeBucket
-    }
+    Extension,
+    LastAcessTime,
+    SizeBucket
+}
 
-    public static class GrouperFactory
+public static class GrouperFactory
+{
+    public static IFileGrouper? Create(FilesGroupingType groupingType)
     {
-        public static IFileGrouper? Create(FilesGroupingType groupingType)
+        switch (groupingType)
         {
-            switch (groupingType)
-            {
-                case FilesGroupingType.Extension:
-                    return new ExtensionGrouper();
+            case FilesGroupingType.Extension:
+                return new ExtensionGrouper();
 
-                case FilesGroupingType.LastAcessTime:
-                    return new LastAccessTimeGrouper();
+            case FilesGroupingType.LastAcessTime:
+                return new LastAccessTimeGrouper();
 
-                case FilesGroupingType.SizeBucket:
-                    return new SizeBucketGrouper();
+            case FilesGroupingType.SizeBucket:
+                return new SizeBucketGrouper();
 
-                default:
-                    throw new Exception("Uncorrect grouper type");
-            }
+            default:
+                throw new Exception("Uncorrect grouper type");
         }
     }
 }

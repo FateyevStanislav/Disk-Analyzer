@@ -1,6 +1,6 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
 
-namespace DiskAnalyzer.Infrastructure.Filters;
+namespace DiskAnalyzer.Domain.Models.Filters;
 
 public class CompositeFilter : ICompositeFilter
 {

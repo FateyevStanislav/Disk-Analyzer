@@ -2,7 +2,9 @@
 using DiskAnalyzer.Api.Modules;
 using DiskAnalyzer.Api.Validation;
 using DiskAnalyzer.Domain.Abstractions;
-using DiskAnalyzer.Infrastructure.Filters;
+using DiskAnalyzer.Domain.Models.Filters;
+
+namespace DiskAnalyzer.Api.Factories;
 
 public static class FilterFactory
 {

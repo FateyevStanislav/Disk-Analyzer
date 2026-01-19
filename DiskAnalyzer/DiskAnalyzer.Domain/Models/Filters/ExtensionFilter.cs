@@ -1,7 +1,7 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Attributes;
 
-namespace DiskAnalyzer.Infrastructure.Filters;
+namespace DiskAnalyzer.Domain.Models.Filters;
 
 [FilterType("Extension")]
 public class ExtensionFilter : IFileFilter

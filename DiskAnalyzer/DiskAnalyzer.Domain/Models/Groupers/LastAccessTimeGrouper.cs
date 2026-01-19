@@ -1,7 +1,7 @@
 ﻿using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Attributes;
 
-namespace DiskAnalyzer.Infrastructure.Groupers;
+namespace DiskAnalyzer.Domain.Models.Groupers;
 
 [GrouperType("LastAccessTime")]
 public class LastAccessTimeGrouper : IFileGrouper

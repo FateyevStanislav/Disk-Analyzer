@@ -4,9 +4,9 @@ using DiskAnalyzer.Api.Validation;
 using DiskAnalyzer.Api.Validation.Filters;
 using DiskAnalyzer.Domain.Abstractions;
 using DiskAnalyzer.Domain.Abstractions.Services;
+using DiskAnalyzer.Domain.Models.Filters;
+using DiskAnalyzer.Domain.Models.Results;
 using DiskAnalyzer.Domain.Services;
-using DiskAnalyzer.Infrastructure.FileSystem;
-using DiskAnalyzer.Infrastructure.Filters;
 using DiskAnalyzer.Infrastructure.Repositories;
 using System.Text.Json.Serialization;
 
@@ -14,7 +14,12 @@ ApiReflection.InitData();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<IRepository, InMemoryRepository>();
+builder.Services.AddSingleton<IRepository<AnalysisResult>>(
+    new InMemoryRepository<AnalysisResult>(
+        getIdFunc: r => r.Id,
+        getDateFunc: r => r.CreatedAt
+    )
+);
 builder.Services.AddSingleton<IFileSystemScanner, DirectoryWalker>();
 builder.Services.AddScoped<IFilesMeasurer, FilesMeasurer>();
 builder.Services.AddScoped<IFilesGrouper, FilesGrouper>();

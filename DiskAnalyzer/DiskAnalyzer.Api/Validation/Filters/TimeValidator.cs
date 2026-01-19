@@ -1,4 +1,4 @@
-﻿using DiskAnalyzer.Infrastructure.Filters;
+﻿using DiskAnalyzer.Domain.Models.Filters;
 
 namespace DiskAnalyzer.Api.Validation.Filters;
 
