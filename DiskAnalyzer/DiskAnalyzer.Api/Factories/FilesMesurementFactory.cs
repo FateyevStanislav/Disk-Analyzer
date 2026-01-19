@@ -9,7 +9,7 @@ public enum FilesMeasurementType
     Size
 }
 
-public static class FilesMesurementFactory
+internal static class FilesMesurementFactory
 {
     public static IEnumerable<IFilesMeasurement> Create(IEnumerable<FilesMeasurementType> measurements)
     {

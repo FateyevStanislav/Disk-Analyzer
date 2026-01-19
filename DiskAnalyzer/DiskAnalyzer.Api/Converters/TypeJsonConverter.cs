@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace DiskAnalyzer.Api.Converters;
 
-public class TypeJsonConverter : JsonConverter<Type>
+internal class TypeJsonConverter : JsonConverter<Type>
 {
     public override Type Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

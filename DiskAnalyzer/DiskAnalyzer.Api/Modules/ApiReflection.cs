@@ -4,9 +4,9 @@ using System.Reflection;
 
 namespace DiskAnalyzer.Api.Modules;
 
-public record FilterFactoryInfo(Type filterType, ParameterInfo[] parameters);
+internal record FilterFactoryInfo(Type filterType, ParameterInfo[] parameters);
 
-public static class ApiReflection
+internal static class ApiReflection
 {
     private static Dictionary<string, FilterFactoryInfo> filtersInfo = new();
 

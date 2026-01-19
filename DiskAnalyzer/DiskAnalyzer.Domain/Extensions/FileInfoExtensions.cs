@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Domain.Extensions;
 
-public static class FileInfoExtensions
+internal static class FileInfoExtensions
 {
     public static byte[] GetFileContentHash(this FileInfo file)
     {

@@ -1,6 +1,6 @@
 ﻿using DiskAnalyzer.Api.Controllers.Dtos;
 using DiskAnalyzer.Domain.Models.Results;
-public interface IApiClient
+internal interface IApiClient
 {
     // Основные методы анализа
     Task<MeasurementAnalysisResult> CreateMeasurementAsync(FilesMeasurementDto request);

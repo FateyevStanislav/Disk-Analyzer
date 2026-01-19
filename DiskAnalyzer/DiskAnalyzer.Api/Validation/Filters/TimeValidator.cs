@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Api.Validation.Filters;
 
-public class TimeValidator : IFilterValidator
+internal class TimeValidator : IFilterValidator
 {
     public void Validate(object value)
     {

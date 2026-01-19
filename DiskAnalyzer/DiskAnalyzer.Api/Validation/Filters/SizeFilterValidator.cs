@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Api.Validation.Filters
 {
-    public class SizeFilterValidator : IFilterValidator
+    internal class SizeFilterValidator : IFilterValidator
     {
         public void Validate(object value)
         {

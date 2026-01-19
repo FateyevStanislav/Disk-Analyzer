@@ -6,7 +6,7 @@ using DiskAnalyzer.Domain.Models.Filters;
 
 namespace DiskAnalyzer.Api.Factories;
 
-public static class FilterFactory
+internal static class FilterFactory
 {
     public static IFileFilter? Create(IEnumerable<FilterDto>? filters)
     {

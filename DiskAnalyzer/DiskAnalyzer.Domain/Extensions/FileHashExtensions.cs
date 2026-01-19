@@ -1,6 +1,6 @@
 ﻿namespace DiskAnalyzer.Domain.Extensions;
 
-public static class FileHashExtensions
+internal static class FileHashExtensions
 {
     public static IEnumerable<IGrouping<string, FileInfo>> GroupByHash(
         this IEnumerable<FileInfo> files,

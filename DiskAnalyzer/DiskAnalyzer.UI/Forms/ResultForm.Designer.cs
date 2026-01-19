@@ -3,7 +3,7 @@ using DiskAnalyzer.Infrastructure;
 
 namespace DiskAnalyzer.UI.Forms
 {
-    public partial class ResultForm
+    internal partial class ResultForm
     {
         private IApiClient apiClient = new ApiClient(new HttpClient());
         private System.ComponentModel.IContainer components = null;

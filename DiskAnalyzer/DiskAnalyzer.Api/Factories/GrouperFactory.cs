@@ -10,7 +10,7 @@ public enum FilesGroupingType
     SizeBucket
 }
 
-public static class GrouperFactory
+internal static class GrouperFactory
 {
     public static IFileGrouper? Create(FilesGroupingType groupingType)
     {

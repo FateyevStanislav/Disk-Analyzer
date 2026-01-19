@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using DiskAnalyzer.Domain.Models.Results;
 
-public class ApiClient : IApiClient
+internal class ApiClient : IApiClient
 {
     private readonly HttpClient _httpClient;
 

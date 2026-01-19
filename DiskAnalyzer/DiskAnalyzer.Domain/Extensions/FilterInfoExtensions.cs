@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DiskAnalyzer.Domain.Extensions;
 
-public static class FilterInfoExtensions
+internal static class FilterInfoExtensions
 {
     private static readonly ConcurrentDictionary<Type, (string typeName, PropertyInfo[] props)> _cache = new();
 

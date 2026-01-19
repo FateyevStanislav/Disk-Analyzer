@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace DiskAnalyzer.UI
 {
-    partial class MainWindow
+    internal partial class MainWindow
     {
         private System.ComponentModel.IContainer components = null;
         private IApiClient apiClient = new ApiClient(new HttpClient());

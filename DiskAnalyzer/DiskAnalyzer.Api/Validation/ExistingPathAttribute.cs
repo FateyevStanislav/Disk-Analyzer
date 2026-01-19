@@ -2,7 +2,7 @@
 
 namespace DiskAnalyzer.Api.Validation;
 
-public sealed class ExistingPathAttribute : ValidationAttribute
+internal sealed class ExistingPathAttribute : ValidationAttribute
 {
     protected override ValidationResult? IsValid(object?  value, ValidationContext context)
     {

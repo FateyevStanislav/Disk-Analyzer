@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace DiskAnalyzer.UI.Forms
 {
-    public partial class ResultForm : Form
+    internal partial class ResultForm : Form
     {
         public ResultForm()
         {

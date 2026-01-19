@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace DiskAnalyzer.Domain.Extensions;
 
-public static class GrouperInfoExtensions
+internal static class GrouperInfoExtensions
 {
     private static readonly ConcurrentDictionary<Type, string> cache = new();
 
