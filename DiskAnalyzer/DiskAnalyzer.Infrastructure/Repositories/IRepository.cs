@@ -2,17 +2,15 @@
 
 public interface IRepository<T> where T : class
 {
-    Task AddAsync(T record, CancellationToken cancellationToken = default);
+    Task AddAsync(T record);
 
-    Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<T?> GetByIdAsync(Guid id);
 
-    Task<IReadOnlyList<T>> GetAllOrderedAsync(
-        bool descending = false,
-        CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<T>> GetAllOrderedAsync(bool descending = false);
 
-    Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<bool> RemoveAsync(Guid id);
 
-    Task<int> CountAsync(CancellationToken cancellationToken = default);
+    Task<int> CountAsync();
 
-    Task ClearAsync(CancellationToken cancellationToken = default);
+    Task ClearAsync();
 }
