@@ -17,6 +17,8 @@ namespace DiskAnalyzer.UI
         private Dictionary<string, string> _filterParameters = new();
         private bool historyOpened = false;
         private AnalysisResult selectedHistoryRecord;
+        private const int mainWindowY = 650;
+        private const int mainWindowX = 650;
 
         protected override void Dispose(bool disposing)
         {
@@ -163,8 +165,8 @@ namespace DiskAnalyzer.UI
             groupingListBox.TabIndex = 11;
             groupingListBox.Items.AddRange(new object[] { "Extension", "LastAccessTime", "SizeBucket" });
 
-            historyDataGrid.Location = new Point(650, 0);
-            historyDataGrid.Size = new Size(650, 580);
+            historyDataGrid.Location = new Point(mainWindowX, 0);
+            historyDataGrid.Size = new Size(mainWindowX, mainWindowY);
             historyDataGrid.Visible = false;
             historyDataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             historyDataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -219,7 +221,8 @@ namespace DiskAnalyzer.UI
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.GradientActiveCaption;
-            ClientSize = new Size(649, 580);
+            ClientSize = new Size(mainWindowX, mainWindowY);
+
             Controls.Add(duplicateCheckBox);
             Controls.Add(groupingListBox);
             Controls.Add(metricsListBox);
@@ -235,8 +238,9 @@ namespace DiskAnalyzer.UI
             Controls.Add(showHistoryButton);
             Controls.Add(historyDataGrid);
             Controls.Add(historyDetailPanel);
+            showHistoryButton.BringToFront();
             Margin = new Padding(4, 3, 4, 3);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
+            FormBorderStyle = FormBorderStyle.Sizable;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "MainWindow";
@@ -426,13 +430,13 @@ namespace DiskAnalyzer.UI
 
             if (historyOpened)
             {
-                ClientSize = new Size(1300, 580);
+                ClientSize = new Size(2 * mainWindowX, mainWindowY);
                 await LoadHistoryToDataGrid();
                 HideHistoryDetail();
             }
             else
             {
-                ClientSize = new Size(650, 580);
+                ClientSize = new Size(mainWindowX, mainWindowY);
                 HideHistoryDetail();
             }
         }
